@@ -35,8 +35,8 @@ const SignupForm = () => {
         </p>
       </div>
       <div>
-        <div className="flex justify-between mt-4">
-          <div className="flex flex-col gap-1.5 w-[48%]">
+        <div className="flex flex-col md:flex-row justify-between mt-4">
+          <div className="flex flex-col gap-1.5 w-full md:w-[48%]">
             <label htmlFor="firstName">First Name*</label>
             <input
               type="text"
@@ -48,7 +48,7 @@ const SignupForm = () => {
             />
           </div>
 
-          <div className="flex flex-col gap-1.5 w-[48%]">
+          <div className="flex flex-col gap-1.5 w-full md:w-[48%] mt-4 md:mt-0">
             <label htmlFor="lastName">Last Name*</label>
             <input
               type="text"
@@ -65,8 +65,8 @@ const SignupForm = () => {
           numbers or special characters.
         </p>
       </div>
-      <div className="flex justify-between mt-4">
-        <div className="flex flex-col gap-1.5 w-[48%]">
+      <div className="flex flex-col md:flex-row justify-between mt-4">
+        <div className="flex flex-col gap-1.5 w-full md:w-[48%]">
           <label htmlFor="idNumber">Identification Number*</label>
           <input
             type="number"
@@ -78,7 +78,7 @@ const SignupForm = () => {
           />
         </div>
 
-        <div className="flex flex-col gap-1.5 w-[48%]">
+        <div className="flex flex-col gap-1.5 w-full md:w-[48%] mt-4 md:mt-0">
           <label htmlFor="DOB">Date Of Birth*</label>
           <input
             type="date"
@@ -93,7 +93,7 @@ const SignupForm = () => {
       <input
         type="submit"
         value="Continue"
-        className="border-2 w-full rounded-md mt-4 p-2.5 text-lg cursor-pointer bg-[#1f2328] text-white hover:bg-[#32383f]"
+        className="border-2 w-full rounded-md mt-4 p-2.5 text-lg cursor-pointer bg-[#1f2328] text-white hover:bg-[#32383f] mb-8 "
       />
     </form>
   );
