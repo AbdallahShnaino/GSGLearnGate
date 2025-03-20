@@ -1,13 +1,8 @@
-"use client";
 import React from "react";
 
 const SignupForm = () => {
-  const submitForm = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-  };
-
   return (
-    <form onSubmit={submitForm}>
+    <form>
       <div className="flex flex-col mt-4 gap-1.5">
         <label htmlFor="email">Email*</label>
         <input
