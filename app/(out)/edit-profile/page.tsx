@@ -1,3 +1,4 @@
+import EditEmailAddress from "@/components/EditEmailAddress/EditEmailAddress";
 import EditPersonalInformation from "@/components/EditPersonalInformation/EditPersonalInformation";
 import EditProfileImage from "@/components/EditProfileImage/EditProfileImage";
 import { SkipBack } from "@phosphor-icons/react/dist/ssr";
@@ -20,6 +21,7 @@ const EditProfilePage = () => {
       <div className="border-2 rounded-lg p-5 flex flex-col gap-5">
         <EditProfileImage />
         <EditPersonalInformation />
+        <EditEmailAddress />
       </div>
     </div>
   );

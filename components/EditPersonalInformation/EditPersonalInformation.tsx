@@ -6,7 +6,6 @@ const EditPersonalInformation = () => {
     firstName: "Mohammed",
     lastName: "Qashqesh",
     dateOfBirth: "2003-12-18",
-    email: "mo.qashqesh@gmail.com",
   };
   //================{For Test}======================
 
@@ -28,8 +27,8 @@ const EditPersonalInformation = () => {
           <p className="text-[#777] text-sm">{user.lastName}</p>
         </div>
         <div>
-          <p className="text-lg font-bold">Email Address</p>
-          <p className="text-[#777] text-sm">{user.email}</p>
+          <p className="text-lg font-bold">Date Of Birth</p>
+          <p className="text-[#777] text-sm">{user.dateOfBirth}</p>
         </div>
       </div>
     </div>
