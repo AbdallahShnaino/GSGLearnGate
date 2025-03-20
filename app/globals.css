@@ -29,15 +29,10 @@ body {
 }
 
 /* لإزالة الأسهم في متصفحات WebKit (Chrome, Safari, Edge) */
-#idNumber::-webkit-outer-spin-button,
-#idNumber::-webkit-inner-spin-button {
+::-webkit-outer-spin-button,
+::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
-}
-
-/* لإزالة الأسهم في Firefox */
-#idNumber {
-  -moz-appearance: textfield;
 }
 
 .bg-signup {
