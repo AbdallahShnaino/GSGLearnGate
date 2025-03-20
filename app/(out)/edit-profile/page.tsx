@@ -1,3 +1,4 @@
+import EditPersonalInformation from "@/components/EditPersonalInformation/EditPersonalInformation";
 import EditProfileImage from "@/components/EditProfileImage/EditProfileImage";
 import { SkipBack } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
@@ -16,8 +17,9 @@ const EditProfilePage = () => {
         </Link>
         <p className="text-lg mt-2">Account information</p>
       </div>
-      <div className="border-2 rounded-lg p-5">
+      <div className="border-2 rounded-lg p-5 flex flex-col gap-5">
         <EditProfileImage />
+        <EditPersonalInformation />
       </div>
     </div>
   );
