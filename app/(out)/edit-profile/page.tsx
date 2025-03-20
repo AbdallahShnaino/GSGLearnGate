@@ -1,4 +1,5 @@
 import EditEmailAddress from "@/components/EditEmailAddress/EditEmailAddress";
+import EditPassword from "@/components/EditPassword/EditPassword";
 import EditPersonalInformation from "@/components/EditPersonalInformation/EditPersonalInformation";
 import EditProfileImage from "@/components/EditProfileImage/EditProfileImage";
 import { SkipBack } from "@phosphor-icons/react/dist/ssr";
@@ -7,7 +8,7 @@ import React from "react";
 
 const EditProfilePage = () => {
   return (
-    <div className="h-dvh flex flex-col gap-5 justify-center w-[85%] m-auto">
+    <div className="flex flex-col gap-5 justify-center w-[85%] mx-auto my-8">
       <div>
         <Link
           href={"/"}
@@ -18,10 +19,11 @@ const EditProfilePage = () => {
         </Link>
         <p className="text-lg mt-2">Account information</p>
       </div>
-      <div className="border-2 rounded-lg p-5 flex flex-col gap-5">
+      <div className="border-1 border-gray-400 shadow-xl rounded-lg p-5 flex flex-col gap-5">
         <EditProfileImage />
         <EditPersonalInformation />
         <EditEmailAddress />
+        <EditPassword />
       </div>
     </div>
   );
