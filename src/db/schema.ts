@@ -6,6 +6,13 @@ import {
   text,
 } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
+import {
+  AssignmentStatus,
+  Attachment,
+  Difficulty,
+  Role,
+  Status,
+} from "@/types/index";
 
 const timestamps = {
   updatedAt: text("updated_at")
