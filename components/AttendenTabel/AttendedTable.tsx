@@ -8,16 +8,6 @@ const AttendedTable = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [Absent, setAbsent] = useState(0);
   const [status, setStatus] = useState('Attended');
-  const [Notify, setNotify] = useState(false);
-  const handleNotify = () => {
-    if(!Notify)
-    setNotify(true);
-    else
-    cancelNotification();
-  }
-  const cancelNotification = () => {
-    setNotify(false);
-};
   const addAbsent = () => {
     setAbsent(Absent + 1);
     
@@ -46,9 +36,9 @@ const AttendedTable = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="max-w-3xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
+      <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         {/* Search & Actions */}
-        <div className="flex items-center justify-between flex-wrap space-y-4 md:space-y-0 p-4 bg-gray-50 dark:bg-gray-900">
+        <div className="flex items-center justify-between flex-wrap space-y-4 md:space-y-0 p-4 bg-[#E99375]">
 
           {/* Search Bar */}
           <div className="relative">
@@ -70,7 +60,7 @@ const AttendedTable = () => {
         {/* Table */}
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left text-gray-500">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-100">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-100 ">
               <tr>
                
                   
@@ -79,16 +69,17 @@ const AttendedTable = () => {
                 <th className="px-6 py-3">Absent</th>
                 <th className="px-6 py-3">Status</th>
                 <th className="px-6 py-3">Notification</th>
+                <th className="px-6 py-3">Cancel</th>
                 <th className="px-6 py-3">Modify Absences</th>
               </tr>
             </thead>
             <tbody>
-            <tr className="bg-white border-b hover:bg-gray-50 h-full items-center">
+            <tr className="bg-white border-b hover:bg-gray-50 h-full ">
                 <td className="flex items-center px-6 py-1.5 text-gray-900">
                     <Image className="rounded-full" src={"/docs/images/people/profile-picture-4.jpg"} alt="User" width={20} height={20}/>
                     <div className="ml-3">
                     <div className="text-base font-semibold">Neil Sims</div>
-                    <div className="text-gray-500">neil.sims@flowbite.com</div>
+                    <div className="text-gray-500 text-xs">neil.sims@flowbite.com</div>
                     </div>
                 </td>
                 <td className="px-6 py-1.5 table-cell align-middle ">{Absent}</td>
@@ -97,16 +88,20 @@ const AttendedTable = () => {
                         {status}
                     </div>
                 </td>
+                <td className="px-6 py-1.5 table-cell align-middle ">
+                    <button className="text-green-600 cursor-pointer m-0.5">Notify</button>
+                    
+                    
+                </td>
                 <td className="px-6 py-1.5 table-cell align-middle">
-                    <button className={`${!Notify?'text-green-700':'text-red-600'} cursor-pointer`} onClick={handleNotify}>{Notify ? "Cancel" : "Notify"}</button>
-                    
-                    
+                <button className="text-red-600 cursor-pointer">Cancel</button>
                 </td>
                 <td className="px-6 py-1.5 table-cell align-middle">
                     <div className="flex  gap-3">
                     <button>
                     <Plus 
                         size={27} 
+                        weight="bold"
                         className="bg-[#393E46] text-white rounded-md p-2 transform transition-transform duration-300 hover:scale-110 cursor-pointer"
                         onClick={addAbsent}
                     />
@@ -114,7 +109,8 @@ const AttendedTable = () => {
                     <button>
                     <Minus 
                     size={27} 
-                    className=" text-[#393E46] bg-[#00ADB5] rounded-md p-2 transform transition-transform duration-300 hover:scale-110 cursor-pointer"
+                    weight="bold"
+                    className=" text-[#393E46] bg-[#319DC4] rounded-md p-2 transform transition-transform duration-300 hover:scale-110 cursor-pointer"
                     onClick={removeAbsent}
                     />
                     </button>
