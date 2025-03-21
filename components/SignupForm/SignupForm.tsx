@@ -35,7 +35,7 @@ const SignupForm = () => {
             <label htmlFor="firstName">First Name*</label>
             <input
               type="text"
-              name="firstName"
+              name="first_name"
               id="firstName"
               placeholder="First Name"
               className="border-1 border-gray-400 rounded-md px-1.5 py-1.5 focus:outline-blue-500"
@@ -47,7 +47,7 @@ const SignupForm = () => {
             <label htmlFor="lastName">Last Name*</label>
             <input
               type="text"
-              name="lastName"
+              name="last_name"
               id="lastName"
               placeholder="Last Name"
               className="border-1 border-gray-400 rounded-md px-1.5 py-1.5 focus:outline-blue-500"
@@ -65,7 +65,7 @@ const SignupForm = () => {
           <label htmlFor="idNumber">Identification Number*</label>
           <input
             type="number"
-            name="idNumber"
+            name="id"
             id="idNumber"
             placeholder="Identification Number"
             className="border-1 border-gray-400 rounded-md px-1.5 py-1.5 focus:outline-blue-500"
@@ -77,7 +77,7 @@ const SignupForm = () => {
           <label htmlFor="DOB">Date Of Birth*</label>
           <input
             type="date"
-            name="DOB"
+            name="date_of_birth"
             id="DOB"
             placeholder="Date Of Birth"
             className="border-1 border-gray-400 rounded-md px-1.5 py-1.5 focus:outline-blue-500"
