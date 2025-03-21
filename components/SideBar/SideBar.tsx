@@ -25,14 +25,14 @@ export default function Sidebar({ links }: IProps) {
         <List size={32} />
       </button>
       <aside
-        className={`bg-[#FFF5E8] w-72 h-screen text-white p-4 flex flex-col fixed top-0 left-0 transform transition-transform duration-300 ${
+        className={`bg-[#FFF5E8] w-64 h-screen text-white p-4 flex flex-col fixed top-0 left-0 transform transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         } md:relative md:translate-x-0`}
       >
         <div className="flex justify-center items-center gap-2 mb-8 pt-4">
           <Image src="/img/gsgLogo.png" width={50} height={50} alt="gsgLogo" />
-          <h1 className="text-[#8c9294] font-semibold text-lg">
-            Gaza Sky Geeks
+          <h1 className="text-gray-600 font-semibold text-lg">
+            Gaza <span className="font-normal">Sky</span> Geeks
           </h1>
           <button
             className="md:hidden text-[#E99375]"
@@ -50,18 +50,18 @@ export default function Sidebar({ links }: IProps) {
                 <li key={href}>
                   <Link
                     href={href}
-                    className="flex items-center p-3 rounded-lg transition-colors duration-200"
+                    className="flex items-center p-1 rounded-lg transition-colors duration-200"
                     onClick={() => setIsOpen(false)}
                   >
                     <div
-                      className={`flex items-center gap-3 w-full p-3 rounded-lg ${
+                      className={`flex items-center gap-2 w-full p-3 rounded-lg ${
                         isActive
                           ? "bg-[#FFA41F] text-white font-medium"
-                          : "text-gray-100 bg-[#E99375] hover:text-white"
+                          : "text-gray-500 font-bold hover:bg-[#e6b77083] hover:text-white "
                       }`}
                     >
                       <div>{icon}</div>
-                      <div>{label}</div>
+                      <div className="text-[15px]">{label}</div>
                     </div>
                   </Link>
                 </li>
@@ -70,9 +70,9 @@ export default function Sidebar({ links }: IProps) {
           </ul>
         </nav>
         <div className="mt-auto pt-4 border-t border-[#4A4F57]">
-          <div className="flex items-center gap-3 p-3 cursor-pointer">
+          <div className="flex items-center gap-2 p-2 cursor-pointer rounded-lg  hover:bg-red-100  hover:text-white">
             <SignOut size={24} />
-            <p className="font-medium text-[#8c9294]">Log Out</p>
+            <p className=" text-red-400 font-bold text-[14px]">Log Out</p>
           </div>
         </div>
       </aside>
