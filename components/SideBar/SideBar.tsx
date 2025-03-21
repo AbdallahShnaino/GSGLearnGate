@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SidebarLink } from "@/types/user";
-import { SignOut, List} from "phosphor-react";
+import { SignOut, List } from "@phosphor-icons/react/dist/ssr";
 
 interface IProps {
   links: SidebarLink[];
