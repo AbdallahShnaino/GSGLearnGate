@@ -11,32 +11,32 @@ import { SidebarLink } from "@/types/user";
 
 export const links: SidebarLink[] = [
   {
-    href: "/dashboard",
+    href: "/admin/dashboard",
     label: "Dashboard",
     icon: <House size={24} weight="bold" />,
   },
   {
-    href: "/courses",
+    href: "/admin/courses",
     label: "Courses",
     icon: <Book size={24} weight="bold" />,
   },
   {
-    href: "/monitors",
+    href: "/admin/monitors",
     label: "Monitors",
     icon: <UserGear size={24} weight="bold" />,  // Updated icon
   },
   {
-    href: "/co-monitors",
+    href: "/admin/co-monitors",
     label: "Co-Monitors",
     icon: <Users size={24} weight="bold" />,
   },
   {
-    href: "/students",
+    href: "/admin/students",
     label: "Students",
     icon: <Student size={24} weight="bold" />,
   },
   {
-    href: "/announcement",
+    href: "/admin/announcement",
     label: "Announcement",
     icon: <Megaphone size={24} weight="bold" />,
   },
