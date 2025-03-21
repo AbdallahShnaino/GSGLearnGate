@@ -38,7 +38,7 @@ const EditPersonalInformation = () => {
           <p className="text-[#777] text-sm">{user.dateOfBirth}</p>
         </div>
       </div>
-      {openModal && <EditProfileModal onClose={() => setOpenModal(false)} />}
+      {openModal && <EditProfileModal onClose={() => setOpenModal(false)} typeOfEdit="editPersonalInformation" />}
     </div>
   );
 };
