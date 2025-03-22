@@ -3,9 +3,11 @@ import React, { useState } from "react";
 import HeaderLogo from "../HeaderLogo/HeaderLogo";
 import NavLinks from "../NavLinks/NavLinks";
 import UserMenu from "../UserMenu/UserMenu";
+import { List } from "@phosphor-icons/react/dist/ssr";
 
 const HeaderNav = () => {
   const [showUserDetails, setShowUserDetails] = useState(false);
+  const [showNav, setShowNav] = useState(false);
   const [login, setLogin] = useState(true);
   const user = {
     first_name: "Mohammed",
@@ -17,13 +19,18 @@ const HeaderNav = () => {
   return (
     <header className="md:w-[750] lg:w-[970] xl:w-[1170] m-auto px-[15] flex items-center justify-between">
       <HeaderLogo />
-      <NavLinks />
+      <NavLinks showNav={showNav} setShowNav={setShowNav} />
       <UserMenu
         user={user}
         showUserDetails={showUserDetails}
         setShowUserDetails={setShowUserDetails}
         login={login}
         setLogin={setLogin}
+      />
+      <List
+        onClick={() => setShowNav(!showNav)}
+        size={26}
+        className="cursor-pointer lg:hidden"
       />
     </header>
   );
