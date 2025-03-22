@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.5-alpha.3",
+    "framer-motion": "^12.5.0",
     "next": "15.2.3",
     "phosphor-react": "^1.4.1",
     "react": "^19.0.0",
