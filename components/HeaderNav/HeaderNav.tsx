@@ -17,7 +17,7 @@ const HeaderNav = () => {
   };
 
   return (
-    <header className="md:w-[750] lg:w-[970] xl:w-[1170] m-auto px-[15] flex items-center justify-between">
+    <header className="md:w-[750] lg:w-[970] xl:w-[1170] m-auto px-[15] flex items-center justify-between lg:absolute lg:left-1/2 lg:-translate-x-1/2 z-50">
       <HeaderLogo />
       <NavLinks showNav={showNav} setShowNav={setShowNav} />
       <UserMenu

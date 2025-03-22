@@ -37,7 +37,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
             />
           </div>
           {showUserDetails && (
-            <div className="absolute border-1 border-gray-300 shadow-lg top-12 right-0 py-2 rounded-md w-60">
+            <div className="absolute border-1 border-gray-300 shadow-lg top-12 right-0 py-2 rounded-md w-60 bg-white">
               <div className="pb-2 border-b-1 border-gray-300 px-2">
                 <div>
                   <span className="text-sm">{user.first_name} </span>

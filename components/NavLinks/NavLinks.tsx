@@ -16,10 +16,10 @@ const NavLinks: React.FC<ShowNavProps> = ({ showNav, setShowNav }) => {
       onClick={() => setShowNav(false)}
     >
       <ul className="flex items-center max-lg:z-50 max-lg:w-[70%] max-lg:h-dvh max-lg:flex-col max-lg:items-start max-lg:bg-white max-lg:relative ">
-        <li className="max-lg:absolute lg:hidden right-2.5 top-2.5">
+        <li className="text-white font-bold max-lg:absolute lg:hidden right-2.5 top-2.5">
           <X size={25} onClick={() => setShowNav(false)} />
         </li>
-        <li className="max-lg:mt-10 max-lg:w-full">
+        <li className="text-white font-bold max-lg:mt-10 max-lg:w-full">
           <Link
             className="max-lg:text-lg py-2 px-4 hover:text-[var(--primary-color)]  max-lg:py-4 max-lg:w-full max-lg:block"
             href={"/"}
@@ -27,7 +27,7 @@ const NavLinks: React.FC<ShowNavProps> = ({ showNav, setShowNav }) => {
             Home
           </Link>
         </li>
-        <li className="max-lg:w-full">
+        <li className="text-white font-bold max-lg:w-full">
           <Link
             className="max-lg:text-lg py-2 px-4 hover:text-[var(--primary-color)]  max-lg:py-4 max-lg:w-full max-lg:block"
             href={"/about-us"}
@@ -35,7 +35,7 @@ const NavLinks: React.FC<ShowNavProps> = ({ showNav, setShowNav }) => {
             About Us
           </Link>
         </li>
-        <li className="max-lg:w-full">
+        <li className="text-white font-bold max-lg:w-full">
           <Link
             className="max-lg:text-lg py-2 px-4 hover:text-[var(--primary-color)]  max-lg:py-4 max-lg:w-full max-lg:block"
             href={"/contact-us"}
@@ -43,7 +43,7 @@ const NavLinks: React.FC<ShowNavProps> = ({ showNav, setShowNav }) => {
             Contact Us
           </Link>
         </li>
-        <li className="max-lg:w-full">
+        <li className="text-white font-bold max-lg:w-full">
           <Link
             className="max-lg:text-lg py-2 px-4 hover:text-[var(--primary-color)]  max-lg:py-4 max-lg:w-full max-lg:block"
             href={"/fq"}
