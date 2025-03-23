@@ -1,17 +1,18 @@
 'use client';
 import { useState } from 'react';
-import { Plus, Minus, MagnifyingGlass } from '@phosphor-icons/react';
+import { Plus, Minus } from '@phosphor-icons/react';
 import Image from 'next/image';
 import { Student } from '@/types/students';
 import { Students } from '@/services/mock';
+import SearchBar from '../SearchBar/SearchBar';
+import { useSearch } from '@/hooks/useSearch';
 
 const AttendedTable = () => {
-  const [searchTerm, setSearchTerm] = useState('');
   const [students, setStudents] = useState<Student[]>(Students);
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  };
+  const { value: searchQuery, updateSearchParam } = useSearch('search');
+  const filteredAttended = students.filter((student) =>
+      student.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
   // Function to update absence count
   const updateAbsent = (userId: number, change: number) => {
@@ -37,28 +38,11 @@ const AttendedTable = () => {
     return 'Absentee';
   };
 
-  // Filter students based on search term
-  const filteredStudents = students.filter((student) =>
-    student.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+
 
   return (
     <div className="container mx-auto p-4">
-      {/* Search Bar */}
-<div className="flex items-center justify-between flex-wrap space-y-4 md:space-y-0 p-4 w-full mb-2">
-  <div className="relative">
-    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-    <MagnifyingGlass size={20} className='text-[#FFA41F]' />
-    </div>
-    <input
-      type="text"
-      className="block w-64 p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-      placeholder="Search for students"
-      value={searchTerm}
-      onChange={handleSearchChange}
-    />
-  </div>
-</div>
+       <SearchBar updateSearchParam={updateSearchParam} />
 
       <div className="max-w-5xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
       
@@ -79,7 +63,7 @@ const AttendedTable = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredStudents.map((student) => (
+              {filteredAttended.map((student) => (
                 <tr className="bg-white hover:bg-gray-50 h-full border-b border-gray-100" key={student.id}>
                   <td className="flex items-center px-6 py-1.5 text-gray-900">
                     <Image

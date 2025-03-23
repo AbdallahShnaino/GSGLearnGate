@@ -17,15 +17,13 @@ export default function Sidebar({ links }: IProps) {
   return (
     <>
       <button
-        className={`md:hidden p-3 text-[#E99375] fixed top-4 left-4 z-50 ${
-          isOpen ? "hidden" : "block"
-        }`}
+        className={`md:hidden p-3 text-[#E99375] fixed top-4 left-4 z-50 ${isOpen ? "hidden" : "block"}`}
         onClick={() => setIsOpen(true)}
       >
         <List size={32} />
       </button>
       <aside
-        className={`bg-[#FFF5E8] w-64 h-screen text-white p-4 flex flex-col fixed top-0 left-0 transform transition-transform duration-300 ${
+        className={`bg-[#FFF5E8] w-64 h-screen text-white p-4 flex flex-col fixed top-0 left-0 transform transition-transform duration-300 z-40 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         } md:relative md:translate-x-0`}
       >
@@ -70,7 +68,7 @@ export default function Sidebar({ links }: IProps) {
           </ul>
         </nav>
         <div className="mt-auto pt-4 border-t border-[#4A4F57]">
-          <div className="flex items-center gap-2 p-2 cursor-pointer rounded-lg  hover:bg-red-100  hover:text-white">
+          <div className="flex items-center gap-2 p-2 cursor-pointer rounded-lg hover:bg-red-100 hover:text-white">
             <SignOut size={24} />
             <p className=" text-red-400 font-bold text-[14px]">Log Out</p>
           </div>
@@ -79,4 +77,3 @@ export default function Sidebar({ links }: IProps) {
     </>
   );
 }
-
