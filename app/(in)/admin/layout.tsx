@@ -6,6 +6,7 @@ import {
   Student,
   Megaphone,
   UserGear,
+  UserPlus
 } from "@phosphor-icons/react/dist/ssr";
 import { SidebarLink } from "@/types/user";
 
@@ -23,12 +24,17 @@ export const links: SidebarLink[] = [
   {
     href: "/admin/monitors",
     label: "Monitors",
-    icon: <UserGear size={24} weight="bold" />,  // Updated icon
+    icon: <UserGear size={24} weight="bold" />, 
   },
   {
     href: "/admin/co-monitors",
     label: "Co-Monitors",
     icon: <Users size={24} weight="bold" />,
+  },
+  {
+    href: "/admin/add-monitor",
+    label: "Add Monitors",
+    icon: <UserPlus size={24} weight="bold" />,
   },
   {
     href: "/admin/students",
