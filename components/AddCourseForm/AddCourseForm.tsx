@@ -4,7 +4,8 @@ import React from "react";
 const AddCourseForm = () => {
   return (
     <div className="w-full max-w-4xl m-auto py-2 px-4">
-      <div className="bg-white rounded-lg shadow-2xl h-[500px] overflow-y-scroll px-6 py-4">
+      <div className="bg-white rounded-lg shadow-2xl px-6 py-4">
+        <h1 className="text-xl font-semibold text-[#FFA41F]">Add Course</h1>
         <form className="space-y-4">
           <div className="flex flex-col items-center">
             <label
