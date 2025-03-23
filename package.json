@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "db:migrate": "npx drizzle-kit migrate --config ./drizzle.config.ts",
     "db:generate": "npx drizzle-kit generate --config ./drizzle.config.ts",
+    "db:migrate": "npx drizzle-kit migrate --config ./drizzle.config.ts",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio --config ./drizzle.config.ts",
     "db:seed": "tsx seed.ts",
@@ -19,13 +19,13 @@
     "framer-motion": "^12.5.0",
 
     "@libsql/client": "^0.15.0",
+    "@phosphor-icons/react": "^2.1.5-alpha.3",
     "dotenv": "^16.4.7",
     "drizzle-kit": "^0.30.5",
     "drizzle-orm": "^0.40.1",
     "drizzle-seed": "^0.3.1",
 
     "next": "15.2.3",
-    "@phosphor-icons/react": "^2.1.5-alpha.3",
     "phosphor-react": "^1.4.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
@@ -39,6 +39,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.2.3",
     "tailwindcss": "^4",
+    "tsx": "^4.19.3",
     "typescript": "^5"
   }
 }
