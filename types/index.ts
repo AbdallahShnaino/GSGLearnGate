@@ -147,5 +147,6 @@ export type JoiningRequest = {
   id: number;
   studentId: number;
   courseId: number;
-  status: Status;
+  interviewStatus: Status;
+  joiningStatus: Status;
 } & Timestamps;

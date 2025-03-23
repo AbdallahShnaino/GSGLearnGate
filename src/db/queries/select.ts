@@ -288,3 +288,23 @@ export async function getAllAttendances(): Promise<Attendance[]> {
 export async function getAllJoiningRequests(): Promise<JoiningRequest[]> {
   return await db.select().from(joiningRequestsTable).all();
 }
+export async function getAllJoiningRequestsWithDetails(): Promise<any[]> {
+  return await db
+    .select({
+      id: joiningRequestsTable.id,
+      title: coursesTable.title,
+      firstName: usersTable.firstName,
+      lastName: usersTable.lastName,
+      image: usersTable.image,
+      interviewStatus: joiningRequestsTable.interviewStatus,
+      joiningStatus: joiningRequestsTable.joiningStatus,
+    })
+    .from(joiningRequestsTable)
+    .leftJoin(coursesTable, eq(joiningRequestsTable.courseId, coursesTable.id))
+    .leftJoin(
+      studentsTable,
+      eq(joiningRequestsTable.studentId, studentsTable.id)
+    )
+    .leftJoin(usersTable, eq(studentsTable.userId, usersTable.id))
+    .all();
+}
