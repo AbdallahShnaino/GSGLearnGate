@@ -1,5 +1,5 @@
 import { Course } from "@/types/course";
-import { Student } from "@/types/students";
+import { MeetingRequest, Student } from "@/types/students";
 import { User } from "@/types/user";
 
 export const users: User[] = [
@@ -81,3 +81,65 @@ export const Students: Student[] = [
   },
 
 ];
+export const meeting: MeetingRequest[] = [
+  {
+    id: 1,
+    name: "Ahmed Ali",
+    email: "ahmed.ali@example.com",
+    RequestDate: "2025-03 - 25",
+    MeetingDate: "2025-03 - 26",
+    day: "Monday",
+    time: "10:00 AM",
+    statusRequest: "Pending",
+    profilePicture: '/profile (7).png',
+    caption: "Explanation of how to handle state in React and use hooks."
+  },
+  {
+    id: 2,
+    name: "Sara Khaled",
+    email: "sara.khaled@example.com",
+    RequestDate: "2025-03 - 26",
+    MeetingDate: "2025-03 - 26",
+    day: "Tuesday",
+    time: "02: 30 PM",
+    statusRequest: "Accepted",
+    profilePicture: '/profile (7).png',
+    caption: "Explanation of how to handle state in React and use hooks."
+  },
+  {
+    id: 3,
+    name: "Mohammed Hassan",
+    email: "mohammed.hassan@example.com",
+    RequestDate: "2025-03 - 27",
+    MeetingDate: "2025-03 - 26",
+    day: "Wednesday",
+    time: "09:00 AM",
+    statusRequest: "Rejected",
+    profilePicture: '/profile (7).png',
+    caption: "Explanation of how to handle state in React and use hooks."
+  },
+  {
+    id: 4,
+    name: "Lina Omar",
+    email: "lina.omar@example.com",
+    RequestDate: "2025-03 - 28",
+    MeetingDate: "2025-03 - 26",
+    day: "Thursday",
+    time: "03: 45 PM",
+    statusRequest: "Pending",
+    profilePicture: '/profile (7).png',
+    caption: " 6Explanation of how to handle state in React and use hooks Explanation of how to handle state in React and use hooks."
+  },
+  {
+    id: 5,
+    name: "Omar Youssef",
+    email: "omar.youssef@example.com",
+    RequestDate: "2025-03 - 29",
+    MeetingDate: "2025-03 - 26",
+    day: "Friday",
+    time: "01: 15 PM",
+    statusRequest: "Accepted",
+    profilePicture: '/profile (7).png',
+    caption: "Explanation of how to handle state in React and use hooks."
+  }
+]
