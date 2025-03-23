@@ -1,14 +1,16 @@
 "use client";
 import { useState } from "react";
-import { users } from "@/services/mock";
 import {
   TrashSimple,
   PencilSimple,
   MagnifyingGlass,
 } from "@phosphor-icons/react/dist/ssr";
 import DeleteUserModal from "../DeleteUserModal/DeleteUserModal";
-
-export default function UsersTable() {
+import { User } from "@/types";
+interface IProps{
+  users: User[];
+}
+export default function UsersTable(props:IProps) {
   const [open, setOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<string>();
 
@@ -44,24 +46,26 @@ export default function UsersTable() {
               <th className="px-4 py-4 text-left">ID</th>
               <th className="px-4 py-4 text-left">Name</th>
               <th className="px-4 py-4 text-left">Email</th>
-              <th className="px-4 py-4 text-right">Date of Birth</th>
+              <th className="px-4 py-4 text-left">Date of Birth</th>
+              <th className="px-4 py-4 text-left">City</th>
               <th className="px-4 py-4 text-center">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {users.map((user) => (
+            {props.users.map((user) => (
               <tr key={user.id} className="hover:bg-gray-50">
                 <td className="px-4 py-4 font-medium text-gray-900">
                   {user.id}
                 </td>
-                <td className="px-4 py-4 text-gray-700">{user.name}</td>
+                <td className="px-4 py-4 text-gray-700">{user.firstName+" "+user.lastName}</td>
                 <td className="px-4 py-4 text-gray-700">{user.email}</td>
-                <td className="px-4 py-4 text-right text-gray-700">
-                  {user.dob}
+                <td className="px-4 py-4 text-left text-gray-700">
+                  {user.dateOfBirth.toLocaleDateString()}
                 </td>
+                <td className="px-4 py-4 text-gray-700">{user.city}</td>
                 <td>
                   <div className="flex justify-evenly">
-                    <button onClick={() => handleDeleteClick(user.name)}>
+                    <button onClick={() => handleDeleteClick(user.firstName)}>
                       <TrashSimple size={18} color="#ee1717" weight="fill" />
                     </button>
                     <PencilSimple size={18} color="#1cc925" weight="fill" />
