@@ -8,6 +8,13 @@
       "when": 1742477172498,
       "tag": "0000_known_nightmare",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1742718743312,
+      "tag": "0001_wandering_alex_power",
+      "breakpoints": true
     }
   ]
 }
