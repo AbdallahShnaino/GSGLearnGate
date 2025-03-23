@@ -17,15 +17,17 @@ export default function Sidebar({ links }: IProps) {
   return (
     <>
       <button
-        className={`md:hidden p-3 text-[#E99375] fixed top-4 left-4 z-50 ${isOpen ? "hidden" : "block"}`}
+        className={`md:hidden p-3 text-[#E99375] fixed top-4 left-4 z-50 ${
+          isOpen ? "hidden" : "block"
+        }`}
         onClick={() => setIsOpen(true)}
       >
         <List size={32} />
       </button>
       <aside
-        className={`bg-[#FFF5E8] w-64 h-screen text-white p-4 flex flex-col fixed top-0 left-0 transform transition-transform duration-300 z-40 ${
+        className={`bg-[#FFF5E8] w-64 h-screen text-white p-4 flex flex-col fixed top-0 left-0 transform transition-transform duration-300 z-40 overflow-y-auto ${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } md:relative md:translate-x-0`}
+        } md:sticky md:top-0 md:translate-x-0`}
       >
         <div className="flex justify-center items-center gap-2 mb-8 pt-4">
           <Image src="/img/gsgLogo.png" width={50} height={50} alt="gsgLogo" />
