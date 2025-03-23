@@ -29,9 +29,9 @@ export enum Attachments {
 }
 
 interface Timestamps {
-  updatedAt: string;
-  createdAt: string;
-  deletedAt: string;
+  updatedAt?: string;
+  createdAt?: string;
+  deletedAt?: string;
 }
 
 export type User = {
@@ -105,7 +105,6 @@ export type StudentCourse = {
   id: number;
   courseId: number;
   studentId: number;
-  status: Status;
 } & Timestamps;
 
 export type Submission = {
@@ -142,4 +141,11 @@ export type Attendance = {
   studentId: number;
   courseId: number;
   absence: number | null;
+} & Timestamps;
+
+export type JoiningRequest = {
+  id: number;
+  studentId: number;
+  courseId: number;
+  status: Status;
 } & Timestamps;

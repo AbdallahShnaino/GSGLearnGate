@@ -13,6 +13,7 @@ import {
   tasksTable,
   attachmentsTable,
   attendancesTable,
+  joiningRequestsTable,
 } from "./../schema";
 import {
   User,
@@ -26,6 +27,7 @@ import {
   Attendance,
   Attachments,
   Role,
+  JoiningRequest,
 } from "@/types/index";
 
 interface InsertUserInput {
@@ -35,10 +37,10 @@ interface InsertUserInput {
 export async function insertUser({
   data,
   role,
-}: InsertUserInput): Promise<User> {
+}: InsertUserInput): Promise<Omit<User, "password">> {
   const [insertedUser] = await db.insert(usersTable).values(data).returning();
 
-  const user = insertedUser as User;
+  const user = insertedUser as Omit<User, "password">;
 
   if (role === Role.ADMIN) {
     await db.insert(adminsTable).values({ userId: user.id }).execute();
@@ -59,7 +61,6 @@ export async function insertCourse(data: Omit<Course, "id">): Promise<Course> {
   const [inserted] = await db.insert(coursesTable).values(data).returning();
   return inserted as Course;
 }
-
 export async function insertAnnouncement(
   data: Omit<Announcement, "id">
 ): Promise<Announcement> {
@@ -120,4 +121,13 @@ export async function insertAttendance(
 ): Promise<Attendance> {
   const [inserted] = await db.insert(attendancesTable).values(data).returning();
   return inserted as Attendance;
+}
+export async function insertJoiningRequest(
+  data: Omit<JoiningRequest, "id">
+): Promise<JoiningRequest> {
+  const [inserted] = await db
+    .insert(joiningRequestsTable)
+    .values(data)
+    .returning();
+  return inserted as JoiningRequest;
 }

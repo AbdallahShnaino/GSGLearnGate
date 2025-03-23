@@ -132,9 +132,6 @@ export const studentsCoursesTable = sqliteTable("students_courses", {
   studentId: int("student_id")
     .notNull()
     .references((): AnySQLiteColumn => studentsTable.id),
-  status: text("status", {
-    enum: [Status.ACCEPTED, Status.PENDING, Status.REJECTED],
-  }).notNull(),
   ...timestamps,
 });
 
@@ -205,6 +202,19 @@ export const attendancesTable = sqliteTable("attendances", {
   absence: int("absence"),
   ...timestamps,
 });
+export const joiningRequestsTable = sqliteTable("joining_requests", {
+  id: int().primaryKey({ autoIncrement: true }),
+  studentId: int("student_id")
+    .notNull()
+    .references((): AnySQLiteColumn => studentsTable.id),
+  courseId: int("course_id")
+    .notNull()
+    .references((): AnySQLiteColumn => coursesTable.id),
+  status: text("status", {
+    enum: [Status.ACCEPTED, Status.PENDING, Status.REJECTED],
+  }).notNull(),
+  ...timestamps,
+});
 
 export type InsertUser = typeof usersTable.$inferInsert;
 export type SelectUsers = typeof usersTable.$inferSelect;
@@ -244,3 +254,6 @@ export type SelectAttachments = typeof attachmentsTable.$inferSelect;
 
 export type InsertAttendance = typeof attendancesTable.$inferInsert;
 export type SelectAttendances = typeof attendancesTable.$inferSelect;
+
+export type InsertJoiningRequest = typeof joiningRequestsTable.$inferInsert;
+export type SelectJoiningRequests = typeof joiningRequestsTable.$inferSelect;
