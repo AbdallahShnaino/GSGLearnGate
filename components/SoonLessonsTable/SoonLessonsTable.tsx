@@ -32,9 +32,6 @@ export default function Table() {
                 Course
               </th>
               <th className="px-8 py-8 text-left font-medium text-gray-500">
-                Monitor
-              </th>
-              <th className="px-8 py-8 text-left font-medium text-gray-500">
                 Date
               </th>
               <th className="px-8 py-8 text-left font-medium text-gray-500">
@@ -47,9 +44,6 @@ export default function Table() {
               <tr key={lesson.id} className="hover:bg-gray-50">
                 <td className="px-8 py-8 font-medium text-gray-900">
                   {lesson.course}
-                </td>
-                <td className="px-8 py-8 font-medium text-gray-900">
-                  {lesson.monitor}
                 </td>
                 <td className="px-8 py-8 text-gray-700">{lesson.date}</td>
                 <td className="px-8 py-8 text-gray-700">{lesson.time}</td>
