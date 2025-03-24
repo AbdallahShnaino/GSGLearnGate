@@ -149,3 +149,8 @@ export type JoiningRequest = {
   courseId: number;
   status: Status;
 } & Timestamps;
+
+export interface StudentCourseChart{
+  course:string;
+  students: number;
+}
