@@ -6,7 +6,7 @@ import HeroSection from "@/components/HeroSection/HeroSection";
 export default function Home() {
   return (
     <div>
-      <HeaderNav />
+      <HeaderNav position="absolute" />
       <HeroSection />
       <CollectionCourses />
       <Footer />

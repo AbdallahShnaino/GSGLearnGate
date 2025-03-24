@@ -5,9 +5,14 @@ import "./navLinks.css";
 interface ShowNavProps {
   showNav: boolean;
   setShowNav: React.Dispatch<React.SetStateAction<boolean>>;
+  position: string;
 }
 
-const NavLinks: React.FC<ShowNavProps> = ({ showNav, setShowNav }) => {
+const NavLinks: React.FC<ShowNavProps> = ({
+  showNav,
+  setShowNav,
+  position,
+}) => {
   return (
     <nav
       className={`lg:block max-lg:absolute max-lg:${
@@ -21,7 +26,7 @@ const NavLinks: React.FC<ShowNavProps> = ({ showNav, setShowNav }) => {
         </li>
         <li className="lg:text-white font-bold max-lg:mt-10 max-lg:w-full">
           <Link
-            className="max-lg:text-lg py-2 px-4 hover:text-[var(--primary-color)]  max-lg:py-4 max-lg:w-full max-lg:block"
+            className={`${position === "absolute" ?"lg:text-white" :"lg:text-black"} max-lg:text-lg py-2 px-4 hover:text-[var(--primary-color)]  max-lg:py-4 max-lg:w-full max-lg:block`}
             href={"/"}
           >
             Home
@@ -29,25 +34,23 @@ const NavLinks: React.FC<ShowNavProps> = ({ showNav, setShowNav }) => {
         </li>
         <li className="lg:text-white font-bold max-lg:w-full">
           <Link
-            className="max-lg:text-lg py-2 px-4 hover:text-[var(--primary-color)]  max-lg:py-4 max-lg:w-full max-lg:block"
+            className={`${position === "absolute" ?"lg:text-white" :"lg:text-black"} max-lg:text-lg py-2 px-4 hover:text-[var(--primary-color)]  max-lg:py-4 max-lg:w-full max-lg:block`}
             href={"/about-us"}
           >
             About Us
           </Link>
         </li>
         <li className="lg:text-white font-bold max-lg:w-full">
-
           <Link
-            className="max-lg:text-lg py-2 px-4 hover:text-[var(--primary-color)]  max-lg:py-4 max-lg:w-full max-lg:block"
+            className={`${position === "absolute" ?"lg:text-white" :"lg:text-black"} max-lg:text-lg py-2 px-4 hover:text-[var(--primary-color)]  max-lg:py-4 max-lg:w-full max-lg:block`}
             href={"/contact-us"}
           >
             Contact Us
           </Link>
         </li>
         <li className="lg:text-white font-bold max-lg:w-full">
-
           <Link
-            className="max-lg:text-lg py-2 px-4 hover:text-[var(--primary-color)]  max-lg:py-4 max-lg:w-full max-lg:block"
+            className={`${position === "absolute" ?"lg:text-white" :"lg:text-black"} max-lg:text-lg py-2 px-4 hover:text-[var(--primary-color)]  max-lg:py-4 max-lg:w-full max-lg:block`}
             href={"/fq"}
           >
             FQ
@@ -59,4 +62,3 @@ const NavLinks: React.FC<ShowNavProps> = ({ showNav, setShowNav }) => {
 };
 
 export default NavLinks;
-
