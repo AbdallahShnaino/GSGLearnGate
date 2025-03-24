@@ -36,6 +36,7 @@ const NavLinks: React.FC<ShowNavProps> = ({ showNav, setShowNav }) => {
           </Link>
         </li>
         <li className="lg:text-white font-bold max-lg:w-full">
+
           <Link
             className="max-lg:text-lg py-2 px-4 hover:text-[var(--primary-color)]  max-lg:py-4 max-lg:w-full max-lg:block"
             href={"/contact-us"}
@@ -44,6 +45,7 @@ const NavLinks: React.FC<ShowNavProps> = ({ showNav, setShowNav }) => {
           </Link>
         </li>
         <li className="lg:text-white font-bold max-lg:w-full">
+
           <Link
             className="max-lg:text-lg py-2 px-4 hover:text-[var(--primary-color)]  max-lg:py-4 max-lg:w-full max-lg:block"
             href={"/fq"}
@@ -57,3 +59,4 @@ const NavLinks: React.FC<ShowNavProps> = ({ showNav, setShowNav }) => {
 };
 
 export default NavLinks;
+

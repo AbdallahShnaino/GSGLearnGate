@@ -8,7 +8,7 @@ import {
 import { sql } from "drizzle-orm";
 import {
   AssignmentStatus,
-  Attachment,
+  Attachments,
   Difficulty,
   Role,
   Status,
@@ -42,21 +42,29 @@ export const usersTable = sqliteTable("users", {
 
 export const adminsTable = sqliteTable("admins", {
   id: int().primaryKey(),
-  userId: int("user_id").references((): AnySQLiteColumn => usersTable.id),
+  userId: int("user_id")
+    .notNull()
+    .references((): AnySQLiteColumn => usersTable.id),
 });
 
 export const monitorsTable = sqliteTable("monitors", {
   id: int().primaryKey(),
-  userId: int("user_id").references((): AnySQLiteColumn => usersTable.id),
+  userId: int("user_id")
+    .notNull()
+    .references((): AnySQLiteColumn => usersTable.id),
 });
 
 export const coMonitorsTable = sqliteTable("co_monitors", {
   id: int().primaryKey(),
-  userId: int("user_id").references((): AnySQLiteColumn => usersTable.id),
+  userId: int("user_id")
+    .notNull()
+    .references((): AnySQLiteColumn => usersTable.id),
 });
 export const studentsTable = sqliteTable("students", {
   id: int().primaryKey(),
-  userId: int("user_id").references((): AnySQLiteColumn => usersTable.id),
+  userId: int("user_id")
+    .notNull()
+    .references((): AnySQLiteColumn => usersTable.id),
 });
 
 export const coursesTable = sqliteTable("courses", {
@@ -89,8 +97,12 @@ export const coursesTable = sqliteTable("courses", {
 });
 export const announcementsTable = sqliteTable("announcements", {
   id: int().primaryKey({ autoIncrement: true }),
-  postedBy: int("posted_by").references((): AnySQLiteColumn => usersTable.id),
-  courseId: int("course_id").references((): AnySQLiteColumn => coursesTable.id),
+  postedBy: int("posted_by")
+    .notNull()
+    .references((): AnySQLiteColumn => usersTable.id),
+  courseId: int("course_id")
+    .notNull()
+    .references((): AnySQLiteColumn => coursesTable.id),
   title: text("title").notNull(),
   description: text("description").notNull(),
   ...timestamps,
@@ -98,12 +110,12 @@ export const announcementsTable = sqliteTable("announcements", {
 
 export const appointmentsTable = sqliteTable("appointments", {
   id: int().primaryKey({ autoIncrement: true }),
-  coMonitorId: int("co_monitor_id").references(
-    (): AnySQLiteColumn => coMonitorsTable.id
-  ),
-  studentId: int("student_id").references(
-    (): AnySQLiteColumn => studentsTable.id
-  ),
+  coMonitorId: int("co_monitor_id")
+    .notNull()
+    .references((): AnySQLiteColumn => coMonitorsTable.id),
+  studentId: int("student_id")
+    .notNull()
+    .references((): AnySQLiteColumn => studentsTable.id),
   caption: text("caption").notNull(),
   date: integer("date", { mode: "timestamp" }).notNull(),
 
@@ -114,23 +126,26 @@ export const appointmentsTable = sqliteTable("appointments", {
 });
 export const studentsCoursesTable = sqliteTable("students_courses", {
   id: int().primaryKey({ autoIncrement: true }),
-  courseId: int("course_id").references((): AnySQLiteColumn => coursesTable.id),
-  studentId: int("student_id").references(
-    (): AnySQLiteColumn => studentsTable.id
-  ),
-  status: text("status", {
-    enum: [Status.ACCEPTED, Status.PENDING, Status.REJECTED],
-  }).notNull(),
+  courseId: int("course_id")
+    .notNull()
+    .references((): AnySQLiteColumn => coursesTable.id),
+  studentId: int("student_id")
+    .notNull()
+    .references((): AnySQLiteColumn => studentsTable.id),
   ...timestamps,
 });
 
 export const submissionsTable = sqliteTable("submissions", {
   id: int().primaryKey({ autoIncrement: true }),
-  taskId: int("task_id").references((): AnySQLiteColumn => tasksTable.id),
-  studentId: int("student_id").references(
-    (): AnySQLiteColumn => studentsTable.id
-  ),
-  courseId: int("course_id").references((): AnySQLiteColumn => coursesTable.id),
+  taskId: int("task_id")
+    .notNull()
+    .references((): AnySQLiteColumn => tasksTable.id),
+  studentId: int("student_id")
+    .notNull()
+    .references((): AnySQLiteColumn => studentsTable.id),
+  courseId: int("course_id")
+    .notNull()
+    .references((): AnySQLiteColumn => coursesTable.id),
   grade: int("grade"),
   feedback: text("feedback").notNull(),
   gradedAt: integer("graded_at", { mode: "timestamp" }).notNull(),
@@ -160,14 +175,17 @@ export const tasksTable = sqliteTable("tasks", {
 
 export const attachmentsTable = sqliteTable("attachments", {
   id: int().primaryKey({ autoIncrement: true }),
-  taskId: int("task_id").references((): AnySQLiteColumn => tasksTable.id),
-  studentId: int("student_id").references(
-    (): AnySQLiteColumn => studentsTable.id
-  ),
-  courseId: int("course_id").references((): AnySQLiteColumn => coursesTable.id),
-
+  taskId: int("task_id")
+    .notNull()
+    .references((): AnySQLiteColumn => tasksTable.id),
+  studentId: int("student_id")
+    .notNull()
+    .references((): AnySQLiteColumn => studentsTable.id),
+  courseId: int("course_id")
+    .notNull()
+    .references((): AnySQLiteColumn => coursesTable.id),
   type: text("status", {
-    enum: [Attachment.FILE, Attachment.LINK],
+    enum: [Attachments.FILE, Attachments.LINK],
   }).notNull(),
   path: text("path").notNull(),
   ...timestamps,
@@ -175,49 +193,67 @@ export const attachmentsTable = sqliteTable("attachments", {
 
 export const attendancesTable = sqliteTable("attendances", {
   id: int().primaryKey({ autoIncrement: true }),
-  studentId: int("student_id").references(
-    (): AnySQLiteColumn => studentsTable.id
-  ),
-  courseId: int("course_id").references((): AnySQLiteColumn => coursesTable.id),
+  studentId: int("student_id")
+    .notNull()
+    .references((): AnySQLiteColumn => studentsTable.id),
+  courseId: int("course_id")
+    .notNull()
+    .references((): AnySQLiteColumn => coursesTable.id),
   absence: int("absence"),
+  ...timestamps,
+});
+export const joiningRequestsTable = sqliteTable("joining_requests", {
+  id: int().primaryKey({ autoIncrement: true }),
+  studentId: int("student_id")
+    .notNull()
+    .references((): AnySQLiteColumn => studentsTable.id),
+  courseId: int("course_id")
+    .notNull()
+    .references((): AnySQLiteColumn => coursesTable.id),
+  status: text("status", {
+    enum: [Status.ACCEPTED, Status.PENDING, Status.REJECTED],
+  }).notNull(),
   ...timestamps,
 });
 
 export type InsertUser = typeof usersTable.$inferInsert;
-export type SelectUser = typeof usersTable.$inferSelect;
+export type SelectUsers = typeof usersTable.$inferSelect;
 
 export type InsertAdmin = typeof adminsTable.$inferInsert;
-export type SelectAdmin = typeof adminsTable.$inferSelect;
+export type SelectAdmins = typeof adminsTable.$inferSelect;
 
 export type InsertMonitor = typeof monitorsTable.$inferInsert;
-export type SelectMonitor = typeof monitorsTable.$inferSelect;
+export type SelectMonitors = typeof monitorsTable.$inferSelect;
 
-export type InsertCoMonitors = typeof coMonitorsTable.$inferInsert;
+export type InsertCoMonitor = typeof coMonitorsTable.$inferInsert;
 export type SelectCoMonitors = typeof coMonitorsTable.$inferSelect;
 
 export type InsertStudent = typeof studentsTable.$inferInsert;
-export type SelectStudent = typeof studentsTable.$inferSelect;
+export type SelectStudents = typeof studentsTable.$inferSelect;
 
 export type InsertCourse = typeof coursesTable.$inferInsert;
-export type SelectCourse = typeof coursesTable.$inferSelect;
+export type SelectCourses = typeof coursesTable.$inferSelect;
 
 export type InsertAnnouncement = typeof announcementsTable.$inferInsert;
-export type SelectAnnouncement = typeof announcementsTable.$inferSelect;
+export type SelectAnnouncements = typeof announcementsTable.$inferSelect;
 
 export type InsertAppointment = typeof appointmentsTable.$inferInsert;
-export type SelectAppointment = typeof appointmentsTable.$inferSelect;
+export type SelectAppointments = typeof appointmentsTable.$inferSelect;
 
 export type InsertStudentCourse = typeof studentsCoursesTable.$inferInsert;
-export type SelectStudentCourse = typeof studentsCoursesTable.$inferSelect;
+export type SelectStudentCourses = typeof studentsCoursesTable.$inferSelect;
 
 export type InsertSubmission = typeof submissionsTable.$inferInsert;
-export type SelectSubmission = typeof submissionsTable.$inferSelect;
+export type SelectSubmissions = typeof submissionsTable.$inferSelect;
 
 export type InsertTask = typeof tasksTable.$inferInsert;
-export type SelectTask = typeof tasksTable.$inferSelect;
+export type SelectTasks = typeof tasksTable.$inferSelect;
 
 export type InsertAttachment = typeof attachmentsTable.$inferInsert;
-export type SelectAttachment = typeof attachmentsTable.$inferSelect;
+export type SelectAttachments = typeof attachmentsTable.$inferSelect;
 
 export type InsertAttendance = typeof attendancesTable.$inferInsert;
-export type SelectAttendance = typeof attendancesTable.$inferSelect;
+export type SelectAttendances = typeof attendancesTable.$inferSelect;
+
+export type InsertJoiningRequest = typeof joiningRequestsTable.$inferInsert;
+export type SelectJoiningRequests = typeof joiningRequestsTable.$inferSelect;

@@ -25,9 +25,9 @@ export default function Sidebar({ links }: IProps) {
         <List size={32} />
       </button>
       <aside
-        className={`bg-[#FFF5E8] w-64 h-screen text-white p-4 flex flex-col fixed top-0 left-0 transform transition-transform duration-300 ${
+        className={`bg-[#FFF5E8] w-64 h-screen text-white p-4 flex flex-col fixed top-0 left-0 transform transition-transform duration-300 z-40 overflow-y-auto ${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } md:relative md:translate-x-0`}
+        } md:sticky md:top-0 md:translate-x-0`}
       >
         <div className="flex justify-center items-center gap-2 mb-8 pt-4">
           <Image src="/img/gsgLogo.png" width={50} height={50} alt="gsgLogo" />
@@ -70,7 +70,7 @@ export default function Sidebar({ links }: IProps) {
           </ul>
         </nav>
         <div className="mt-auto pt-4 border-t border-[#4A4F57]">
-          <div className="flex items-center gap-2 p-2 cursor-pointer rounded-lg  hover:bg-red-100  hover:text-white">
+          <div className="flex items-center gap-2 p-2 cursor-pointer rounded-lg hover:bg-red-100 hover:text-white">
             <SignOut size={24} />
             <p className=" text-red-400 font-bold text-[14px]">Log Out</p>
           </div>
@@ -79,4 +79,3 @@ export default function Sidebar({ links }: IProps) {
     </>
   );
 }
-
