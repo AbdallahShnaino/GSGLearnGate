@@ -7,10 +7,12 @@ import {
 } from "@phosphor-icons/react/dist/ssr";
 import DeleteUserModal from "../DeleteUserModal/DeleteUserModal";
 import { User } from "@/types";
+import { useSearch } from "@/hooks/useSearch";
 interface IProps{
   users: User[];
 }
 export default function UsersTable(props:IProps) {
+  const{value, setValue, updateSearchParam}=useSearch("name")
   const [open, setOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<string>();
 
@@ -26,6 +28,15 @@ export default function UsersTable(props:IProps) {
     setOpen(false);
     setSelectedUser("");
   };
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const searchValue = event.target.value;
+    setValue(searchValue);
+    updateSearchParam(searchValue);
+  };
+  const filteredUsers = props.users.filter((user) =>
+    `${user.firstName} ${user.lastName}`.toLowerCase().includes(value.toLowerCase())
+  );
+
 
   return (
     <div className="w-full max-w-4xl mx-auto p-4 space-y-4">
@@ -37,6 +48,8 @@ export default function UsersTable(props:IProps) {
           type="text"
           className="block w-64 p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
           placeholder="Search for students"
+          value={value}
+          onChange={handleSearchChange}
         />
       </div>
       <div className="overflow-hidden border border-gray-200 shadow-sm rounded-xl">
@@ -52,7 +65,7 @@ export default function UsersTable(props:IProps) {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {props.users.map((user) => (
+            {filteredUsers.map((user) => (
               <tr key={user.id} className="hover:bg-gray-50">
                 <td className="px-4 py-4 font-medium text-gray-900">
                   {user.id}
