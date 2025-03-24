@@ -5,8 +5,7 @@ const page = () => {
   return (
     <>
     <h1 className="text-3xl font-bold mb-6 ml-8">Meeting Requests</h1>
-    
-    {/* Use Table Component */}
+
    <MeetingRequestsTable />
   </>
   )
