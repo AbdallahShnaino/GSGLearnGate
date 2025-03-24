@@ -2,7 +2,7 @@
 import { SealQuestion } from '@phosphor-icons/react'
 import React from 'react'
 
-const TaskCard = () => {
+const TaskCardCo = () => {
   return (
     <div>
       <li className="relative flex-col gap-0 p-1 mt-1.5 rounded-xl list-none shadow-lg bg-gradient-to-r from-[#f1f5f9] to-[#e5e7eb] hover:bg-gray-100 transition-all duration-300 ease-in-out transform hover:scale-105 cursor-pointer w-full  ml-auto">
@@ -23,4 +23,4 @@ const TaskCard = () => {
   )
 }
 
-export default TaskCard
+export default TaskCardCo
