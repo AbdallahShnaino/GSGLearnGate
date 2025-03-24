@@ -16,7 +16,6 @@ import { addStudentToCourse, getMonitorCoursesNames } from "@/services/courses";
 import Loader from "../Shared/Loader";
 
 export default function StudentRequestsTable() {
-  const { value: searchQuery, updateSearchParam } = useSearch("search");
   const [joiningOrders, setJoiningOrders] = useState<JoiningOrder[]>([]);
   const [monitorCoursesList, setMonitorCoursesList] = useState<
     { courseId: number; courseName: string }[]
@@ -42,7 +41,7 @@ export default function StudentRequestsTable() {
   };
   const fetchMonitorCourses = async () => {
     setIsLoading(true);
-    const coursesList = await getMonitorCoursesNames(6);
+    const coursesList = await getMonitorCoursesNames(STATIC_MONITOR_ID);
     setMonitorCoursesList(coursesList ?? []);
     setIsLoading(false);
   };
@@ -50,7 +49,7 @@ export default function StudentRequestsTable() {
   useEffect(() => {
     fetchRequests();
     fetchMonitorCourses();
-  }, [currentPage, searchQuery]);
+  }, [currentPage]);
 
   const handleOpenRejectModal = (order: JoiningOrder) => {
     setSelectedOrder(order);

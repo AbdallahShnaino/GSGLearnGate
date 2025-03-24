@@ -336,7 +336,16 @@ export async function getAllJoiningRequestsWithDetails(
     .limit(pageSize)
     .offset(offset)
     .all();
-
+  /* 
+  const whereConditions = [
+    eq(coursesTable.monitorId, monitorId), // Always include monitorId filter
+  ];
+  if (courseId !== undefined) {
+    whereConditions.push(eq(coursesTable.id, courseId)); // Add courseId filter if provided
+  }
+    .where(and(...whereConditions)) // Spread the conditions into and()
+  
+*/
   return results.map((result) => ({
     id: result.id,
     courseId: result.courseId,
