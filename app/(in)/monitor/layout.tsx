@@ -12,39 +12,39 @@ import { SidebarLink } from "@/types/user";
 
 export const links: SidebarLink[] = [
   {
-    href: "/admin/dashboard",
+    href: "/monitor/dashboard",
     label: "Dashboard",
     icon: <House size={24} weight="bold" />,
   },
   {
-    href: "/admin/courses",
-    label: "Courses",
+    href: "/monitor/joining-requests",
+    label: "Joining Requests",
     icon: <Book size={24} weight="bold" />,
   },
   {
-    href: "/admin/monitors",
-    label: "Monitors",
+    href: "/monitor/create-announcement",
+    label: "Create Announcement",
     icon: <UserGear size={24} weight="bold" />,
   },
   {
-    href: "/admin/co-monitors",
-    label: "Co-Monitors",
-    icon: <Users size={24} weight="bold" />,
-  },
-  {
-    href: "/admin/add-monitor",
-    label: "Add Monitors",
-    icon: <UserPlus size={24} weight="bold" />,
-  },
-  {
-    href: "/admin/students",
-    label: "Students",
+    href: "/monitor/task",
+    label: "Create Task",
     icon: <Student size={24} weight="bold" />,
   },
   {
-    href: "/admin/announcement",
-    label: "Announcement",
-    icon: <Megaphone size={24} weight="bold" />,
+    href: "/monitor/grading",
+    label: "Grading",
+    icon: <Users size={24} weight="bold" />,
+  },
+  {
+    href: "/monitor/attendance",
+    label: "Attendance",
+    icon: <UserPlus size={24} weight="bold" />,
+  },
+  {
+    href: "/monitor/tasks",
+    label: "Tasks",
+    icon: <Student size={24} weight="bold" />,
   },
 ];
 

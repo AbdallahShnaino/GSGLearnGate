@@ -1,71 +1,110 @@
 "use client";
-import { useState } from "react";
-import { meeting } from "@/services/mock";
-import { MeetingRequest } from "@/types/students";
+import { useEffect, useState } from "react";
 import { CheckCircle, XCircle } from "phosphor-react";
-import ApproveModal from "../ApproveModal/ApproveModal";
-import RejectModal from "../RejectModal/RejectModal";
 import SearchBar from "../SearchBar/SearchBar";
 import { useSearch } from "@/hooks/useSearch";
 import PersonCard from "../PersonCard/PersonCard";
-import { getJoiningRequests } from "@/services/joiningRequest";
+import {
+  getJoiningRequests,
+  updateJoiningRequestStatus,
+} from "@/services/joiningRequest";
+import { JoiningOrder, Status } from "@/types";
+import ApproveJoiningModal from "../modals/ApproveJoiningModal/ApproveJoiningModal";
+import RejectJoiningModal from "../modals/RejectJoiningModal/RejectJoiningModal";
+import SelectCourse from "../Dropdowns/SelectCourse";
+import { addStudentToCourse, getMonitorCoursesNames } from "@/services/courses";
+import Loader from "../Shared/Loader";
 
 export default function StudentRequestsTable() {
-  getJoiningRequests();
   const { value: searchQuery, updateSearchParam } = useSearch("search");
-  const [meetingRequests, setMeetingRequests] =
-    useState<MeetingRequest[]>(meeting);
-  const filteredRequests = meetingRequests.filter((student) =>
-    student.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const [joiningOrders, setJoiningOrders] = useState<JoiningOrder[]>([]);
+  const [monitorCoursesList, setMonitorCoursesList] = useState<
+    { courseId: number; courseName: string }[]
+  >([]);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
   const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<MeetingRequest | null>(
-    null
-  );
+  const [selectedOrder, setSelectedOrder] = useState<JoiningOrder | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleOpenRejectModal = (request: MeetingRequest) => {
-    setSelectedRequest(request);
+  const STATIC_MONITOR_ID = 13;
+  const fetchRequests = async () => {
+    setIsLoading(true);
+    const requests = await getJoiningRequests(
+      STATIC_MONITOR_ID,
+      currentPage,
+      pageSize
+    );
+    setJoiningOrders(requests);
+    setIsLoading(false);
+  };
+  const fetchMonitorCourses = async () => {
+    setIsLoading(true);
+    const coursesList = await getMonitorCoursesNames(6);
+    setMonitorCoursesList(coursesList ?? []);
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    fetchRequests();
+    fetchMonitorCourses();
+  }, [currentPage, searchQuery]);
+
+  const handleOpenRejectModal = (order: JoiningOrder) => {
+    setSelectedOrder(order);
     setIsRejectModalOpen(true);
   };
 
-  const handleOpenApproveModal = (request: MeetingRequest) => {
-    setSelectedRequest(request);
+  const handleOpenApproveModal = (order: JoiningOrder) => {
+    setSelectedOrder(order);
     setIsApproveModalOpen(true);
   };
 
   const handleCloseRejectModal = () => {
     setIsRejectModalOpen(false);
-    setSelectedRequest(null);
+    setSelectedOrder(null);
   };
 
   const handleCloseApproveModal = () => {
     setIsApproveModalOpen(false);
-    setSelectedRequest(null);
+    setSelectedOrder(null);
   };
 
-  const handleApprove = (id: number) => {
-    setMeetingRequests((prevRequests) =>
-      prevRequests.map((request) =>
-        request.id === id ? { ...request, statusRequest: "Accepted" } : request
-      )
-    );
+  const handleApprove = async (
+    id: number,
+    courseId: number,
+    studentId: number
+  ) => {
+    addStudentToCourse(studentId, courseId);
+    updateJoiningRequestStatus(id, Status.ACCEPTED);
     handleCloseApproveModal();
+    await fetchRequests();
   };
 
-  const handleReject = (id: number) => {
-    setMeetingRequests((prevRequests) =>
-      prevRequests.map((request) =>
-        request.id === id ? { ...request, statusRequest: "Rejected" } : request
-      )
-    );
+  const handleReject = async (id: number) => {
+    updateJoiningRequestStatus(id, Status.REJECTED);
     handleCloseRejectModal();
+    await fetchRequests();
+  };
+  const handlePreviousPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
   };
 
+  const handleNextPage = () => {
+    setCurrentPage((prev) => prev + 1);
+  };
+  const onSelectCourseChange = () => {};
+  if (isLoading) {
+    return <Loader message="Loading data..." />;
+  }
   return (
     <div className="container mx-auto p-4">
-      <SearchBar updateSearchParam={updateSearchParam} />
+      <SelectCourse
+        onChange={onSelectCourseChange}
+        options={monitorCoursesList}
+      />
       <div className="max-w-6xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         <div className="overflow-x-auto border border-gray-200">
           <table className="w-full text-sm text-left text-gray-800">
@@ -78,24 +117,30 @@ export default function StudentRequestsTable() {
               </tr>
             </thead>
             <tbody>
-              {filteredRequests.map((student) => (
+              {joiningOrders.map((joiningOrder) => (
                 <tr
                   className="bg-white hover:bg-gray-50 h-full border-b border-gray-100"
-                  key={student.id}
+                  key={joiningOrder.id}
                 >
                   <td>
                     <PersonCard
-                      email="email@email.com"
-                      imageURL={student.profilePicture}
-                      name="mohammed ali"
+                      email={joiningOrder.email ?? ""}
+                      imageURL={joiningOrder.image ?? "/profile (1).png"}
+                      name={
+                        joiningOrder.firstName + " " + joiningOrder.lastName
+                      }
                     />
                   </td>
-                  <td className="px-6 py-1.5 text-xs">React</td>
-                  <td className="px-6 py-1.5 text-xs">Interview Status</td>
+                  <td className="px-6 py-1.5 text-xs">
+                    {joiningOrder.courseName}
+                  </td>
+                  <td className="px-6 py-1.5 text-xs">
+                    {joiningOrder.interviewStatus}
+                  </td>
 
                   <td className="px-6 py-1.5">
                     <div className="flex gap-1 items-center">
-                      {student.statusRequest === "Accepted" ? (
+                      {joiningOrder.joiningStatus === Status.ACCEPTED ? (
                         <div className="flex items-center bg-[#a4e6c7] text-gray-800 rounded-2xl px-2 py-1">
                           <CheckCircle
                             size={14}
@@ -104,7 +149,7 @@ export default function StudentRequestsTable() {
                           />
                           <span className="text-xs">Approve</span>
                         </div>
-                      ) : student.statusRequest === "Rejected" ? (
+                      ) : joiningOrder.joiningStatus === Status.REJECTED ? (
                         <div className="flex items-center bg-[#ffc9c5] text-gray-800 rounded-2xl px-2 py-1">
                           <XCircle
                             size={14}
@@ -116,13 +161,13 @@ export default function StudentRequestsTable() {
                       ) : (
                         <>
                           <button
-                            onClick={() => handleOpenRejectModal(student)}
+                            onClick={() => handleOpenRejectModal(joiningOrder)}
                             className="text-red-500 hover:text-red-800 cursor-pointer"
                           >
                             <XCircle size={28} className="rounded-2xl" />
                           </button>
                           <button
-                            onClick={() => handleOpenApproveModal(student)}
+                            onClick={() => handleOpenApproveModal(joiningOrder)}
                             className="flex items-center bg-gray-800 text-white rounded-md px-2 py-1 hover:bg-gray-700 cursor-pointer"
                           >
                             <CheckCircle
@@ -143,21 +188,53 @@ export default function StudentRequestsTable() {
         </div>
       </div>
 
-      {selectedRequest && (
-        <ApproveModal
+      <div className="flex justify-between items-center p-4">
+        <button
+          onClick={handlePreviousPage}
+          disabled={currentPage === 1}
+          className={`px-4 py-2 rounded-md ${
+            currentPage === 1
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-gray-800 text-white hover:bg-gray-700"
+          }`}
+        >
+          Previous
+        </button>
+        <span className="text-sm text-gray-700">Page {currentPage}</span>
+        <button
+          onClick={handleNextPage}
+          disabled={joiningOrders.length < pageSize}
+          className={`px-4 py-2 rounded-md ${
+            joiningOrders.length < pageSize
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-gray-800 text-white hover:bg-gray-700"
+          }`}
+        >
+          Next
+        </button>
+      </div>
+
+      {selectedOrder && (
+        <ApproveJoiningModal
           isOpen={isApproveModalOpen}
           onClose={handleCloseApproveModal}
-          request={selectedRequest}
-          onApprove={() => handleApprove(selectedRequest.id)}
+          order={selectedOrder}
+          onApprove={() =>
+            handleApprove(
+              selectedOrder.id,
+              selectedOrder.courseId ?? -1,
+              selectedOrder.studentId ?? -1
+            )
+          }
         />
       )}
 
-      {selectedRequest && (
-        <RejectModal
+      {selectedOrder && (
+        <RejectJoiningModal
           isOpen={isRejectModalOpen}
           onClose={handleCloseRejectModal}
-          request={selectedRequest}
-          onApprove={() => handleReject(selectedRequest.id)}
+          order={selectedOrder}
+          onApprove={() => handleReject(selectedOrder.id)}
         />
       )}
     </div>

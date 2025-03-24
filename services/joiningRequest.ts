@@ -1,23 +1,21 @@
-import { getAllJoiningRequestsWithDetails } from "@/src/db/queries/select";
+import {
+  getAllJoiningRequestsWithDetails,
+  updateJoiningRequest,
+} from "@/src/db/queries/select";
+import { Status } from "@/types";
 
-/*
-export type JoiningRequest = {
-  id: number;
-  studentId: number;
-  courseId: number;
-  status: Status;
-} & Timestamps;
-
-
-*/
-export async function getJoiningRequests() {
-  const result = await getAllJoiningRequestsWithDetails();
-  console.log(result);
-  // i want to get data from joing re table
-  // after that i need to get all courses and users
-  // i will return needed data
+export async function getJoiningRequests(
+  monitorId: number,
+  currentPage: number,
+  pageSize: number
+) {
+  return await getAllJoiningRequestsWithDetails(
+    monitorId,
+    currentPage,
+    pageSize
+  );
 }
 
-export function updateJoiningRequestStatus() {
-  // i want to update status
+export async function updateJoiningRequestStatus(id: number, status: Status) {
+  return await updateJoiningRequest(id, { joiningStatus: status });
 }
