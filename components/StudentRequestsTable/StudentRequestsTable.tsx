@@ -48,7 +48,6 @@ export default function StudentRequestsTable() {
 
   useEffect(() => {
     fetchRequests();
-    fetchMonitorCourses();
   }, [currentPage]);
 
   const handleOpenRejectModal = (order: JoiningOrder) => {
@@ -76,8 +75,8 @@ export default function StudentRequestsTable() {
     courseId: number,
     studentId: number
   ) => {
-    addStudentToCourse(studentId, courseId);
     updateJoiningRequestStatus(id, Status.ACCEPTED);
+    addStudentToCourse(studentId, courseId);
     handleCloseApproveModal();
     await fetchRequests();
   };
