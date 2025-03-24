@@ -168,3 +168,11 @@ export const meeting: MeetingRequest[] = [
     caption: "Explanation of how to handle state in React and use hooks."
   }
 ]
+
+export const chartData = [
+  { course: "Math", students: 120 },
+  { course: "Science", students: 95 },
+  { course: "History", students: 75 },
+  { course: "English", students: 110 },
+  { course: "Computer Science", students: 150 },
+];
