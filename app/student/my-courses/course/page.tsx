@@ -1,3 +1,5 @@
+import CourseTask from "@/components/CourseTask/CourseTask";
+import Link from "next/link";
 import React from "react";
 
 const CourseDetails = () => {
@@ -27,23 +29,18 @@ const CourseDetails = () => {
 
           <section id="assignments" className="mb-10">
             <h2 className="text-2xl font-bold text-[#FFA41F]">Assignments</h2>
-            <div className="space-y-4 mt-4">
-              <div className="p-4 bg-white rounded-lg shadow">
-                <h3 className="text-lg font-semibold">
-                  Assignment 1: Using Hooks
-                </h3>
-                <p className="text-sm text-gray-500">
-                  Deadline: March 22, 2025 | Status: Completed
-                </p>
-              </div>
-              <div className="p-4 bg-white rounded-lg shadow">
-                <h3 className="text-lg font-semibold">
-                  Assignment 2: Context API
-                </h3>
-                <p className="text-sm text-gray-500">
-                  Deadline: April 5, 2025 | Status: Pending
-                </p>
-              </div>
+            <div className="space-y-4">
+              <CourseTask />
+              <CourseTask />
+              <CourseTask />
+            </div>
+            <div className="flex justify-center sm:justify-end  mt-4 mb-6">
+              <Link
+                href="/student/my-courses/course/tasks"
+                className="px-4 py-2 text-sm sm:text-base text-white bg-[#FFA41F] hover:bg-[#FF8700] rounded-lg font-semibold shadow-md transition-all duration-300 focus:ring-2 focus:ring-[#FFA41F] focus:ring-offset-2"
+              >
+                Show Details
+              </Link>
             </div>
           </section>
 
