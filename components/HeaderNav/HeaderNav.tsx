@@ -5,7 +5,11 @@ import NavLinks from "../NavLinks/NavLinks";
 import UserMenu from "../UserMenu/UserMenu";
 import { List } from "@phosphor-icons/react/dist/ssr";
 
-const HeaderNav = () => {
+interface positionProps {
+  position: string;
+}
+
+const HeaderNav = ({ position }: positionProps) => {
   const [showUserDetails, setShowUserDetails] = useState(false);
   const [showNav, setShowNav] = useState(false);
   const [login, setLogin] = useState(true);
@@ -17,9 +21,15 @@ const HeaderNav = () => {
   };
 
   return (
-    <header className="md:w-[750] lg:w-[970] xl:w-[1170] m-auto px-[15] flex items-center justify-between lg:absolute lg:left-1/2 lg:-translate-x-1/2 z-50">
-      <HeaderLogo />
-      <NavLinks showNav={showNav} setShowNav={setShowNav} />
+    <header
+      className={`md:w-[750] lg:w-[970] xl:w-[1170] m-auto px-[15] flex items-center justify-between  z-50 py-2.5 ${
+        position === "absolute"
+          ? "lg:absolute lg:left-1/2 lg:-translate-x-1/2"
+          : ""
+      } `}
+    >
+      <HeaderLogo position={position}/>
+      <NavLinks showNav={showNav} setShowNav={setShowNav} position={position}/>
       <UserMenu
         user={user}
         showUserDetails={showUserDetails}

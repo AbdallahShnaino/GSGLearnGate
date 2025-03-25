@@ -1,27 +1,52 @@
-import { Course } from "@/types/course";
+import { Role, User } from "@/types";
+import { Course, Task } from "@/types/course";
 import { MeetingRequest, Student } from "@/types/students";
-import { User } from "@/types/user";
 
-export const users: User[] = [
+export const mockUsers: User[] = [
   {
     id: 1,
-    name: "John Doe",
+    firstName: "John",
+    lastName: "Doe",
     email: "john.doe@example.com",
-    dob: "1990-05-15",
+    password: "hashed_password_123",
+    dateOfBirth: new Date("1995-06-15"),
+    image: "https://randomuser.me/api/portraits/men/1.jpg",
+    role: Role.ADMIN,
+    city: "New York",
+    createdAt: "2024-03-20T12:00:00Z",
+    updatedAt: "2024-03-22T15:45:00Z",
+    deletedAt: undefined,
   },
   {
     id: 2,
-    name: "Jane Smith",
+    firstName: "Jane",
+    lastName: "Smith",
     email: "jane.smith@example.com",
-    dob: "1985-09-23",
+    password: "hashed_password_456",
+    dateOfBirth: new Date("1998-09-25"),
+    image: "https://randomuser.me/api/portraits/women/2.jpg",
+    role: Role.MONITOR,
+    city: "Los Angeles",
+    createdAt: "2024-01-10T08:30:00Z",
+    updatedAt: "2024-02-15T10:10:00Z",
+    deletedAt: undefined,
   },
   {
     id: 3,
-    name: "Alice Johnson",
+    firstName: "Alice",
+    lastName: "Johnson",
     email: "alice.johnson@example.com",
-    dob: "1992-11-07",
+    password: "hashed_password_789",
+    dateOfBirth: new Date("2000-02-18"),
+    image: "https://randomuser.me/api/portraits/women/3.jpg",
+    role: Role.CO_MONITOR,
+    city: "Chicago",
+    createdAt: "2024-04-01T14:20:00Z",
+    updatedAt: "2024-04-05T16:50:00Z",
+    deletedAt: "2024-06-01T10:00:00Z",
   },
 ];
+
 
 export const courses: Course[] = [
   {
@@ -143,3 +168,60 @@ export const meeting: MeetingRequest[] = [
     caption: "Explanation of how to handle state in React and use hooks."
   }
 ]
+
+export const chartData = [
+  { course: "Math", students: 120 },
+  { course: "Science", students: 95 },
+  { course: "History", students: 75 },
+  { course: "English", students: 110 },
+  { course: "Computer Science", students: 150 },
+];
+
+
+export const tasks: Task[] = [
+  {
+    id: 1,
+    title: "Assignment #4: Database Design",
+    deadline: "Mar 28, 2025",
+    status: "active",
+    points: 100,
+    submissions: 15,
+    totalStudents: 42,
+  },
+  {
+    id: 2,
+    title: "Quiz #2: Data Structures",
+    deadline: "Mar 30, 2025",
+    status: "upcoming",
+    points: 50,
+    submissions: 0,
+    totalStudents: 42,
+  },
+  {
+    id: 3,
+    title: "Project Milestone: UI Prototype",
+    deadline: "Apr 5, 2025",
+    status: "active",
+    points: 150,
+    submissions: 8,
+    totalStudents: 42,
+  },
+  {
+    id: 4,
+    title: "Lab Exercise: Algorithm Implementation",
+    deadline: "Mar 22, 2025",
+    status: "completed",
+    points: 75,
+    submissions: 38,
+    totalStudents: 42,
+  },
+  {
+    id: 5,
+    title: "Midterm Exam: Programming Fundamentals",
+    deadline: "Apr 15, 2025",
+    status: "upcoming",
+    points: 200,
+    submissions: 0,
+    totalStudents: 42,
+  },
+];

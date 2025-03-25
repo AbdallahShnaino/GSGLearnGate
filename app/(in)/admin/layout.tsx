@@ -12,7 +12,7 @@ import { SidebarLink } from "@/types/user";
 
 export const links: SidebarLink[] = [
   {
-    href: "/admin/dashboard",
+    href: "/admin",
     label: "Dashboard",
     icon: <House size={24} weight="bold" />,
   },

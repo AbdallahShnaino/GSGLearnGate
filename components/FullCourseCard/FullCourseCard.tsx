@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 
 const FullCourseCard = () => {
@@ -32,9 +33,12 @@ const FullCourseCard = () => {
           <p className="text-gray-600">Mohammad Ahmad</p>
         </div>
       </div>
-      <button className="mt-3 px-4 py-2 bg-[#FFA41F] text-white rounded-lg hover:bg-[#FFA41F] transition cursor-pointer">
+      <Link
+        href="/student/my-courses/course"
+        className="mt-3 px-4 py-2 bg-[#FFA41F] text-white rounded-lg hover:bg-[#FFA41F] transition cursor-pointer flex justify-center"
+      >
         More Details
-      </button>
+      </Link>
     </div>
   );
 };

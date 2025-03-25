@@ -26,7 +26,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
   return (
     <>
       {login ? (
-        <div className="relative flex items-center gap-3">
+        <div className="relative flex items-center gap-3 z-50">
           <div className="w-[40] h-[40] rounded-full overflow-hidden cursor-pointer flex justify-center items-center">
             <Image
               src={"/img/Unknown_person.jpg"}
