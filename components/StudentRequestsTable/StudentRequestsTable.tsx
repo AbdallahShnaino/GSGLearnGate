@@ -1,8 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { CheckCircle, XCircle } from "phosphor-react";
-import SearchBar from "../SearchBar/SearchBar";
-import { useSearch } from "@/hooks/useSearch";
+import { useSearchParams } from "next/navigation";
 import PersonCard from "../PersonCard/PersonCard";
 import {
   getJoiningRequests,
@@ -16,6 +15,9 @@ import { addStudentToCourse, getMonitorCoursesNames } from "@/services/courses";
 import Loader from "../Shared/Loader";
 
 export default function StudentRequestsTable() {
+  const searchParams = useSearchParams();
+  const courseId = Number(searchParams.get("courseId")) || undefined;
+
   const [joiningOrders, setJoiningOrders] = useState<JoiningOrder[]>([]);
   const [monitorCoursesList, setMonitorCoursesList] = useState<
     { courseId: number; courseName: string }[]
@@ -33,6 +35,7 @@ export default function StudentRequestsTable() {
     setIsLoading(true);
     const requests = await getJoiningRequests(
       STATIC_MONITOR_ID,
+      courseId,
       currentPage,
       pageSize
     );
@@ -40,15 +43,14 @@ export default function StudentRequestsTable() {
     setIsLoading(false);
   };
   const fetchMonitorCourses = async () => {
-    setIsLoading(true);
     const coursesList = await getMonitorCoursesNames(STATIC_MONITOR_ID);
     setMonitorCoursesList(coursesList ?? []);
-    setIsLoading(false);
   };
 
   useEffect(() => {
     fetchRequests();
-  }, [currentPage]);
+    fetchMonitorCourses();
+  }, [currentPage, searchParams]);
 
   const handleOpenRejectModal = (order: JoiningOrder) => {
     setSelectedOrder(order);
@@ -75,10 +77,10 @@ export default function StudentRequestsTable() {
     courseId: number,
     studentId: number
   ) => {
-    updateJoiningRequestStatus(id, Status.ACCEPTED);
     addStudentToCourse(studentId, courseId);
-    handleCloseApproveModal();
+    await updateJoiningRequestStatus(id, Status.ACCEPTED);
     await fetchRequests();
+    handleCloseApproveModal();
   };
 
   const handleReject = async (id: number) => {
@@ -104,85 +106,93 @@ export default function StudentRequestsTable() {
         options={monitorCoursesList}
       />
       <div className="max-w-6xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
-        <div className="overflow-x-auto border border-gray-200">
-          <table className="w-full text-sm text-left text-gray-800">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-100 items-center">
-              <tr>
-                <th className="px-6 py-3"></th>
-                <th className="px-6 py-3">Course</th>
-                <th className="px-6 py-3">Interview Status</th>
-                <th className="px-6 py-3">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {joiningOrders.map((joiningOrder) => (
-                <tr
-                  className="bg-white hover:bg-gray-50 h-full border-b border-gray-100"
-                  key={joiningOrder.id}
-                >
-                  <td>
-                    <PersonCard
-                      email={joiningOrder.email ?? ""}
-                      imageURL={joiningOrder.image ?? "/profile (1).png"}
-                      name={
-                        joiningOrder.firstName + " " + joiningOrder.lastName
-                      }
-                    />
-                  </td>
-                  <td className="px-6 py-1.5 text-xs">
-                    {joiningOrder.courseName}
-                  </td>
-                  <td className="px-6 py-1.5 text-xs">
-                    {joiningOrder.interviewStatus}
-                  </td>
+        <div className="h-[400px] overflow-x-auto border border-gray-200">
+          {joiningOrders.length > 0 ? (
+            <table className="w-full text-sm text-left text-gray-800">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-100 items-center">
+                <tr>
+                  <th className="px-6 py-3"></th>
+                  <th className="px-6 py-3">Course</th>
+                  <th className="px-6 py-3">Interview Status</th>
+                  <th className="px-6 py-3">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {joiningOrders.map((joiningOrder) => (
+                  <tr
+                    className="bg-white hover:bg-gray-50 h-full border-b border-gray-100"
+                    key={joiningOrder.id}
+                  >
+                    <td>
+                      <PersonCard
+                        email={joiningOrder.email ?? ""}
+                        imageURL={joiningOrder.image ?? "/profile (1).png"}
+                        name={
+                          joiningOrder.firstName + " " + joiningOrder.lastName
+                        }
+                      />
+                    </td>
+                    <td className="px-6 py-1.5 text-xs">
+                      {joiningOrder.courseName}
+                    </td>
+                    <td className="px-6 py-1.5 text-xs">
+                      {joiningOrder.interviewStatus}
+                    </td>
 
-                  <td className="px-6 py-1.5">
-                    <div className="flex gap-1 items-center">
-                      {joiningOrder.joiningStatus === Status.ACCEPTED ? (
-                        <div className="flex items-center bg-[#a4e6c7] text-gray-800 rounded-2xl px-2 py-1">
-                          <CheckCircle
-                            size={14}
-                            weight="bold"
-                            className="mr-1 text-emerald-600"
-                          />
-                          <span className="text-xs">Approve</span>
-                        </div>
-                      ) : joiningOrder.joiningStatus === Status.REJECTED ? (
-                        <div className="flex items-center bg-[#ffc9c5] text-gray-800 rounded-2xl px-2 py-1">
-                          <XCircle
-                            size={14}
-                            weight="bold"
-                            className="mr-1 text-red-500"
-                          />
-                          <span className="text-xs">Rejected</span>
-                        </div>
-                      ) : (
-                        <>
-                          <button
-                            onClick={() => handleOpenRejectModal(joiningOrder)}
-                            className="text-red-500 hover:text-red-800 cursor-pointer"
-                          >
-                            <XCircle size={28} className="rounded-2xl" />
-                          </button>
-                          <button
-                            onClick={() => handleOpenApproveModal(joiningOrder)}
-                            className="flex items-center bg-gray-800 text-white rounded-md px-2 py-1 hover:bg-gray-700 cursor-pointer"
-                          >
+                    <td className="px-6 py-1.5">
+                      <div className="flex gap-1 items-center">
+                        {joiningOrder.joiningStatus === Status.ACCEPTED ? (
+                          <div className="flex items-center bg-[#a4e6c7] text-gray-800 rounded-2xl px-2 py-1">
                             <CheckCircle
                               size={14}
                               weight="bold"
-                              className="mr-1"
+                              className="mr-1 text-emerald-600"
                             />
                             <span className="text-xs">Approve</span>
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                          </div>
+                        ) : joiningOrder.joiningStatus === Status.REJECTED ? (
+                          <div className="flex items-center bg-[#ffc9c5] text-gray-800 rounded-2xl px-2 py-1">
+                            <XCircle
+                              size={14}
+                              weight="bold"
+                              className="mr-1 text-red-500"
+                            />
+                            <span className="text-xs">Rejected</span>
+                          </div>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() =>
+                                handleOpenRejectModal(joiningOrder)
+                              }
+                              className="text-red-500 hover:text-red-800 cursor-pointer"
+                            >
+                              <XCircle size={28} className="rounded-2xl" />
+                            </button>
+                            <button
+                              onClick={() =>
+                                handleOpenApproveModal(joiningOrder)
+                              }
+                              className="flex items-center bg-gray-800 text-white rounded-md px-2 py-1 hover:bg-gray-700 cursor-pointer"
+                            >
+                              <CheckCircle
+                                size={14}
+                                weight="bold"
+                                className="mr-1"
+                              />
+                              <span className="text-xs">Approve</span>
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="p-4 border-none text-center">No data to view</div>
+          )}
         </div>
       </div>
 

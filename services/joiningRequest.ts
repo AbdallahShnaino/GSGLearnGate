@@ -6,11 +6,13 @@ import { Status } from "@/types";
 
 export async function getJoiningRequests(
   monitorId: number,
+  courseId: number | undefined = undefined,
   currentPage: number,
   pageSize: number
 ) {
   return await getAllJoiningRequestsWithDetails(
     monitorId,
+    courseId,
     currentPage,
     pageSize
   );

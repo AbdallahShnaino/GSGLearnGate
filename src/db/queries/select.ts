@@ -1,5 +1,5 @@
 import { db } from "./../index";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, and } from "drizzle-orm";
 
 import {
   usersTable,
@@ -308,10 +308,15 @@ export async function getAllJoiningRequests(): Promise<JoiningRequest[]> {
 
 export async function getAllJoiningRequestsWithDetails(
   monitorId: number,
+  courseId: number | undefined,
   page: number = 1,
   pageSize: number = 10
 ): Promise<JoiningOrder[]> {
   const offset = (page - 1) * pageSize;
+  const whereConditions = [eq(coursesTable.monitorId, monitorId)];
+  if (courseId !== undefined) {
+    whereConditions.push(eq(coursesTable.id, courseId)); // Add courseId filter if provided
+  }
   const results = await db
     .select({
       id: joiningRequestsTable.id,
@@ -332,7 +337,8 @@ export async function getAllJoiningRequestsWithDetails(
       eq(joiningRequestsTable.studentId, studentsTable.id)
     )
     .leftJoin(usersTable, eq(studentsTable.userId, usersTable.id))
-    .where(eq(coursesTable.monitorId, monitorId))
+    // .where(eq(coursesTable.monitorId, monitorId))
+    .where(and(...whereConditions))
     .limit(pageSize)
     .offset(offset)
     .all();
