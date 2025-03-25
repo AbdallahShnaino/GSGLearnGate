@@ -10,7 +10,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     { href: "/co-mentor/attended-student", label: "Attended", icon: <CallBell size={16} /> },
     { href: "/co-mentor/announcments", label: "Announcment", icon: <Megaphone size={16} /> },
     { href: "/co-mentor/meeting-requests", label: "Meeting Requests", icon:<VideoCamera size={16} /> },
-    { href: "/co-mentor/add-task", label: "Create Task", icon:<ClipboardText size={16} weight="bold" /> },
+    { href: "/co-mentor/task-list", label: "Tasks", icon:<ClipboardText size={16} weight="bold" /> },
     
   ];
  

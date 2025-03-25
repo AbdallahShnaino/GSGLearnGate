@@ -62,7 +62,7 @@ const MeetingRequestsTable = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <SearchBar updateSearchParam={updateSearchParam} />
+      <SearchBar updateSearchParam={updateSearchParam} placeholderText="Search Request... " />
       <div className="max-w-6xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         <div className="overflow-x-auto border border-gray-200">
           <table className="w-full text-sm text-left text-gray-800">

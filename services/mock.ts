@@ -1,5 +1,5 @@
 import { Role, User } from "@/types";
-import { Course } from "@/types/course";
+import { Course, Task } from "@/types/course";
 import { MeetingRequest, Student } from "@/types/students";
 
 export const mockUsers: User[] = [
@@ -175,4 +175,53 @@ export const chartData = [
   { course: "History", students: 75 },
   { course: "English", students: 110 },
   { course: "Computer Science", students: 150 },
+];
+
+
+export const tasks: Task[] = [
+  {
+    id: 1,
+    title: "Assignment #4: Database Design",
+    deadline: "Mar 28, 2025",
+    status: "active",
+    points: 100,
+    submissions: 15,
+    totalStudents: 42,
+  },
+  {
+    id: 2,
+    title: "Quiz #2: Data Structures",
+    deadline: "Mar 30, 2025",
+    status: "upcoming",
+    points: 50,
+    submissions: 0,
+    totalStudents: 42,
+  },
+  {
+    id: 3,
+    title: "Project Milestone: UI Prototype",
+    deadline: "Apr 5, 2025",
+    status: "active",
+    points: 150,
+    submissions: 8,
+    totalStudents: 42,
+  },
+  {
+    id: 4,
+    title: "Lab Exercise: Algorithm Implementation",
+    deadline: "Mar 22, 2025",
+    status: "completed",
+    points: 75,
+    submissions: 38,
+    totalStudents: 42,
+  },
+  {
+    id: 5,
+    title: "Midterm Exam: Programming Fundamentals",
+    deadline: "Apr 15, 2025",
+    status: "upcoming",
+    points: 200,
+    submissions: 0,
+    totalStudents: 42,
+  },
 ];
