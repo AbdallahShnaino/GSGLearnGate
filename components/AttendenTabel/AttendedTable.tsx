@@ -42,13 +42,13 @@ const AttendedTable = () => {
 
   return (
     <div className="container mx-auto p-4">
-       <SearchBar updateSearchParam={updateSearchParam} />
+       <SearchBar updateSearchParam={updateSearchParam}  placeholderText="Search student..."  />
 
       <div className="max-w-5xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
       
        
 
-        {/* Table */}
+      
         <div className="overflow-x-auto border border-gray-200  ">
           <table className="w-full text-sm text-left text-gray-800">
             <thead className="text-xs text-gray-700 uppercase bg-gray-100 ">
