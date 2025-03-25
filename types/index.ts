@@ -147,10 +147,23 @@ export type JoiningRequest = {
   id: number;
   studentId: number;
   courseId: number;
-  status: Status;
+  interviewStatus: Status;
+  joiningStatus: Status;
 } & Timestamps;
 
-export interface StudentCourseChart{
-  course:string;
+export interface JoiningOrder {
+  id: number;
+  courseId: number | null;
+  studentId: number | null;
+  courseName: string;
+  firstName: string;
+  lastName: string | null;
+  email: string | null;
+  image: string | null;
+  interviewStatus: Status;
+  joiningStatus: Status;
+}
+export interface StudentCourseChart {
+  course: string;
   students: number;
 }

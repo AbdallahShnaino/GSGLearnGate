@@ -1,13 +1,13 @@
 CREATE TABLE `admins` (
 	`id` integer PRIMARY KEY NOT NULL,
-	`user_id` integer,
+	`user_id` integer NOT NULL,
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `announcements` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`posted_by` integer,
-	`course_id` integer,
+	`posted_by` integer NOT NULL,
+	`course_id` integer NOT NULL,
 	`title` text NOT NULL,
 	`description` text NOT NULL,
 	`updated_at` text DEFAULT (current_timestamp) NOT NULL,
@@ -19,8 +19,8 @@ CREATE TABLE `announcements` (
 --> statement-breakpoint
 CREATE TABLE `appointments` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`co_monitor_id` integer,
-	`student_id` integer,
+	`co_monitor_id` integer NOT NULL,
+	`student_id` integer NOT NULL,
 	`caption` text NOT NULL,
 	`date` integer NOT NULL,
 	`status` text NOT NULL,
@@ -33,9 +33,9 @@ CREATE TABLE `appointments` (
 --> statement-breakpoint
 CREATE TABLE `attachments` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`task_id` integer,
-	`student_id` integer,
-	`course_id` integer,
+	`task_id` integer NOT NULL,
+	`student_id` integer NOT NULL,
+	`course_id` integer NOT NULL,
 	`status` text NOT NULL,
 	`path` text NOT NULL,
 	`updated_at` text DEFAULT (current_timestamp) NOT NULL,
@@ -48,8 +48,8 @@ CREATE TABLE `attachments` (
 --> statement-breakpoint
 CREATE TABLE `attendances` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`student_id` integer,
-	`course_id` integer,
+	`student_id` integer NOT NULL,
+	`course_id` integer NOT NULL,
 	`absence` integer,
 	`updated_at` text DEFAULT (current_timestamp) NOT NULL,
 	`created_at` text DEFAULT (current_timestamp) NOT NULL,
@@ -60,7 +60,7 @@ CREATE TABLE `attendances` (
 --> statement-breakpoint
 CREATE TABLE `co_monitors` (
 	`id` integer PRIMARY KEY NOT NULL,
-	`user_id` integer,
+	`user_id` integer NOT NULL,
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
@@ -88,17 +88,29 @@ CREATE TABLE `courses` (
 	FOREIGN KEY (`admin_id`) REFERENCES `admins`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
+CREATE TABLE `joining_requests` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`student_id` integer NOT NULL,
+	`course_id` integer NOT NULL,
+	`interview_status` text NOT NULL,
+	`joining_status` text NOT NULL,
+	`updated_at` text DEFAULT (current_timestamp) NOT NULL,
+	`created_at` text DEFAULT (current_timestamp) NOT NULL,
+	`deleted_at` text DEFAULT (current_timestamp) NOT NULL,
+	FOREIGN KEY (`student_id`) REFERENCES `students`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`course_id`) REFERENCES `courses`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
 CREATE TABLE `monitors` (
 	`id` integer PRIMARY KEY NOT NULL,
-	`user_id` integer,
+	`user_id` integer NOT NULL,
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `students_courses` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`course_id` integer,
-	`student_id` integer,
-	`status` text NOT NULL,
+	`course_id` integer NOT NULL,
+	`student_id` integer NOT NULL,
 	`updated_at` text DEFAULT (current_timestamp) NOT NULL,
 	`created_at` text DEFAULT (current_timestamp) NOT NULL,
 	`deleted_at` text DEFAULT (current_timestamp) NOT NULL,
@@ -108,15 +120,15 @@ CREATE TABLE `students_courses` (
 --> statement-breakpoint
 CREATE TABLE `students` (
 	`id` integer PRIMARY KEY NOT NULL,
-	`user_id` integer,
+	`user_id` integer NOT NULL,
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `submissions` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`task_id` integer,
-	`student_id` integer,
-	`course_id` integer,
+	`task_id` integer NOT NULL,
+	`student_id` integer NOT NULL,
+	`course_id` integer NOT NULL,
 	`grade` integer,
 	`feedback` text NOT NULL,
 	`graded_at` integer NOT NULL,

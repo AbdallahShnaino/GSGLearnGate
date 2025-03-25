@@ -210,7 +210,10 @@ export const joiningRequestsTable = sqliteTable("joining_requests", {
   courseId: int("course_id")
     .notNull()
     .references((): AnySQLiteColumn => coursesTable.id),
-  status: text("status", {
+  interviewStatus: text("interview_status", {
+    enum: [Status.ACCEPTED, Status.PENDING, Status.REJECTED],
+  }).notNull(),
+  joiningStatus: text("joining_status", {
     enum: [Status.ACCEPTED, Status.PENDING, Status.REJECTED],
   }).notNull(),
   ...timestamps,

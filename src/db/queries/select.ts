@@ -1,5 +1,5 @@
 import { db } from "./../index";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, and } from "drizzle-orm";
 
 import {
   usersTable,
@@ -26,6 +26,7 @@ import {
   CoMonitor,
   Course,
   JoiningRequest,
+  JoiningOrder,
   Monitor,
   Student,
   StudentCourse,
@@ -128,6 +129,22 @@ export async function getCoursesByMonitor(
     .where(eq(coursesTable.monitorId, monitorId));
 
   return results.length > 0 ? results : null;
+}
+
+export async function getCoursesNamesByMonitor(
+  monitorId: number
+): Promise<{ courseId: number; courseName: string }[] | null> {
+  const results = await db
+    .select({
+      title: coursesTable.title,
+      id: coursesTable.id,
+    })
+    .from(coursesTable)
+    .where(eq(coursesTable.monitorId, monitorId));
+  return results.map((course) => ({
+    courseId: course.id,
+    courseName: course.title,
+  }));
 }
 
 export async function getCoursesByCoMonitor(
@@ -287,4 +304,74 @@ export async function getAllAttendances(): Promise<Attendance[]> {
 }
 export async function getAllJoiningRequests(): Promise<JoiningRequest[]> {
   return await db.select().from(joiningRequestsTable).all();
+}
+
+export async function getAllJoiningRequestsWithDetails(
+  monitorId: number,
+  courseId: number | undefined,
+  page: number = 1,
+  pageSize: number = 10
+): Promise<JoiningOrder[]> {
+  const offset = (page - 1) * pageSize;
+  const whereConditions = [eq(coursesTable.monitorId, monitorId)];
+  if (courseId !== undefined) {
+    whereConditions.push(eq(coursesTable.id, courseId)); // Add courseId filter if provided
+  }
+  const results = await db
+    .select({
+      id: joiningRequestsTable.id,
+      courseName: coursesTable.title,
+      courseId: coursesTable.id,
+      studentId: usersTable.id,
+      firstName: usersTable.firstName,
+      lastName: usersTable.lastName,
+      email: usersTable.email,
+      image: usersTable.image,
+      interviewStatus: joiningRequestsTable.interviewStatus,
+      joiningStatus: joiningRequestsTable.joiningStatus,
+    })
+    .from(joiningRequestsTable)
+    .leftJoin(coursesTable, eq(joiningRequestsTable.courseId, coursesTable.id))
+    .leftJoin(
+      studentsTable,
+      eq(joiningRequestsTable.studentId, studentsTable.id)
+    )
+    .leftJoin(usersTable, eq(studentsTable.userId, usersTable.id))
+    // .where(eq(coursesTable.monitorId, monitorId))
+    .where(and(...whereConditions))
+    .limit(pageSize)
+    .offset(offset)
+    .all();
+  /* 
+  const whereConditions = [
+    eq(coursesTable.monitorId, monitorId), // Always include monitorId filter
+  ];
+  if (courseId !== undefined) {
+    whereConditions.push(eq(coursesTable.id, courseId)); // Add courseId filter if provided
+  }
+    .where(and(...whereConditions)) // Spread the conditions into and()
+  
+*/
+  return results.map((result) => ({
+    id: result.id,
+    courseId: result.courseId,
+    studentId: result.studentId,
+    courseName: result.courseName ?? "Unknown Course",
+    firstName: result.firstName ?? "Unknown",
+    lastName: result.lastName,
+    email: result.email,
+    image: result.image,
+    interviewStatus: result.interviewStatus,
+    joiningStatus: result.joiningStatus,
+  }));
+}
+export async function updateJoiningRequest(
+  id: number,
+  updates: Partial<JoiningRequest>
+): Promise<JoiningRequest[]> {
+  return await db
+    .update(joiningRequestsTable)
+    .set(updates)
+    .where(eq(joiningRequestsTable.id, id))
+    .returning();
 }
