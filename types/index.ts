@@ -107,6 +107,17 @@ export type StudentCourse = {
   studentId: number;
 } & Timestamps;
 
+export type CourseJoinStudent = {
+  id: number;
+  title: string;
+  difficulty: Difficulty;
+  monitorId: number | null;
+  monitorName:string| null;
+  coMonitorId: number | null;
+  coMonitorName:string | null;
+  studentCount: number;
+}
+
 export type Submission = {
   id: number;
   taskId: number;
