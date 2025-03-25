@@ -4,7 +4,6 @@ import {
   Book,
   Users,
   Student,
-  Megaphone,
   UserGear,
   UserPlus,
 } from "@phosphor-icons/react/dist/ssr";

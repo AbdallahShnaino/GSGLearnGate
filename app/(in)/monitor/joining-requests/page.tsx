@@ -1,4 +1,3 @@
-import PersonCard from "@/components/PersonCard/PersonCard";
 import StudentRequestsTable from "@/components/StudentRequestsTable/StudentRequestsTable";
 
 export default function joiningRequestsPage() {
