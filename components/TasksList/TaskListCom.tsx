@@ -4,7 +4,6 @@ import { Clock } from "@phosphor-icons/react/dist/icons/Clock";
 import { DotsThree } from "@phosphor-icons/react/dist/icons/DotsThree";
 import React from "react";
 
-
 interface TaskListProps {
   tasks: Task[];
 }
@@ -33,7 +32,17 @@ const TaskListCom: React.FC<TaskListProps> = ({ tasks }) => {
                 <div className="flex items-center mt-1 text-sm text-gray-500 md:hidden">
                   <CalendarBlank size={14} className="mr-1" />
                   <span className="mr-3">{task.deadline}</span>
-
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-xs ${
+                      task.status === "active"
+                        ? "bg-green-100 text-green-700"
+                        : task.status === "upcoming"
+                        ? "bg-blue-100 text-blue-700"
+                        : "bg-gray-100 text-gray-700"
+                    }`}
+                  >
+                    {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+                  </span>
                 </div>
                 <div className="flex items-center mt-1 text-sm text-gray-500">
                   <span>
@@ -54,13 +63,13 @@ const TaskListCom: React.FC<TaskListProps> = ({ tasks }) => {
               </button>
             </div>
           </div>
-          <div className="col-span-2 flex items-center justify-center  md:flex">
+          <div className="col-span-2 flex items-center justify-center md:flex hidden">
             <div className="flex items-center">
               <Clock size={16} className="mr-1 text-[#FFA41F]" />
               <span>{task.deadline}</span>
             </div>
           </div>
-          <div className="col-span-2 flex items-center justify-center md:flex">
+          <div className="col-span-2 flex items-center justify-center md:flex hidden">
             <span
               className={`px-2 py-1 rounded-full text-xs ${
                 task.status === "active"
@@ -75,7 +84,7 @@ const TaskListCom: React.FC<TaskListProps> = ({ tasks }) => {
           </div>
           <div className="col-span-2 hidden md:flex">
             <div className="flex items-center justify-center w-full">
-              <div className=" text-[#FFA41F] px-2 py-1 rounded-md font-medium">
+              <div className="text-[#FFA41F] px-2 py-1 rounded-md font-medium">
                 {task.points}
               </div>
             </div>
