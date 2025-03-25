@@ -151,7 +151,6 @@ export type JoiningRequest = {
   joiningStatus: Status;
 } & Timestamps;
 
-// output of joining req orders
 export interface JoiningOrder {
   id: number;
   courseId: number | null;
@@ -163,4 +162,8 @@ export interface JoiningOrder {
   image: string | null;
   interviewStatus: Status;
   joiningStatus: Status;
+}
+export interface StudentCourseChart {
+  course: string;
+  students: number;
 }
