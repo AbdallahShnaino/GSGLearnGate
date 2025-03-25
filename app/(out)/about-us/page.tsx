@@ -1,5 +1,5 @@
 import Footer from "@/components/Footer/Footer";
-import HeaderNav from "@/components/HeaderNav/HeaderNav";
+import HeaderNav from "@/components/Header/HeaderNav/HeaderNav";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";

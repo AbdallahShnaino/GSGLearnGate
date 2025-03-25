@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import SignupForm from "@/components/SignupForm/SignupForm";
+import SignupForm from "@/components/Forms/SignupForm/SignupForm";
 import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
 
 const page = () => {
