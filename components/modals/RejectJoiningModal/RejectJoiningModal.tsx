@@ -53,34 +53,6 @@ export default function RejectJoiningModal({
             <p className="text-sm text-gray-500"> {order.email}</p>
           </div>
         </div>
-
-        {/*
-        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-          <p>
-            <span className="font-semibold text-gray-700">Request Date:</span>{" "}
-            {request.RequestDate}
-          </p>
-          <p>
-            <span className="font-semibold text-gray-700">Meeting Date:</span>{" "}
-            {request.MeetingDate}
-          </p>
-          <p>
-            <span className="font-semibold text-gray-700">Day:</span>{" "}
-            {request.day}
-          </p>
-          <p>
-            <span className="font-semibold text-gray-700">Time:</span>{" "}
-            {request.time}
-          </p>
-          <p className="col-span-2 border-t pt-3 text-gray-600">
-            <span className="font-semibold text-gray-700">Caption:</span>{" "}
-            {request.caption}
-          </p>
-        </div>
-     
-     
-     */}
-
         <div className="flex justify-end gap-3 mt-5">
           <button
             onClick={onClose}

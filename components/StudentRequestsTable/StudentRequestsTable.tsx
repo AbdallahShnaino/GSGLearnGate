@@ -16,7 +16,9 @@ import Loader from "../Shared/Loader";
 
 export default function StudentRequestsTable() {
   const searchParams = useSearchParams();
-  const courseId = Number(searchParams.get("courseId")) || undefined;
+  const [courseId, setCourseId] = useState<number | undefined>(
+    Number(searchParams.get("courseId")) || undefined
+  );
 
   const [joiningOrders, setJoiningOrders] = useState<JoiningOrder[]>([]);
   const [monitorCoursesList, setMonitorCoursesList] = useState<
@@ -48,9 +50,10 @@ export default function StudentRequestsTable() {
   };
 
   useEffect(() => {
+    setCourseId(Number(searchParams.get("courseId")) || undefined);
     fetchRequests();
     fetchMonitorCourses();
-  }, [currentPage, searchParams]);
+  }, [currentPage, searchParams, courseId]);
 
   const handleOpenRejectModal = (order: JoiningOrder) => {
     setSelectedOrder(order);
@@ -95,16 +98,12 @@ export default function StudentRequestsTable() {
   const handleNextPage = () => {
     setCurrentPage((prev) => prev + 1);
   };
-  const onSelectCourseChange = () => {};
   if (isLoading) {
     return <Loader message="Loading data..." />;
   }
   return (
     <div className="container mx-auto p-4">
-      <SelectCourse
-        onChange={onSelectCourseChange}
-        options={monitorCoursesList}
-      />
+      <SelectCourse options={monitorCoursesList} value={courseId} />
       <div className="max-w-6xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         <div className="h-[400px] overflow-x-auto border border-gray-200">
           {joiningOrders.length > 0 ? (
