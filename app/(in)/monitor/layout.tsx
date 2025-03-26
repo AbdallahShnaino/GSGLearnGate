@@ -6,6 +6,8 @@ import {
   Student,
   UserGear,
   UserPlus,
+  UserCirclePlus,
+  ReadCvLogo,
 } from "@phosphor-icons/react/dist/ssr";
 import { SidebarLink } from "@/types/user";
 
@@ -18,17 +20,17 @@ export const links: SidebarLink[] = [
   {
     href: "/monitor/joining-requests",
     label: "Joining Requests",
-    icon: <Book size={24} weight="bold" />,
+    icon: <UserCirclePlus size={24} weight="bold" />,
+  },
+  {
+    href: "/monitor/create-task",
+    label: "Create Task",
+    icon: <ReadCvLogo size={24} weight="bold" />,
   },
   {
     href: "/monitor/create-announcement",
     label: "Create Announcement",
     icon: <UserGear size={24} weight="bold" />,
-  },
-  {
-    href: "/monitor/task",
-    label: "Create Task",
-    icon: <Student size={24} weight="bold" />,
   },
   {
     href: "/monitor/grading",

@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "f8d55100-4ce2-4122-942d-492bc8ef6d8f",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "1a29bea3-d7ff-4056-ad9d-3e35949e6bf8",
+  "prevId": "f8d55100-4ce2-4122-942d-492bc8ef6d8f",
   "tables": {
     "admins": {
       "name": "admins",
@@ -1114,11 +1114,10 @@
         },
         "started_at": {
           "name": "started_at",
-          "type": "text",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
-          "default": "(current_timestamp)"
+          "autoincrement": false
         },
         "deadline": {
           "name": "deadline",

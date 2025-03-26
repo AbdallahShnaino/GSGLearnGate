@@ -1,3 +1,5 @@
+"use server";
+
 import { db } from "./../index";
 import { eq, sql, and } from "drizzle-orm";
 
@@ -141,10 +143,15 @@ export async function getCoursesNamesByMonitor(
     })
     .from(coursesTable)
     .where(eq(coursesTable.monitorId, monitorId));
-  return results.map((course) => ({
-    courseId: course.id,
-    courseName: course.title,
-  }));
+  try {
+    return results.map((course: { id: any; title: any }) => ({
+      courseId: course.id,
+      courseName: course.title,
+    }));
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
 }
 
 export async function getCoursesByCoMonitor(
@@ -291,10 +298,6 @@ export async function getSubmissionsByCourse(
   return results.length > 0 ? results : null;
 }
 
-export async function getAllTasks(): Promise<Task[]> {
-  return await db.select().from(tasksTable).all();
-}
-
 export async function getAllAttachments(): Promise<Attachment[]> {
   return await db.select().from(attachmentsTable).all();
 }
@@ -337,34 +340,37 @@ export async function getAllJoiningRequestsWithDetails(
       eq(joiningRequestsTable.studentId, studentsTable.id)
     )
     .leftJoin(usersTable, eq(studentsTable.userId, usersTable.id))
-    // .where(eq(coursesTable.monitorId, monitorId))
     .where(and(...whereConditions))
     .limit(pageSize)
     .offset(offset)
     .all();
-  /* 
-  const whereConditions = [
-    eq(coursesTable.monitorId, monitorId), // Always include monitorId filter
-  ];
-  if (courseId !== undefined) {
-    whereConditions.push(eq(coursesTable.id, courseId)); // Add courseId filter if provided
-  }
-    .where(and(...whereConditions)) // Spread the conditions into and()
-  
-*/
-  return results.map((result) => ({
-    id: result.id,
-    courseId: result.courseId,
-    studentId: result.studentId,
-    courseName: result.courseName ?? "Unknown Course",
-    firstName: result.firstName ?? "Unknown",
-    lastName: result.lastName,
-    email: result.email,
-    image: result.image,
-    interviewStatus: result.interviewStatus,
-    joiningStatus: result.joiningStatus,
-  }));
+  return results.map(
+    (result: {
+      id: any;
+      courseId: any;
+      studentId: any;
+      courseName: any;
+      firstName: any;
+      lastName: any;
+      email: any;
+      image: any;
+      interviewStatus: any;
+      joiningStatus: any;
+    }) => ({
+      id: result.id,
+      courseId: result.courseId,
+      studentId: result.studentId,
+      courseName: result.courseName ?? "Unknown Course",
+      firstName: result.firstName ?? "Unknown",
+      lastName: result.lastName,
+      email: result.email,
+      image: result.image,
+      interviewStatus: result.interviewStatus,
+      joiningStatus: result.joiningStatus,
+    })
+  );
 }
+
 export async function updateJoiningRequest(
   id: number,
   updates: Partial<JoiningRequest>

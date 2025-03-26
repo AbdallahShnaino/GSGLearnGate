@@ -8,12 +8,13 @@ import RejectJoiningModal from "../modals/RejectJoiningModal/RejectJoiningModal"
 import SelectCourse from "../Dropdowns/SelectCourse";
 import Loader from "../Shared/Loader";
 import useStudentRequests from "@/hooks/useStudentRequests";
-
-export default function StudentRequestsTable() {
+interface IProps {
+  monitorCoursesList: { courseId: number; courseName: string }[] | null;
+}
+export default function StudentRequestsTable({ monitorCoursesList }: IProps) {
   const {
     courseId,
     joiningOrders,
-    monitorCoursesList,
     currentPage,
     pageSize,
     isApproveModalOpen,
@@ -33,9 +34,16 @@ export default function StudentRequestsTable() {
   if (isLoading) {
     return <Loader message="Loading data..." />;
   }
+
   return (
     <div className="container mx-auto p-4">
-      <SelectCourse options={monitorCoursesList} value={courseId} />
+      <div className="my-5">
+        <SelectCourse
+          options={monitorCoursesList}
+          value={courseId}
+          appendSearchParams={true}
+        />
+      </div>
       <div className="max-w-6xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         <div className="h-[400px] overflow-x-auto border border-gray-200">
           {joiningOrders.length > 0 ? (
