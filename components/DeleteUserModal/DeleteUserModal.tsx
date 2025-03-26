@@ -2,18 +2,19 @@ import React from 'react'
 interface IProps{
     setOpen: (open:boolean)=>void;
     confirmDelete:()=>void;
-    selectedUser:string;
+    selectedUser?:string;
+    selectedCourse?:number;
 }
 const DeleteUserModal = (props:IProps) => {
   return (
-    <div className="fixed inset-0 flex items-center justify-center  bg-gray-900/10 backdrop-blur-sm">
+    <div className="fixed inset-0 flex justify-center items-center backdrop-blur-sm z-50">
 
     <div className="bg-white p-6 rounded-lg shadow-lg w-80">
       <h2 className="text-lg font-semibold text-gray-800">
         Delete User
       </h2>
       <p className="text-gray-600 mt-2">
-        Are you sure you want to delete <b>{props.selectedUser}</b>?
+        Are you sure you want to delete <b>{props.selectedUser?props.selectedUser:props.selectedCourse}</b>?
       </p>
       <div className="mt-4 flex justify-end space-x-3">
         <button
