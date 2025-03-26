@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import React, { useState } from "react";
-import EditProfileModal from "../EditProfileModal/EditProfileModal";
+import EditProfileModal from "../modals/EditProfileModal/EditProfileModal";
 
 const EditProfileImage = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -25,7 +25,12 @@ const EditProfileImage = () => {
           height={64}
         />
       </div>
-      {openModal && <EditProfileModal onClose={() => setOpenModal(false)} typeOfEdit={"editImage"} />}
+      {openModal && (
+        <EditProfileModal
+          onClose={() => setOpenModal(false)}
+          typeOfEdit={"editImage"}
+        />
+      )}
     </div>
   );
 };
