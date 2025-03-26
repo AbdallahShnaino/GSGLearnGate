@@ -7,6 +7,7 @@ import {
 import DeleteUserModal from "../DeleteUserModal/DeleteUserModal";
 import { useCoursesTable } from "@/hooks/useCourseTable";
 import Loader from "../Shared/Loader";
+import TempPagination from "../Pagination/TempPagination";
 
 export default function CoursesTable() {
   const {
@@ -18,6 +19,11 @@ export default function CoursesTable() {
     handleDeleteClick,
     confirmDelete,
     isLoading,
+    currentPage,
+    totalPages,
+    handleNextPage,
+    handlePreviousPage,
+    setCurrentPage,
   } = useCoursesTable();
 
   if (isLoading) {
@@ -25,7 +31,7 @@ export default function CoursesTable() {
   }
 
   return (
-    <div className="w-full max-w-5xl mx-auto p-4 space-y-4">
+    <div className="w-full max-w-4xl mx-auto p-4 space-y-4">
       <div className="relative">
         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
           <MagnifyingGlass size={20} className="text-[#FFA41F]" />
@@ -79,6 +85,14 @@ export default function CoursesTable() {
           </tbody>
         </table>
       </div>
+      <TempPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        handleNextPage={handleNextPage}
+        handlePreviousPage={handlePreviousPage}
+        onPageChange={setCurrentPage}
+      />
+
       {open && selectedCourse && (
         <DeleteUserModal
           setOpen={setOpen}

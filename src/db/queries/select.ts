@@ -268,9 +268,10 @@ export async function getStudentsByCourse(
   return results.length > 0 ? results : null;
 }
 export async function getCoursesWithStudentCount(
-  limit: number, 
-  offset: number
-): Promise<CourseJoinStudent[] | null> {
+  page: number = 1,
+  pageSize: number = 10
+): Promise<{ courses: CourseJoinStudent[]; totalCount: number } | null> {
+  const offset = (page - 1) * pageSize;
   const monitorUsers = alias(usersTable, "monitorUsers");
   const coMonitorUsers = alias(usersTable, "coMonitorUsers");
 
@@ -296,23 +297,35 @@ export async function getCoursesWithStudentCount(
       monitorUsers.firstName,
       coMonitorUsers.firstName
     )
-    .limit(limit)
-    .offset(offset).all();
+    .limit(pageSize)
+    .offset(offset)
+    .all();
 
-  return results.map(result =>({
-    id: result.id,
-      title: result.title,
-      difficulty: result.difficulty,
-      monitorId: result.monitorId,
-      monitorName: result.monitorName,
-      coMonitorId: result.coMonitorId,
-      coMonitorName: result.coMonitorName,
-      studentCount: result.studentCount,
-  }));
+  const totalCount = await db  .select({
+    id: coursesTable.id,
+    title: coursesTable.title,
+    difficulty: coursesTable.difficulty,
+    monitorId: monitorsTable.userId,
+    monitorName: monitorUsers.firstName,
+    coMonitorId: coMonitorsTable.userId,
+    coMonitorName: coMonitorUsers.firstName,
+    studentCount: sql<number>`COUNT(${studentsCoursesTable.studentId})`.as("studentCount"),
+  })
+  .from(coursesTable)
+  .leftJoin(studentsCoursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
+  .leftJoin(monitorsTable, eq(coursesTable.id, monitorsTable.id))
+  .leftJoin(monitorUsers, eq(monitorsTable.userId, monitorUsers.id))
+  .leftJoin(coMonitorsTable, eq(coursesTable.id, coMonitorsTable.id))
+  .leftJoin(coMonitorUsers, eq(coMonitorsTable.userId, coMonitorUsers.id))
+  .groupBy(
+    coursesTable.id,
+    monitorUsers.firstName,
+    coMonitorUsers.firstName
+  ).all();
+   
+
+  return { courses: results, totalCount: totalCount.length };
 }
-
-
-
 
 
 export async function getAllSubmissions(): Promise<Submission[]> {
