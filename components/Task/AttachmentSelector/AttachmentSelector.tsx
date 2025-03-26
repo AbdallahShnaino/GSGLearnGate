@@ -106,6 +106,3 @@ export const AttachmentSelector = ({
     </div>
   );
 };
-/* transition-all duration-300 ease-in-out active:scale-95
-
-*/
