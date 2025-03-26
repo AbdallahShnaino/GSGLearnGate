@@ -178,3 +178,15 @@ export interface StudentCourseChart {
   course: string;
   students: number;
 }
+
+export type MonitorsJoinUsers = {
+  id: number;
+  userId: number;
+  firstName: string | null;
+  lastName: string | null;
+  email: string | null;
+  dateOfBirth: Date | null;
+  image: string | null;
+  role: Role | null;
+  city: string | null;
+};

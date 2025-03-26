@@ -1,5 +1,5 @@
 import UsersTable from '@/components/UsersTables/UsersTable';
-import { mockUsers } from '@/services/mock';
+import { Role } from '@/types';
 import { UserCircle } from '@phosphor-icons/react/dist/ssr';
 import React from 'react'
 
@@ -13,7 +13,7 @@ const ViewStudentsPage = () => {
         <UserCircle size={32} weight="duotone" className="text-[#FFA41F]" />
       </div>
     </div>
-    <UsersTable users={mockUsers} />
+    <UsersTable role={Role.STUDENT} />
   </div>
   )
 }

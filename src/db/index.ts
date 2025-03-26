@@ -7,7 +7,7 @@ export const db = drizzle({
   connection: {
     url: "libsql://gsglearngatedb-abdallah-shnaino.turso.io",
     authToken:
-      "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJleHAiOjE3NDU0ODY5MzEsImlhdCI6MTc0Mjg5NDkzMSwiaWQiOiI0YzkwMDMyZC0xZmVjLTQ5NjgtYTFkMS1hMWNhNWM1Yzg1NzgifQ.-jk9mYCQCkMWOJsjhMKsWCWjSSEim91XufMQCGI88dWWLXHJFiQ3uGaF9gukTUs88H0lbLAE_P8bmgisx2kHBA",
+      "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJleHAiOjE3NDU1NjM3NTksImlhdCI6MTc0Mjk3MTc1OSwiaWQiOiJjMDNiNDU0OS02NjJkLTQ0YWItOGMxMi00NzdmYzFlN2Y4YjcifQ.jlzz_4Wjmr9PLtWbeIINDCoGegqCyaCSKUFTegQB1oyb8iwxM2tdDSfNAnK4mhvcj82fp3PliQrR89a3I5HbAA",
   },
 });
 

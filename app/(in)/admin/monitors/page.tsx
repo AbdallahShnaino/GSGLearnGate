@@ -1,7 +1,7 @@
 import React from "react";
 import { UserCircle } from "@phosphor-icons/react/dist/ssr";
 import UsersTable from "@/components/UsersTables/UsersTable";
-import { mockUsers } from "@/services/mock";
+import { Role } from "@/types";
 
 const ViewMonitorsPage = () => {
   return (
@@ -13,7 +13,7 @@ const ViewMonitorsPage = () => {
           <UserCircle size={32} weight="duotone" className="text-[#FFA41F]" />
         </div>
       </div>
-      <UsersTable users={mockUsers} />
+      <UsersTable role={Role.MONITOR} />
     </div>
   );
 };
