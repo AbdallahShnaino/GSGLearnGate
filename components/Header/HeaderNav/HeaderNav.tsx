@@ -1,9 +1,9 @@
 "use client";
 import React, { useState } from "react";
-import HeaderLogo from "../HeaderLogo/HeaderLogo";
-import NavLinks from "../NavLinks/NavLinks";
 import UserMenu from "../UserMenu/UserMenu";
 import { List } from "@phosphor-icons/react/dist/ssr";
+import HeaderLogo from "../HeaderLogo/HeaderLogo";
+import NavLinks from "@/components/NavLinks/NavLinks";
 
 interface positionProps {
   position: string;
