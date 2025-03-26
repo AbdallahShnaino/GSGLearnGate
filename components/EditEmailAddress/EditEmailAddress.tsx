@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import EditProfileModal from "../EditProfileModal/EditProfileModal";
+import EditProfileModal from "../modals/EditProfileModal/EditProfileModal";
 
 const EditEmailAddress = () => {
   //================{For Test}======================
