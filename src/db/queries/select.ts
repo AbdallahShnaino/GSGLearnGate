@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "./../index";
-import { eq, sql, and } from "drizzle-orm";
+import { eq, sql, and, count, lte, gt } from "drizzle-orm";
 
 import {
   usersTable,
@@ -39,19 +39,18 @@ import {
   CourseJoinStudent,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
+import { MonitorsTasks } from "@/types/tasksOperations";
 export async function getAllUsers(): Promise<User[]> {
   return await db.select().from(usersTable).all();
 }
 export async function getUserByEmail(
   email: string
 ): Promise<Omit<User, "password"> | null> {
-  // i am adding limit 1 to avoid returning array
   const result = await db
     .select()
     .from(usersTable)
     .where(eq(usersTable.email, email))
     .limit(1);
-  // may there is user with that email and may not
   return result.length > 0 ? result[0] : null;
 }
 
@@ -63,9 +62,11 @@ export async function getAllMonitors(): Promise<Monitor[]> {
   return await db.select().from(monitorsTable).all();
 }
 
-export async function getMonitors (page: number = 1,
-  pageSize: number = 10):Promise<{users:MonitorsJoinUsers[], totalCount:number}| null>{
-    const offset = (page - 1) * pageSize;
+export async function getMonitors(
+  page: number = 1,
+  pageSize: number = 10
+): Promise<{ users: MonitorsJoinUsers[]; totalCount: number } | null> {
+  const offset = (page - 1) * pageSize;
   const result = await db
     .select({
       id: monitorsTable.id,
@@ -79,24 +80,31 @@ export async function getMonitors (page: number = 1,
       city: usersTable.city,
     })
     .from(monitorsTable)
-    .leftJoin(usersTable, eq(usersTable.id,monitorsTable.userId)).limit(pageSize).offset(offset).all();
+    .leftJoin(usersTable, eq(usersTable.id, monitorsTable.userId))
+    .limit(pageSize)
+    .offset(offset)
+    .all();
 
-    const totalCount = await db
+  const totalCount = await db
     .select({
       monitorId: monitorsTable.id,
-      userId: monitorsTable.userId})
+      userId: monitorsTable.userId,
+    })
     .from(monitorsTable)
-    .leftJoin(usersTable, eq(usersTable.id,monitorsTable.userId)).all();
+    .leftJoin(usersTable, eq(usersTable.id, monitorsTable.userId))
+    .all();
 
-  return {users:result, totalCount: totalCount.length};
-};
+  return { users: result, totalCount: totalCount.length };
+}
 
 export async function getAllCoMonitors(): Promise<CoMonitor[]> {
   return await db.select().from(coMonitorsTable).all();
 }
-export async function getCoMonitors (page: number = 1,
-  pageSize: number = 10):Promise<{users:MonitorsJoinUsers[], totalCount:number}| null>{
-    const offset = (page - 1) * pageSize;
+export async function getCoMonitors(
+  page: number = 1,
+  pageSize: number = 10
+): Promise<{ users: MonitorsJoinUsers[]; totalCount: number } | null> {
+  const offset = (page - 1) * pageSize;
   const result = await db
     .select({
       id: coMonitorsTable.id,
@@ -110,25 +118,32 @@ export async function getCoMonitors (page: number = 1,
       city: usersTable.city,
     })
     .from(coMonitorsTable)
-    .leftJoin(usersTable, eq(usersTable.id,coMonitorsTable.userId)).limit(pageSize).offset(offset).all();
+    .leftJoin(usersTable, eq(usersTable.id, coMonitorsTable.userId))
+    .limit(pageSize)
+    .offset(offset)
+    .all();
 
-    const totalCount = await db
+  const totalCount = await db
     .select({
       monitorId: coMonitorsTable.id,
-      userId: coMonitorsTable.userId})
+      userId: coMonitorsTable.userId,
+    })
     .from(coMonitorsTable)
-    .leftJoin(usersTable, eq(usersTable.id,coMonitorsTable.userId)).all();
+    .leftJoin(usersTable, eq(usersTable.id, coMonitorsTable.userId))
+    .all();
 
-  return {users:result, totalCount: totalCount.length};
-};
+  return { users: result, totalCount: totalCount.length };
+}
 
 export async function getAllStudents(): Promise<Student[]> {
   return await db.select().from(studentsTable).all();
 }
 
-export async function getStudents (page: number = 1,
-  pageSize: number = 10):Promise<{users:MonitorsJoinUsers[], totalCount:number}| null>{
-    const offset = (page - 1) * pageSize;
+export async function getStudents(
+  page: number = 1,
+  pageSize: number = 10
+): Promise<{ users: MonitorsJoinUsers[]; totalCount: number } | null> {
+  const offset = (page - 1) * pageSize;
   const result = await db
     .select({
       id: studentsTable.id,
@@ -142,17 +157,22 @@ export async function getStudents (page: number = 1,
       city: usersTable.city,
     })
     .from(studentsTable)
-    .leftJoin(usersTable, eq(usersTable.id,studentsTable.userId)).limit(pageSize).offset(offset).all();
+    .leftJoin(usersTable, eq(usersTable.id, studentsTable.userId))
+    .limit(pageSize)
+    .offset(offset)
+    .all();
 
-    const totalCount = await db
+  const totalCount = await db
     .select({
       monitorId: studentsTable.id,
-      userId: studentsTable.userId})
+      userId: studentsTable.userId,
+    })
     .from(studentsTable)
-    .leftJoin(usersTable, eq(usersTable.id,studentsTable.userId)).all();
+    .leftJoin(usersTable, eq(usersTable.id, studentsTable.userId))
+    .all();
 
-  return {users:result, totalCount: totalCount.length};
-};
+  return { users: result, totalCount: totalCount.length };
+}
 
 export async function getAllCourses(): Promise<Course[]> {
   return await db.select().from(coursesTable).all();
@@ -183,7 +203,6 @@ export async function getCoursesByStudent(
       deletedAt: coursesTable.deletedAt,
     })
     .from(studentsCoursesTable)
-    // innerJoin to merge 2 tables rows togather
     .innerJoin(coursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
     .where(eq(studentsCoursesTable.studentId, studentId));
 
@@ -375,50 +394,149 @@ export async function getCoursesWithStudentCount(
       monitorName: monitorUsers.firstName,
       coMonitorId: coMonitorsTable.userId,
       coMonitorName: coMonitorUsers.firstName,
-      studentCount: sql<number>`COUNT(${studentsCoursesTable.studentId})`.as("studentCount"),
+      studentCount: sql<number>`COUNT(${studentsCoursesTable.studentId})`.as(
+        "studentCount"
+      ),
     })
     .from(coursesTable)
-    .leftJoin(studentsCoursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
+    .leftJoin(
+      studentsCoursesTable,
+      eq(coursesTable.id, studentsCoursesTable.courseId)
+    )
     .leftJoin(monitorsTable, eq(coursesTable.id, monitorsTable.id))
     .leftJoin(monitorUsers, eq(monitorsTable.userId, monitorUsers.id))
     .leftJoin(coMonitorsTable, eq(coursesTable.id, coMonitorsTable.id))
     .leftJoin(coMonitorUsers, eq(coMonitorsTable.userId, coMonitorUsers.id))
-    .groupBy(
-      coursesTable.id,
-      monitorUsers.firstName,
-      coMonitorUsers.firstName
-    )
+    .groupBy(coursesTable.id, monitorUsers.firstName, coMonitorUsers.firstName)
     .limit(pageSize)
     .offset(offset)
     .all();
 
-  const totalCount = await db  .select({
-    id: coursesTable.id,
-    title: coursesTable.title,
-    difficulty: coursesTable.difficulty,
-    monitorId: monitorsTable.userId,
-    monitorName: monitorUsers.firstName,
-    coMonitorId: coMonitorsTable.userId,
-    coMonitorName: coMonitorUsers.firstName,
-    studentCount: sql<number>`COUNT(${studentsCoursesTable.studentId})`.as("studentCount"),
-  })
-  .from(coursesTable)
-  .leftJoin(studentsCoursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
-  .leftJoin(monitorsTable, eq(coursesTable.id, monitorsTable.id))
-  .leftJoin(monitorUsers, eq(monitorsTable.userId, monitorUsers.id))
-  .leftJoin(coMonitorsTable, eq(coursesTable.id, coMonitorsTable.id))
-  .leftJoin(coMonitorUsers, eq(coMonitorsTable.userId, coMonitorUsers.id))
-  .groupBy(
-    coursesTable.id,
-    monitorUsers.firstName,
-    coMonitorUsers.firstName
-  ).all();
-   
+  const totalCount = await db
+    .select({
+      id: coursesTable.id,
+      title: coursesTable.title,
+      difficulty: coursesTable.difficulty,
+      monitorId: monitorsTable.userId,
+      monitorName: monitorUsers.firstName,
+      coMonitorId: coMonitorsTable.userId,
+      coMonitorName: coMonitorUsers.firstName,
+      studentCount: sql<number>`COUNT(${studentsCoursesTable.studentId})`.as(
+        "studentCount"
+      ),
+    })
+    .from(coursesTable)
+    .leftJoin(
+      studentsCoursesTable,
+      eq(coursesTable.id, studentsCoursesTable.courseId)
+    )
+    .leftJoin(monitorsTable, eq(coursesTable.id, monitorsTable.id))
+    .leftJoin(monitorUsers, eq(monitorsTable.userId, monitorUsers.id))
+    .leftJoin(coMonitorsTable, eq(coursesTable.id, coMonitorsTable.id))
+    .leftJoin(coMonitorUsers, eq(coMonitorsTable.userId, coMonitorUsers.id))
+    .groupBy(coursesTable.id, monitorUsers.firstName, coMonitorUsers.firstName)
+    .all();
 
   return { courses: results, totalCount: totalCount.length };
 }
 
+export async function getMonitorTasksDeadlines(
+  monitorId: number
+): Promise<Date[]> {
+  const results = await db
+    .select({
+      deadline: tasksTable.deadline,
+    })
+    .from(tasksTable)
+    .innerJoin(monitorsTable, eq(monitorsTable.userId, tasksTable.creatorId))
+    .where(eq(monitorsTable.userId, monitorId));
 
+  const deadlines = results.map(
+    (result: { deadline: string | number | Date }) => new Date(result.deadline)
+  );
+  return deadlines;
+}
+export async function getMonitorTasksNotGradedCount(
+  monitorId: number
+): Promise<number> {
+  const result = await db
+    .select({ total: count() })
+    .from(submissionsTable)
+    .innerJoin(coursesTable, eq(submissionsTable.courseId, coursesTable.id))
+    .where(
+      and(eq(coursesTable.monitorId, monitorId), lte(submissionsTable.grade, 0))
+    );
+
+  return result[0]?.total || 0;
+}
+
+export async function getTasksByMonitor(
+  monitorId: number
+): Promise<MonitorsTasks[]> {
+  const tasks = await db
+    .select({
+      id: tasksTable.id,
+      title: tasksTable.title,
+      description: tasksTable.description,
+      courseId: tasksTable.courseId,
+      startedAt: tasksTable.startedAt,
+      deadline: tasksTable.deadline,
+      points: tasksTable.points,
+      createdAt: tasksTable.createdAt,
+      updatedAt: tasksTable.updatedAt,
+      courseTitle: coursesTable.title,
+      submissionCount: sql<number>`
+        count(distinct ${submissionsTable.id})
+      `.as("submission_count"),
+      studentCount: sql<number>`
+        count(distinct ${studentsCoursesTable.studentId})
+      `.as("student_count"),
+    })
+    .from(tasksTable)
+    .innerJoin(monitorsTable, eq(monitorsTable.userId, tasksTable.creatorId))
+    .leftJoin(coursesTable, eq(tasksTable.courseId, coursesTable.id))
+    .leftJoin(submissionsTable, eq(tasksTable.id, submissionsTable.taskId))
+    .leftJoin(
+      studentsCoursesTable,
+      eq(tasksTable.courseId, studentsCoursesTable.courseId)
+    )
+    .where(eq(monitorsTable.userId, monitorId))
+    .groupBy(
+      tasksTable.id,
+      tasksTable.title,
+      tasksTable.description,
+      tasksTable.courseId,
+      tasksTable.startedAt,
+      tasksTable.deadline,
+      tasksTable.points,
+      tasksTable.createdAt,
+      tasksTable.updatedAt,
+      coursesTable.title
+    );
+  return tasks;
+}
+
+/*
+export async function getTasksByMonitor(monitorId: number) {
+  const tasks = await db
+    .select({
+      id: tasksTable.id,
+      title: tasksTable.title,
+      description: tasksTable.description,
+      courseId: tasksTable.courseId,
+      startedAt: tasksTable.startedAt,
+      deadline: tasksTable.deadline,
+      points: tasksTable.points,
+      createdAt: tasksTable.createdAt,
+      updatedAt: tasksTable.updatedAt,
+    })
+    .from(tasksTable)
+    .innerJoin(monitorsTable, eq(monitorsTable.userId, tasksTable.creatorId))
+    .where(eq(monitorsTable.userId, monitorId));
+
+  return tasks as Task[];
+}
+*/
 export async function getAllSubmissions(): Promise<Submission[]> {
   return await db.select().from(submissionsTable).all();
 }
@@ -465,7 +583,7 @@ export async function getAllJoiningRequestsWithDetails(
   const offset = (page - 1) * pageSize;
   const whereConditions = [eq(coursesTable.monitorId, monitorId)];
   if (courseId !== undefined) {
-    whereConditions.push(eq(coursesTable.id, courseId)); // Add courseId filter if provided
+    whereConditions.push(eq(coursesTable.id, courseId));
   }
   const results = await db
     .select({
@@ -527,4 +645,20 @@ export async function updateJoiningRequest(
     .set(updates)
     .where(eq(joiningRequestsTable.id, id))
     .returning();
+}
+
+export async function getLateSubmissionsCountByMonitor(monitorId: number) {
+  const result = await db
+    .select({ count: count() })
+    .from(submissionsTable)
+    .innerJoin(tasksTable, eq(submissionsTable.taskId, tasksTable.id))
+    .innerJoin(coursesTable, eq(submissionsTable.courseId, coursesTable.id))
+    .where(
+      and(
+        eq(coursesTable.monitorId, monitorId),
+        gt(submissionsTable.createdAt, tasksTable.deadline)
+      )
+    );
+
+  return result[0]?.count ?? 0;
 }
