@@ -3,22 +3,20 @@
 import { insertTask } from "@/src/db/queries/insert";
 
 export async function createTaskByMonitor(
-  monitorId: number,
+  creatorId: number,
   courseId: number,
   deadline: Date,
   startedAt: Date,
   title: string,
   description: string,
-  points: number,
-  coMonitorId: number = 1
+  points: number
 ) {
   return await insertTask({
-    coMonitorId,
+    creatorId,
     title,
     courseId,
     deadline,
     description,
-    monitorId,
     startedAt,
     points,
   });

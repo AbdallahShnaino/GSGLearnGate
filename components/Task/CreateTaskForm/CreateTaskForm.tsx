@@ -29,7 +29,14 @@ export default function CreateTaskForm({ coursesList }: IProps) {
   };
 
   const [formState, formAction] = useFormState(submitTask, initialState);
-
+  const handleSubmit = (formData: FormData) => {
+    if (attachment.type === "link" && attachment.value) {
+      formData.set("url", attachment.value as string);
+    } else if (attachment.type === "file" && attachment.value) {
+      formData.set("file", attachment.value as File);
+    }
+    return formAction(formData);
+  };
   const handleAttachmentChange = (
     type: AttachmentType,
     value?: string | File | null
@@ -41,12 +48,11 @@ export default function CreateTaskForm({ coursesList }: IProps) {
     } else if (type === "file" && value instanceof File) {
       setAttachment({ type: "file", value });
     }
-    console.log("attachment ", attachment);
   };
 
   return (
     <form
-      action={formAction}
+      action={handleSubmit}
       className="space-y-4 max-w-6xl mx-auto p-4 border-none rounded-lg shadow-sm bg-white"
     >
       <h2 className="text-xl font-semibold text-[#FFA41F]">Create New Task</h2>

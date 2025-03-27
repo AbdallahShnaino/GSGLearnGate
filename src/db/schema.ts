@@ -162,12 +162,9 @@ export const submissionsTable = sqliteTable("submissions", {
 
 export const tasksTable = sqliteTable("tasks", {
   id: int().primaryKey({ autoIncrement: true }),
-  monitorId: int("monitor_id")
+  creatorId: int("creator_id")
     .notNull()
-    .references((): AnySQLiteColumn => monitorsTable.id),
-  coMonitorId: int("co_monitor_id")
-    .notNull()
-    .references((): AnySQLiteColumn => coMonitorsTable.id),
+    .references((): AnySQLiteColumn => usersTable.id),
   courseId: int("course_id")
     .notNull()
     .references((): AnySQLiteColumn => coursesTable.id),
@@ -190,9 +187,7 @@ export const attachmentsTable = sqliteTable("attachments", {
   courseId: int("course_id")
     .notNull()
     .references((): AnySQLiteColumn => coursesTable.id),
-  submissionId: int("submission_id")
-    .notNull()
-    .references((): AnySQLiteColumn => submissionsTable.id),
+  submissionId: int("submission_id"),
   type: text("status", {
     enum: [Attachments.FILE, Attachments.LINK],
   }).notNull(),

@@ -145,19 +145,17 @@ CREATE TABLE `submissions` (
 --> statement-breakpoint
 CREATE TABLE `tasks` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`monitor_id` integer NOT NULL,
-	`co_monitor_id` integer NOT NULL,
+	`creator_id` integer NOT NULL,
 	`course_id` integer NOT NULL,
 	`title` text NOT NULL,
 	`description` text NOT NULL,
-	`started_at` text DEFAULT (current_timestamp) NOT NULL,
+	`started_at` integer NOT NULL,
 	`deadline` integer NOT NULL,
 	`grade` integer,
 	`updated_at` text DEFAULT (current_timestamp) NOT NULL,
 	`created_at` text DEFAULT (current_timestamp) NOT NULL,
 	`deleted_at` text DEFAULT (current_timestamp) NOT NULL,
-	FOREIGN KEY (`monitor_id`) REFERENCES `monitors`(`id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`co_monitor_id`) REFERENCES `co_monitors`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`creator_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`course_id`) REFERENCES `courses`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint

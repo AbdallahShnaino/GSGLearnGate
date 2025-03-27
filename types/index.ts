@@ -109,8 +109,7 @@ export type StudentCourse = {
 
 export type Task = {
   id: number;
-  monitorId: number;
-  coMonitorId: number;
+  creatorId: number;
   courseId: number;
   title: string;
   description: string;

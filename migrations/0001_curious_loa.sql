@@ -1,1 +1,0 @@
-ALTER TABLE `tasks` ALTER COLUMN "started_at" TO "started_at" integer NOT NULL;

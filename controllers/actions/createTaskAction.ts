@@ -10,13 +10,11 @@ import { Attachments } from "@/types";
 export type TaskState =
   | { success: false; error: string; message: string; taskId: undefined }
   | { success: true; message: string; taskId: number; error?: undefined };
-
+const NOT_SUBMISSION = -1;
 export async function submitTask(
   state: TaskState,
   formData: FormData
 ): Promise<TaskState> {
-  console.log("formData : ", Object.fromEntries(formData));
-
   try {
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
@@ -25,8 +23,7 @@ export async function submitTask(
     const points = formData.get("points") as string;
     const monitorId = formData.get("monitorId") as string;
     const courseId = formData.get("courseId") as string;
-    const url = formData.get("url") as string;
-
+    const url = formData.get("url") as string | File;
     if (
       !title ||
       !description ||
@@ -43,9 +40,6 @@ export async function submitTask(
       };
     }
 
-    const file = formData.get("file") as File | null;
-    let filePath: string | null = null;
-
     const newTask = await createTaskByMonitor(
       Number(monitorId),
       Number(courseId),
@@ -55,7 +49,9 @@ export async function submitTask(
       description,
       Number(points)
     );
-    if (file) {
+    const file = formData.get("file") as File | null;
+    if (file && file instanceof File && file.size > 0) {
+      let filePath: string | null = null;
       const fileExtension = path.extname(file.name);
       const randomName = `${randomUUID()}${fileExtension}`;
       const uploadDir = path.join(process.cwd(), "uploads");
@@ -71,7 +67,7 @@ export async function submitTask(
         Number(courseId),
         Number(monitorId),
         publicFilePath,
-        1,
+        NOT_SUBMISSION,
         newTask.id,
         Attachments.FILE
       );
@@ -80,12 +76,12 @@ export async function submitTask(
         message: "Task creation done.",
         taskId: newTask.id,
       };
-    } else if (url) {
+    } else if (typeof url == "string") {
       await addAttachmentForTask(
         Number(courseId),
         Number(monitorId),
         url,
-        1,
+        NOT_SUBMISSION,
         newTask.id,
         Attachments.LINK
       );
@@ -111,7 +107,6 @@ export async function submitTask(
       }
     }
   } catch (error) {
-    console.error("Error in submitTask:", error);
     return {
       success: false,
       error: "Something went wrong",

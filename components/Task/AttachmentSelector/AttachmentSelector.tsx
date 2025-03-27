@@ -90,7 +90,7 @@ export const AttachmentSelector = ({
           <input
             type="file"
             id="file"
-            name="url"
+            name="file"
             onChange={handleFileChange}
             className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-[#FFA41F] file:px-4 file:py-2 file:text-white file:shadow-sm hover:file:bg-[#ffd9a0] "
           />

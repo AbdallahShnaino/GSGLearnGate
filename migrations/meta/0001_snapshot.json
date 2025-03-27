@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "1a29bea3-d7ff-4056-ad9d-3e35949e6bf8",
-  "prevId": "f8d55100-4ce2-4122-942d-492bc8ef6d8f",
+  "id": "a3370c77-5f70-402a-94aa-ef3481fcdd16",
+  "prevId": "59485f92-044c-4ade-a5bb-a7a8dd886410",
   "tables": {
     "admins": {
       "name": "admins",
@@ -276,7 +276,7 @@
           "name": "submission_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "status": {
@@ -352,19 +352,6 @@
           "tableTo": "courses",
           "columnsFrom": [
             "course_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "attachments_submission_id_submissions_id_fk": {
-          "name": "attachments_submission_id_submissions_id_fk",
-          "tableFrom": "attachments",
-          "tableTo": "submissions",
-          "columnsFrom": [
-            "submission_id"
           ],
           "columnsTo": [
             "id"
@@ -1077,15 +1064,8 @@
           "notNull": true,
           "autoincrement": true
         },
-        "monitor_id": {
-          "name": "monitor_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "co_monitor_id": {
-          "name": "co_monitor_id",
+        "creator_id": {
+          "name": "creator_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -1160,25 +1140,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "tasks_monitor_id_monitors_id_fk": {
-          "name": "tasks_monitor_id_monitors_id_fk",
+        "tasks_creator_id_users_id_fk": {
+          "name": "tasks_creator_id_users_id_fk",
           "tableFrom": "tasks",
-          "tableTo": "monitors",
+          "tableTo": "users",
           "columnsFrom": [
-            "monitor_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "tasks_co_monitor_id_co_monitors_id_fk": {
-          "name": "tasks_co_monitor_id_co_monitors_id_fk",
-          "tableFrom": "tasks",
-          "tableTo": "co_monitors",
-          "columnsFrom": [
-            "co_monitor_id"
+            "creator_id"
           ],
           "columnsTo": [
             "id"

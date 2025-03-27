@@ -28,6 +28,11 @@ export const links: SidebarLink[] = [
     icon: <ReadCvLogo size={24} weight="bold" />,
   },
   {
+    href: "/monitor/tasks",
+    label: "Tasks",
+    icon: <Student size={24} weight="bold" />,
+  },
+  {
     href: "/monitor/create-announcement",
     label: "Create Announcement",
     icon: <UserGear size={24} weight="bold" />,
@@ -41,11 +46,6 @@ export const links: SidebarLink[] = [
     href: "/monitor/attendance",
     label: "Attendance",
     icon: <UserPlus size={24} weight="bold" />,
-  },
-  {
-    href: "/monitor/tasks",
-    label: "Tasks",
-    icon: <Student size={24} weight="bold" />,
   },
 ];
 
