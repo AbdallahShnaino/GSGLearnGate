@@ -1,64 +1,30 @@
 "use client";
-import { useState } from "react";
-import { meeting } from '@/services/mock';
-import { MeetingRequest } from '@/types/students';
 import Image from 'next/image';
 import { CheckCircle, XCircle } from 'phosphor-react';
 import ApproveModal from '../ApproveModal/ApproveModal';
 import RejectModal from '../RejectModal/RejectModal';
 import SearchBar from "../SearchBar/SearchBar";
 import { useSearch } from "@/hooks/useSearch";
+import { useMeetingRequests } from '@/hooks/useMeetingRequests';
 
 const MeetingRequestsTable = () => {
   const { value: searchQuery, updateSearchParam } = useSearch('search');
-  const [meetingRequests, setMeetingRequests] = useState<MeetingRequest[]>(meeting);
-  const filteredRequests = meetingRequests.filter((student) =>
-    student.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const {
+    meetingRequests,
+    filterRequests,
+    selectedRequest,
+    isApproveModalOpen,
+    isRejectModalOpen,
+    handleOpenRejectModal,
+    handleOpenApproveModal,
+    handleCloseRejectModal,
+    handleCloseApproveModal,
+    handleApprove,
+    handleReject
+  } = useMeetingRequests();
 
-  const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
-  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<MeetingRequest | null>(null);
 
-  const handleOpenRejectModal = (request: MeetingRequest) => {
-    setSelectedRequest(request);
-    setIsRejectModalOpen(true);
-  };
-
-  const handleOpenApproveModal = (request: MeetingRequest) => {
-    setSelectedRequest(request);
-    setIsApproveModalOpen(true);
-  };
-
-  const handleCloseRejectModal = () => {
-    setIsRejectModalOpen(false);
-    setSelectedRequest(null);
-  };
-
-  const handleCloseApproveModal = () => {
-    setIsApproveModalOpen(false);
-    setSelectedRequest(null);
-  };
-
-  
-  const handleApprove = (id: number) => {
-    setMeetingRequests(prevRequests =>
-      prevRequests.map(request =>
-        request.id === id ? { ...request, statusRequest: 'Accepted' } : request
-      )
-    );
-    handleCloseApproveModal(); 
-  };
-
-  
-  const handleReject = (id: number) => {
-    setMeetingRequests(prevRequests =>
-      prevRequests.map(request =>
-        request.id === id ? { ...request, statusRequest: 'Rejected' } : request
-      )
-    );
-    handleCloseRejectModal(); 
-  };
+  const filteredRequests = filterRequests(searchQuery);
 
   return (
     <div className="container mx-auto p-4">
@@ -66,7 +32,7 @@ const MeetingRequestsTable = () => {
       <div className="max-w-6xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         <div className="overflow-x-auto border border-gray-200">
           <table className="w-full text-sm text-left text-gray-800">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-100 items-center">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-100">
               <tr>
                 <th className="px-6 py-3">Name</th>
                 <th className="px-6 py-3">Request Date</th>
@@ -79,27 +45,27 @@ const MeetingRequestsTable = () => {
             </thead>
             <tbody>
               {filteredRequests.map((student) => (
-                <tr className="bg-white hover:bg-gray-50 h-full border-b border-gray-100" key={student.id}>
+                <tr className="bg-white hover:bg-gray-50 border-b border-gray-100" key={student.id}>
                   <td className="flex items-center px-6 py-1.5 text-gray-900">
-                    <Image className="rounded-full" src={student.profilePicture} alt="User" width={25} height={25} />
+                    <Image className="rounded-full" src={`${student.profileImage}`} alt="User" width={25} height={25} />
                     <div className="ml-3">
-                      <div className="text-xs font-semibold">{student.name}</div>
-                      <div className="text-gray-500 text-[10px]">{student.email}</div>
+                      <div className="text-xs font-semibold">{student.studentName}</div>
+                      <div className="text-gray-500 text-[10px]">{student.studentEmail}</div>
                     </div>
                   </td>
-                  <td className="px-6 py-1.5 text-xs">{student.RequestDate}</td>
-                  <td className="px-6 py-1.5 text-xs">{student.MeetingDate}</td>
-                  <td className="px-6 py-1.5 text-xs">{student.day}</td>
-                  <td className="px-6 py-1.5 text-xs">{student.time}</td>
+                  <td className="px-6 py-1.5 text-xs">{student.createdAt}</td>
+                  <td className="px-6 py-1.5 text-xs">{student.date.toISOString().split("T")[0]}</td> 
+                  <td className="px-6 py-1.5 text-xs">{student.date.toLocaleDateString("en-US", { weekday: "long" })}</td>
+                  <td className="px-6 py-1.5 text-xs">{student.date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</td>
                   <td className="px-6 py-1.5 text-xs max-w-[170px] truncate">{student.caption}</td>
                   <td className="px-6 py-1.5">
                     <div className="flex gap-1 items-center">
-                      {student.statusRequest === 'Accepted' ? (
+                      {student.status === 'ACCEPTED' ? (
                         <div className="flex items-center bg-[#a4e6c7] text-gray-800 rounded-2xl px-2 py-1">
                           <CheckCircle size={14} weight="bold" className="mr-1 text-emerald-600" />
-                          <span className='text-xs'>Approve</span>
+                          <span className='text-xs'>Approved</span>
                         </div>
-                      ) : student.statusRequest === 'Rejected' ? (
+                      ) : student.status === 'REJECTED' ? (
                         <div className="flex items-center bg-[#ffc9c5] text-gray-800 rounded-2xl px-2 py-1">
                           <XCircle size={14} weight="bold" className="mr-1 text-red-500" />
                           <span className='text-xs'>Rejected</span>

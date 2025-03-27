@@ -33,6 +33,7 @@ export default function useStudentRequests() {
       currentPage,
       pageSize
     );
+
     setJoiningOrders(requests);
     setIsLoading(false);
   };

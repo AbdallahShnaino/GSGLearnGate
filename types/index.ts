@@ -1,3 +1,5 @@
+
+
 export enum Role {
   ADMIN = "ADMIN",
   STUDENT = "STUDENT",
@@ -166,4 +168,23 @@ export interface JoiningOrder {
 export interface StudentCourseChart {
   course: string;
   students: number;
+}
+export interface AppointmentWithStudent {
+  id: number;
+  coMonitorId: number;
+  studentId: number;
+  studentName: string;
+  studentEmail: string;
+  profileImage: string;
+  caption: string;
+  date: Date;
+  status: Status;
+  createdAt: string,
+
+}
+export interface ApproveModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onApprove: (id: number) => void;
+  request: AppointmentWithStudent;
 }

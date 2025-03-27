@@ -33,6 +33,7 @@ import {
   Submission,
   Task,
   User,
+  AppointmentWithStudent,
 } from "@/types/index";
 export async function getAllUsers(): Promise<User[]> {
   return await db.select().from(usersTable).all();
@@ -237,6 +238,50 @@ export async function getAppointmentsByCoMonitor(
 
   return results.length > 0 ? results : null;
 }
+export async function getCoMonitorAppointments(
+  coMonitorId: number,
+  courseId?: number,
+  page: number = 1,
+  pageSize: number = 10
+): Promise<{ coMonitorId: number; appointments: AppointmentWithStudent[] }> {
+  const offset = (page - 1) * pageSize;
+
+
+  const whereConditions = [eq(appointmentsTable.coMonitorId, coMonitorId)];
+
+  if (courseId !== undefined) {
+    whereConditions.push(eq(coursesTable.id, courseId));
+  }
+
+  const results = await db
+    .select({
+      id: appointmentsTable.id,
+      studentId: appointmentsTable.studentId,
+      date: appointmentsTable.date,
+      caption: appointmentsTable.caption,
+      coMonitorId: appointmentsTable.coMonitorId,
+      status: appointmentsTable.status,
+      createdAt: appointmentsTable.createdAt,
+      profileImage: usersTable.image,
+      studentName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      studentEmail: usersTable.email,
+      courseName: coursesTable.title,
+      courseId: coursesTable.id,
+    })
+    .from(appointmentsTable)
+    .innerJoin(studentsTable, eq(appointmentsTable.studentId, studentsTable.id))
+    .innerJoin(usersTable, eq(studentsTable.userId, usersTable.id))
+    .innerJoin(coursesTable, eq(coursesTable.coMonitorId, appointmentsTable.coMonitorId))
+    .where(and(...whereConditions))
+    .limit(pageSize)
+    .offset(offset);
+
+  return {
+    coMonitorId,
+    appointments: results.length > 0 ? results : [],
+  };
+}
+
 
 export async function getAllStudentsCourses(): Promise<StudentCourse[]> {
   return await db.select().from(studentsCoursesTable).all();
