@@ -98,11 +98,11 @@ export async function insertSubmission(
   return inserted as Submission;
 }
 
-export async function insertTask(data: Omit<Task, "id">): Promise<Task> {
+export async function insertTask(data: Omit<Task, "id">) {
   const [inserted] = await db.insert(tasksTable).values(data).returning();
-  return inserted as Task;
+  if (!inserted) throw new Error("Failed to insert task");
+  return inserted;
 }
-
 export async function insertAttachment(
   data: Omit<Attachment, "id">
 ): Promise<Attachment> {

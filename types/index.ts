@@ -107,6 +107,17 @@ export type StudentCourse = {
   studentId: number;
 } & Timestamps;
 
+export type Task = {
+  id: number;
+  creatorId: number;
+  courseId: number;
+  title: string;
+  description: string;
+  startedAt: Date;
+  deadline: Date;
+  points?: number;
+} & Timestamps;
+
 export type CourseJoinStudent = {
   id: number;
   title: string;
@@ -129,22 +140,14 @@ export type Submission = {
   status: AssignmentStatus;
 } & Timestamps;
 
-export type Task = {
-  id: number;
-  title: string;
-  description: string;
-  startedAt: string;
-  deadline: Date;
-  points: number | null;
-} & Timestamps;
-
 export type Attachment = {
   id: number;
   taskId: number;
-  studentId: number;
+  creatorId: number;
   courseId: number;
   type: Attachments;
   path: string;
+  submissionId: number; // if its from student or not
 } & Timestamps;
 
 export type Attendance = {

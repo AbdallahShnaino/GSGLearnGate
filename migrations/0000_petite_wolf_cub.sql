@@ -34,16 +34,18 @@ CREATE TABLE `appointments` (
 CREATE TABLE `attachments` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`task_id` integer NOT NULL,
-	`student_id` integer NOT NULL,
+	`creator_id` integer NOT NULL,
 	`course_id` integer NOT NULL,
+	`submission_id` integer NOT NULL,
 	`status` text NOT NULL,
 	`path` text NOT NULL,
 	`updated_at` text DEFAULT (current_timestamp) NOT NULL,
 	`created_at` text DEFAULT (current_timestamp) NOT NULL,
 	`deleted_at` text DEFAULT (current_timestamp) NOT NULL,
 	FOREIGN KEY (`task_id`) REFERENCES `tasks`(`id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`student_id`) REFERENCES `students`(`id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`course_id`) REFERENCES `courses`(`id`) ON UPDATE no action ON DELETE no action
+	FOREIGN KEY (`creator_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`course_id`) REFERENCES `courses`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`submission_id`) REFERENCES `submissions`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `attendances` (
@@ -143,14 +145,18 @@ CREATE TABLE `submissions` (
 --> statement-breakpoint
 CREATE TABLE `tasks` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`creator_id` integer NOT NULL,
+	`course_id` integer NOT NULL,
 	`title` text NOT NULL,
 	`description` text NOT NULL,
-	`started_at` text DEFAULT (current_timestamp) NOT NULL,
+	`started_at` integer NOT NULL,
 	`deadline` integer NOT NULL,
 	`grade` integer,
 	`updated_at` text DEFAULT (current_timestamp) NOT NULL,
 	`created_at` text DEFAULT (current_timestamp) NOT NULL,
-	`deleted_at` text DEFAULT (current_timestamp) NOT NULL
+	`deleted_at` text DEFAULT (current_timestamp) NOT NULL,
+	FOREIGN KEY (`creator_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`course_id`) REFERENCES `courses`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `users` (

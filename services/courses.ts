@@ -1,3 +1,4 @@
+"use server";
 import { insertStudentCourse } from "@/src/db/queries/insert";
 import { getCoursesNamesByMonitor, getCoursesWithStudentCount } from "@/src/db/queries/select";
 

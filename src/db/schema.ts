@@ -162,12 +162,15 @@ export const submissionsTable = sqliteTable("submissions", {
 
 export const tasksTable = sqliteTable("tasks", {
   id: int().primaryKey({ autoIncrement: true }),
+  creatorId: int("creator_id")
+    .notNull()
+    .references((): AnySQLiteColumn => usersTable.id),
+  courseId: int("course_id")
+    .notNull()
+    .references((): AnySQLiteColumn => coursesTable.id),
   title: text("title").notNull(),
   description: text("description").notNull(),
-  startedAt: text("started_at")
-    .notNull()
-    .default(sql`(current_timestamp)`),
-
+  startedAt: integer("started_at", { mode: "timestamp" }).notNull(),
   deadline: integer("deadline", { mode: "timestamp" }).notNull(),
   points: int("grade"),
   ...timestamps,
@@ -178,12 +181,13 @@ export const attachmentsTable = sqliteTable("attachments", {
   taskId: int("task_id")
     .notNull()
     .references((): AnySQLiteColumn => tasksTable.id),
-  studentId: int("student_id")
+  creatorId: int("creator_id")
     .notNull()
-    .references((): AnySQLiteColumn => studentsTable.id),
+    .references((): AnySQLiteColumn => usersTable.id),
   courseId: int("course_id")
     .notNull()
     .references((): AnySQLiteColumn => coursesTable.id),
+  submissionId: int("submission_id"),
   type: text("status", {
     enum: [Attachments.FILE, Attachments.LINK],
   }).notNull(),
