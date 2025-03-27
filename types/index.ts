@@ -118,6 +118,17 @@ export type Task = {
   points?: number;
 } & Timestamps;
 
+export type CourseJoinStudent = {
+  id: number;
+  title: string;
+  difficulty: Difficulty;
+  monitorId: number | null;
+  monitorName:string| null;
+  coMonitorId: number | null;
+  coMonitorName:string | null;
+  studentCount: number;
+}
+
 export type Submission = {
   id: number;
   taskId: number;
@@ -170,3 +181,15 @@ export interface StudentCourseChart {
   course: string;
   students: number;
 }
+
+export type MonitorsJoinUsers = {
+  id: number;
+  userId: number;
+  firstName: string | null;
+  lastName: string | null;
+  email: string | null;
+  dateOfBirth: Date | null;
+  image: string | null;
+  role: Role | null;
+  city: string | null;
+};

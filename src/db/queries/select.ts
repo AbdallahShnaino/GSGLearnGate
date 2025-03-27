@@ -35,7 +35,10 @@ import {
   Submission,
   Task,
   User,
+  MonitorsJoinUsers,
+  CourseJoinStudent,
 } from "@/types/index";
+import { alias } from "drizzle-orm/sqlite-core";
 export async function getAllUsers(): Promise<User[]> {
   return await db.select().from(usersTable).all();
 }
@@ -60,13 +63,96 @@ export async function getAllMonitors(): Promise<Monitor[]> {
   return await db.select().from(monitorsTable).all();
 }
 
+export async function getMonitors (page: number = 1,
+  pageSize: number = 10):Promise<{users:MonitorsJoinUsers[], totalCount:number}| null>{
+    const offset = (page - 1) * pageSize;
+  const result = await db
+    .select({
+      id: monitorsTable.id,
+      userId: monitorsTable.userId,
+      firstName: usersTable.firstName,
+      lastName: usersTable.lastName,
+      email: usersTable.email,
+      dateOfBirth: usersTable.dateOfBirth,
+      image: usersTable.image,
+      role: usersTable.role,
+      city: usersTable.city,
+    })
+    .from(monitorsTable)
+    .leftJoin(usersTable, eq(usersTable.id,monitorsTable.userId)).limit(pageSize).offset(offset).all();
+
+    const totalCount = await db
+    .select({
+      monitorId: monitorsTable.id,
+      userId: monitorsTable.userId})
+    .from(monitorsTable)
+    .leftJoin(usersTable, eq(usersTable.id,monitorsTable.userId)).all();
+
+  return {users:result, totalCount: totalCount.length};
+};
+
 export async function getAllCoMonitors(): Promise<CoMonitor[]> {
   return await db.select().from(coMonitorsTable).all();
 }
+export async function getCoMonitors (page: number = 1,
+  pageSize: number = 10):Promise<{users:MonitorsJoinUsers[], totalCount:number}| null>{
+    const offset = (page - 1) * pageSize;
+  const result = await db
+    .select({
+      id: coMonitorsTable.id,
+      userId: coMonitorsTable.userId,
+      firstName: usersTable.firstName,
+      lastName: usersTable.lastName,
+      email: usersTable.email,
+      dateOfBirth: usersTable.dateOfBirth,
+      image: usersTable.image,
+      role: usersTable.role,
+      city: usersTable.city,
+    })
+    .from(coMonitorsTable)
+    .leftJoin(usersTable, eq(usersTable.id,coMonitorsTable.userId)).limit(pageSize).offset(offset).all();
+
+    const totalCount = await db
+    .select({
+      monitorId: coMonitorsTable.id,
+      userId: coMonitorsTable.userId})
+    .from(coMonitorsTable)
+    .leftJoin(usersTable, eq(usersTable.id,coMonitorsTable.userId)).all();
+
+  return {users:result, totalCount: totalCount.length};
+};
 
 export async function getAllStudents(): Promise<Student[]> {
   return await db.select().from(studentsTable).all();
 }
+
+export async function getStudents (page: number = 1,
+  pageSize: number = 10):Promise<{users:MonitorsJoinUsers[], totalCount:number}| null>{
+    const offset = (page - 1) * pageSize;
+  const result = await db
+    .select({
+      id: studentsTable.id,
+      userId: studentsTable.userId,
+      firstName: usersTable.firstName,
+      lastName: usersTable.lastName,
+      email: usersTable.email,
+      dateOfBirth: usersTable.dateOfBirth,
+      image: usersTable.image,
+      role: usersTable.role,
+      city: usersTable.city,
+    })
+    .from(studentsTable)
+    .leftJoin(usersTable, eq(usersTable.id,studentsTable.userId)).limit(pageSize).offset(offset).all();
+
+    const totalCount = await db
+    .select({
+      monitorId: studentsTable.id,
+      userId: studentsTable.userId})
+    .from(studentsTable)
+    .leftJoin(usersTable, eq(usersTable.id,studentsTable.userId)).all();
+
+  return {users:result, totalCount: totalCount.length};
+};
 
 export async function getAllCourses(): Promise<Course[]> {
   return await db.select().from(coursesTable).all();
@@ -272,6 +358,67 @@ export async function getStudentsByCourse(
 
   return results.length > 0 ? results : null;
 }
+export async function getCoursesWithStudentCount(
+  page: number = 1,
+  pageSize: number = 10
+): Promise<{ courses: CourseJoinStudent[]; totalCount: number } | null> {
+  const offset = (page - 1) * pageSize;
+  const monitorUsers = alias(usersTable, "monitorUsers");
+  const coMonitorUsers = alias(usersTable, "coMonitorUsers");
+
+  const results = await db
+    .select({
+      id: coursesTable.id,
+      title: coursesTable.title,
+      difficulty: coursesTable.difficulty,
+      monitorId: monitorsTable.userId,
+      monitorName: monitorUsers.firstName,
+      coMonitorId: coMonitorsTable.userId,
+      coMonitorName: coMonitorUsers.firstName,
+      studentCount: sql<number>`COUNT(${studentsCoursesTable.studentId})`.as("studentCount"),
+    })
+    .from(coursesTable)
+    .leftJoin(studentsCoursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
+    .leftJoin(monitorsTable, eq(coursesTable.id, monitorsTable.id))
+    .leftJoin(monitorUsers, eq(monitorsTable.userId, monitorUsers.id))
+    .leftJoin(coMonitorsTable, eq(coursesTable.id, coMonitorsTable.id))
+    .leftJoin(coMonitorUsers, eq(coMonitorsTable.userId, coMonitorUsers.id))
+    .groupBy(
+      coursesTable.id,
+      monitorUsers.firstName,
+      coMonitorUsers.firstName
+    )
+    .limit(pageSize)
+    .offset(offset)
+    .all();
+
+  const totalCount = await db  .select({
+    id: coursesTable.id,
+    title: coursesTable.title,
+    difficulty: coursesTable.difficulty,
+    monitorId: monitorsTable.userId,
+    monitorName: monitorUsers.firstName,
+    coMonitorId: coMonitorsTable.userId,
+    coMonitorName: coMonitorUsers.firstName,
+    studentCount: sql<number>`COUNT(${studentsCoursesTable.studentId})`.as("studentCount"),
+  })
+  .from(coursesTable)
+  .leftJoin(studentsCoursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
+  .leftJoin(monitorsTable, eq(coursesTable.id, monitorsTable.id))
+  .leftJoin(monitorUsers, eq(monitorsTable.userId, monitorUsers.id))
+  .leftJoin(coMonitorsTable, eq(coursesTable.id, coMonitorsTable.id))
+  .leftJoin(coMonitorUsers, eq(coMonitorsTable.userId, coMonitorUsers.id))
+  .groupBy(
+    coursesTable.id,
+    monitorUsers.firstName,
+    coMonitorUsers.firstName
+  ).all();
+   
+
+  return { courses: results, totalCount: totalCount.length };
+}
+
+
 export async function getAllSubmissions(): Promise<Submission[]> {
   return await db.select().from(submissionsTable).all();
 }
