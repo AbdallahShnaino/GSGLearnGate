@@ -1,8 +1,10 @@
+"use server";
+
 import {
   getAllJoiningRequestsWithDetails,
   updateJoiningRequest,
 } from "@/src/db/queries/select";
-import { Status } from "@/types";
+import { JoiningOrder, Status } from "@/types";
 
 export async function getJoiningRequests(
   monitorId: number,

@@ -13,9 +13,7 @@ export default function useStudentRequests() {
     Number(searchParams.get("courseId")) || undefined
   );
   const [joiningOrders, setJoiningOrders] = useState<JoiningOrder[]>([]);
-  const [monitorCoursesList, setMonitorCoursesList] = useState<
-    { courseId: number; courseName: string }[]
-  >([]);
+
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
@@ -26,7 +24,6 @@ export default function useStudentRequests() {
   const STATIC_MONITOR_ID = 13;
 
   const fetchRequests = async () => {
-    setIsLoading(true);
     const requests = await getJoiningRequests(
       STATIC_MONITOR_ID,
       courseId,
@@ -34,22 +31,18 @@ export default function useStudentRequests() {
       pageSize
     );
 
+
+
     setJoiningOrders(requests);
     setIsLoading(false);
-  };
-
-  const fetchMonitorCourses = async () => {
-    const coursesList = await getMonitorCoursesNames(STATIC_MONITOR_ID);
-    setMonitorCoursesList(coursesList ?? []);
   };
 
   useEffect(() => {
     setCourseId(Number(searchParams.get("courseId")) || undefined);
     fetchRequests();
-    fetchMonitorCourses();
   }, [currentPage, searchParams, courseId]);
 
-  const handleOpenRejectModal = (order: JoiningOrder) => {
+  const handleOpenRejectModal: Function = (order: JoiningOrder) => {
     setSelectedOrder(order);
     setIsRejectModalOpen(true);
   };
@@ -74,6 +67,7 @@ export default function useStudentRequests() {
     courseId: number,
     studentId: number
   ) => {
+    console.log("hi there");
     await addStudentToCourse(studentId, courseId);
     await updateJoiningRequestStatus(id, Status.ACCEPTED);
     await fetchRequests();
@@ -97,7 +91,6 @@ export default function useStudentRequests() {
   return {
     courseId,
     joiningOrders,
-    monitorCoursesList,
     currentPage,
     pageSize,
     isApproveModalOpen,

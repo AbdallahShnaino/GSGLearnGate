@@ -109,6 +109,28 @@ export type StudentCourse = {
   studentId: number;
 } & Timestamps;
 
+export type Task = {
+  id: number;
+  creatorId: number;
+  courseId: number;
+  title: string;
+  description: string;
+  startedAt: Date;
+  deadline: Date;
+  points?: number;
+} & Timestamps;
+
+export type CourseJoinStudent = {
+  id: number;
+  title: string;
+  difficulty: Difficulty;
+  monitorId: number | null;
+  monitorName: string | null;
+  coMonitorId: number | null;
+  coMonitorName: string | null;
+  studentCount: number;
+}
+
 export type Submission = {
   id: number;
   taskId: number;
@@ -120,22 +142,14 @@ export type Submission = {
   status: AssignmentStatus;
 } & Timestamps;
 
-export type Task = {
-  id: number;
-  title: string;
-  description: string;
-  startedAt: string;
-  deadline: Date;
-  points: number | null;
-} & Timestamps;
-
 export type Attachment = {
   id: number;
   taskId: number;
-  studentId: number;
+  creatorId: number;
   courseId: number;
   type: Attachments;
   path: string;
+  submissionId: number; // if its from student or not
 } & Timestamps;
 
 export type Attendance = {
@@ -169,6 +183,7 @@ export interface StudentCourseChart {
   course: string;
   students: number;
 }
+
 export interface AppointmentWithStudent {
   id: number;
   coMonitorId: number;
@@ -188,3 +203,17 @@ export interface ApproveModalProps {
   onApprove: (id: number) => void;
   request: AppointmentWithStudent;
 }
+
+
+export type MonitorsJoinUsers = {
+  id: number;
+  userId: number;
+  firstName: string | null;
+  lastName: string | null;
+  email: string | null;
+  dateOfBirth: Date | null;
+  image: string | null;
+  role: Role | null;
+  city: string | null;
+};
+
