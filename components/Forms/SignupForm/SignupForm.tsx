@@ -1,8 +1,22 @@
+"use client";
+import {
+  submitUser,
+  SubmitUserStatus,
+} from "@/controllers/actions/createUserAction";
 import React from "react";
+import { useFormState } from "react-dom";
+
+const initialState: SubmitUserStatus = {
+  success: false,
+  message: "",
+  error: "",
+  userId: undefined,
+};
 
 const SignupForm = () => {
+  const [formState, action] = useFormState(submitUser, initialState);
   return (
-    <form>
+    <form action={action}>
       <div className="flex flex-col mt-4 gap-1.5">
         <label htmlFor="email">Email*</label>
         <input
@@ -62,12 +76,12 @@ const SignupForm = () => {
       </div>
       <div className="flex flex-col md:flex-row justify-between mt-4">
         <div className="flex flex-col gap-1.5 w-full md:w-[48%]">
-          <label htmlFor="idNumber">Identification Number*</label>
+          <label htmlFor="idNumber">City*</label>
           <input
-            type="number"
-            name="id"
-            id="idNumber"
-            placeholder="Identification Number"
+            type="text"
+            name="city"
+            id="city"
+            placeholder="City"
             className="border-1 border-gray-400 rounded-md px-1.5 py-1.5 focus:outline-blue-500"
             required
           />
@@ -85,6 +99,7 @@ const SignupForm = () => {
           />
         </div>
       </div>
+      {!formState.success && <div>{formState.message}</div>}
       <input
         type="submit"
         value="Continue"
