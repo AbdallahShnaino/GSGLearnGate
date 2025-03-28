@@ -35,6 +35,7 @@ import {
   User,
   MonitorsJoinUsers,
   CourseJoinStudent,
+  UsersNames,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 export async function getAllUsers(): Promise<User[]> {
@@ -59,6 +60,19 @@ export async function getAllAdmins(): Promise<Admin[]> {
 
 export async function getAllMonitors(): Promise<Monitor[]> {
   return await db.select().from(monitorsTable).all();
+}
+
+export async function getMonitorsNames(): Promise<UsersNames[]> {
+  return await db
+  .select({
+    id: monitorsTable.id,
+    userId: monitorsTable.userId,
+    firstName: usersTable.firstName,
+    lastName: usersTable.lastName,
+  })
+  .from(monitorsTable)
+  .leftJoin(usersTable, eq(usersTable.id, monitorsTable.userId))
+  .all();
 }
 
 export async function getMonitors (page: number = 1,
@@ -91,6 +105,18 @@ export async function getMonitors (page: number = 1,
 
 export async function getAllCoMonitors(): Promise<CoMonitor[]> {
   return await db.select().from(coMonitorsTable).all();
+}
+export async function getCoMonitorsNames(): Promise<UsersNames[]> {
+  return await db
+  .select({
+    id: coMonitorsTable.id,
+    userId: coMonitorsTable.userId,
+    firstName: usersTable.firstName,
+    lastName: usersTable.lastName,
+  })
+  .from(coMonitorsTable)
+  .leftJoin(usersTable, eq(usersTable.id, coMonitorsTable.userId))
+  .all();
 }
 export async function getCoMonitors (page: number = 1,
   pageSize: number = 10):Promise<{users:MonitorsJoinUsers[], totalCount:number}| null>{

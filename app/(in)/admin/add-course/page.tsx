@@ -1,8 +1,11 @@
 import AddCourseForm from '@/components/AddCourseForm/AddCourseForm';
+import { getCoMonitorsNames, getMonitorsNames } from '@/src/db/queries/select';
 import { UserCircle } from '@phosphor-icons/react/dist/ssr';
 import React from 'react';
 
-const AddCoursePage = () => {
+const AddCoursePage = async() => {
+  const monitors = await getMonitorsNames();
+  const coMonitors = await getCoMonitorsNames();
   return (
     <div className="flex flex-col">
       <div className="flex flex-col items-center text-center p-4 sm:flex-row sm:justify-between sm:text-left">
@@ -13,7 +16,7 @@ const AddCoursePage = () => {
         </div>
       </div>
 
-      <AddCourseForm />
+      <AddCourseForm monitors={monitors} coMonitors={coMonitors}/>
     </div>
   );
 };

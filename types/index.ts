@@ -190,3 +190,10 @@ export type MonitorsJoinUsers = {
   role: Role | null;
   city: string | null;
 };
+
+export type UsersNames={
+  id: number;
+  userId: number;
+  firstName: string | null;
+  lastName: string | null;
+}
