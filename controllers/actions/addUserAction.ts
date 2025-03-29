@@ -4,6 +4,7 @@ import path from "path";
 import { promises as fs } from "fs";
 import { Role } from "@/types";
 import { addUser } from "@/services/users";
+import bcrypt from "bcryptjs";
 
 export type UserState =
   | { success: false; error: string; message: string; id: undefined }
@@ -32,7 +33,7 @@ export async function submitUser(
         id: undefined,
       };
     }
-
+    const hashedPassword = await bcrypt.hash(password, 10);
     const image = formData.get("image") as File | null;
     let publicFilePath: string = "";
 
@@ -57,7 +58,7 @@ export async function submitUser(
         firstName,
         lastName,
         email,
-        password,
+        password: hashedPassword,
         dateOfBirth,
         image: publicFilePath,
         role,
