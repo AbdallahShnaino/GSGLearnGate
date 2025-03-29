@@ -40,6 +40,7 @@ import {
 
   MonitorsJoinUsers,
   CourseJoinStudent,
+
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 export async function getAllUsers(): Promise<User[]> {
@@ -245,6 +246,28 @@ export async function getCoursesNamesByMonitor(
     return null;
   }
 }
+export async function getCoursesNamesByCoMonitor(
+  coMonitorId: number
+): Promise<{ courseId: number; courseName: string }[] | null> {
+  const results = await db
+    .select({
+      title: coursesTable.title,
+      id: coursesTable.id,
+    })
+    .from(coursesTable)
+    .where(eq(coursesTable.coMonitorId, coMonitorId));
+  try {
+    return results.map((course: { id: any; title: any }) => ({
+      courseId: course.id,
+      courseName: course.title,
+    }));
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+
+}
+
 
 export async function getCoursesByCoMonitor(
   coMonitorId: number
@@ -341,9 +364,8 @@ export async function getCoMonitorAppointments(
   courseId?: number,
   page: number = 1,
   pageSize: number = 10
-): Promise<{ coMonitorId: number; appointments: AppointmentWithStudent[] }> {
+): Promise<{ coMonitorId: number; appointments: AppointmentWithStudent[]; totalCount: number }> {
   const offset = (page - 1) * pageSize;
-
 
   const whereConditions = [eq(appointmentsTable.coMonitorId, coMonitorId)];
 
@@ -374,11 +396,26 @@ export async function getCoMonitorAppointments(
     .limit(pageSize)
     .offset(offset);
 
+  // إزالة التكرار بناءً على studentId
+  const uniqueResults = Array.from(
+    new Map(results.map((item) => [item.studentId, item])).values()
+  );
+
+  const countResults = await db
+    .select({ count: sql<number>`COUNT(*)` })
+    .from(appointmentsTable)
+    .innerJoin(studentsTable, eq(appointmentsTable.studentId, studentsTable.id))
+    .innerJoin(usersTable, eq(studentsTable.userId, usersTable.id))
+    .innerJoin(coursesTable, eq(coursesTable.coMonitorId, appointmentsTable.coMonitorId))
+    .where(and(...whereConditions));
+
   return {
     coMonitorId,
-    appointments: results.length > 0 ? results : [],
+    appointments: uniqueResults.length > 0 ? uniqueResults : [],
+    totalCount: countResults[0]?.count || 0,
   };
 }
+
 
 
 export async function getAllStudentsCourses(): Promise<StudentCourse[]> {

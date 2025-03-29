@@ -15,24 +15,37 @@ export const useMeetingRequests = () => {
     const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
     const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [isLoading, setIsLoading] = useState(true);
     const pageSize = 10;
-
     const CO_MONITOR_ID = 4;
 
     const fetchRequestsMeeting = async () => {
         try {
-            const requests = await getCoMonitorAppointments(CO_MONITOR_ID, courseId, currentPage, pageSize);
-            setMeetingRequests(requests.appointments);
-            console.log(meetingRequests);
+            setIsLoading(true);
+            const response = await getCoMonitorAppointments(CO_MONITOR_ID, courseId, currentPage, pageSize);
+            if (response && response.appointments) {
+                setMeetingRequests(response.appointments);
+                setTotalPages(Math.ceil(response.totalCount / 10));
+            }
         } catch (error) {
-            console.error('Error fetching meeting requests:', error);
+            console.error("Failed to fetch data:", error);
+        } finally {
+            setIsLoading(false);
         }
     };
+
+
     useEffect(() => {
         setCourseId(Number(searchParams.get("courseId")) || undefined);
-        console.log(meetingRequests);
         fetchRequestsMeeting();
-    }, [currentPage, searchParams, courseId]);
+    }, [currentPage, courseId]);
+
+    useEffect(() => {
+        if (currentPage > totalPages) {
+            setCurrentPage(totalPages);
+        }
+    }, [totalPages]);
 
     const filterRequests = (query: string) => {
         return meetingRequests.filter((appointment) =>
@@ -63,7 +76,7 @@ export const useMeetingRequests = () => {
     const handleApprove = async (id: number) => {
         try {
             await updateMeetingRequestStatus(id, Status.ACCEPTED);
-            fetchRequestsMeeting();
+            await fetchRequestsMeeting();
             handleCloseApproveModal();
         } catch (error) {
             console.error('Error approving meeting request:', error);
@@ -73,19 +86,24 @@ export const useMeetingRequests = () => {
     const handleReject = async (id: number) => {
         try {
             await updateMeetingRequestStatus(id, Status.REJECTED);
-            fetchRequestsMeeting();
+            await fetchRequestsMeeting();
             handleCloseRejectModal();
         } catch (error) {
             console.error('Error rejecting meeting request:', error);
         }
     };
 
+
     const handlePreviousPage = () => {
         setCurrentPage((prev) => Math.max(prev - 1, 1));
     };
 
     const handleNextPage = () => {
-        setCurrentPage((prev) => prev + 1);
+        setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev));
+    };
+
+    const onPageChange = (page: number) => {
+        setCurrentPage(page);
     };
 
     return {
@@ -103,7 +121,10 @@ export const useMeetingRequests = () => {
         handleReject,
         currentPage,
         pageSize,
+        totalPages,
         handlePreviousPage,
         handleNextPage,
+        onPageChange,
+        isLoading
     };
 };

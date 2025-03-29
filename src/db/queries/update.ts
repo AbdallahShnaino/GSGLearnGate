@@ -1,7 +1,8 @@
-import { AppointmentWithStudent } from "@/types";
-import { appointmentsTable, usersTable } from "../schema";
+
 import { db } from "..";
 import { eq } from "drizzle-orm";
+import { appointmentsTable, usersTable } from "../schema";
+import { AppointmentWithStudent } from "@/types";
 
 export async function updateMeetingRequest(
     id: number,

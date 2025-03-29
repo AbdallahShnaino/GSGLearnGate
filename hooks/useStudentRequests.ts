@@ -84,6 +84,7 @@ export default function useStudentRequests() {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
   };
 
+
   const handleNextPage = () => {
     setCurrentPage((prev) => prev + 1);
   };
@@ -105,5 +106,6 @@ export default function useStudentRequests() {
     handleReject,
     handlePreviousPage,
     handleNextPage,
+
   };
 }

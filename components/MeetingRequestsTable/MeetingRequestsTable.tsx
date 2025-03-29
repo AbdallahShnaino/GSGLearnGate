@@ -6,10 +6,17 @@ import RejectModal from '../RejectModal/RejectModal';
 import SearchBar from "../SearchBar/SearchBar";
 import { useSearch } from "@/hooks/useSearch";
 import { useMeetingRequests } from '@/hooks/useMeetingRequests';
+import TempPagination from '../Pagination/TempPagination';
+import Loader from '../Shared/Loader';
+import SelectCourse from '../Dropdowns/SelectCourse';
+interface IProps {
+  coMonitorCoursesList: { courseId: number; courseName: string }[] | null;
+}
 
-const MeetingRequestsTable = () => {
+const MeetingRequestsTable = ({coMonitorCoursesList}:IProps) => {
   const { value: searchQuery, updateSearchParam } = useSearch('search');
   const {
+    courseId,
     meetingRequests,
     filterRequests,
     selectedRequest,
@@ -20,15 +27,34 @@ const MeetingRequestsTable = () => {
     handleCloseRejectModal,
     handleCloseApproveModal,
     handleApprove,
-    handleReject
+    handleReject,
+    currentPage,
+    handlePreviousPage,
+    handleNextPage,
+    totalPages,
+    onPageChange,
+    isLoading
+
   } = useMeetingRequests();
 
 
   const filteredRequests = filterRequests(searchQuery);
+  if (isLoading) {
+      return <Loader message="Loading data..." />;
+    }
 
   return (
     <div className="container mx-auto p-4">
+      <div className='flex'>
       <SearchBar updateSearchParam={updateSearchParam} placeholderText="Search Request... " />
+       <div className="my-5">
+              <SelectCourse
+                options={coMonitorCoursesList}
+                value={courseId}
+                appendSearchParams={true}
+              />
+            </div>
+        </div>
       <div className="max-w-6xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         <div className="overflow-x-auto border border-gray-200">
           <table className="w-full text-sm text-left text-gray-800">
@@ -107,7 +133,12 @@ const MeetingRequestsTable = () => {
           onApprove={() => handleReject(selectedRequest.id)}
         />
       )}
+      <div className='mt-10'>
+      <TempPagination currentPage={currentPage} handleNextPage={handleNextPage} handlePreviousPage={handlePreviousPage } onPageChange={onPageChange} totalPages={totalPages} />
+      </div>
     </div>
+    
+   
   );
 };
 
