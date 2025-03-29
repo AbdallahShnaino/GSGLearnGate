@@ -382,33 +382,31 @@ export async function getCoursesWithStudentCount(
   pageSize: number = 10
 ): Promise<{ courses: CourseJoinStudent[]; totalCount: number } | null> {
   const offset = (page - 1) * pageSize;
-  const monitorUsers = alias(usersTable, "monitorUsers");
-  const coMonitorUsers = alias(usersTable, "coMonitorUsers");
+  const monitorUser = alias(usersTable, "monitorUser");
+  const coMonitorUser = alias(usersTable, "coMonitorUser");
 
   const results = await db
     .select({
       id: coursesTable.id,
       title: coursesTable.title,
       difficulty: coursesTable.difficulty,
-      monitorId: monitorsTable.userId,
-      monitorName: monitorUsers.firstName,
-      coMonitorId: coMonitorsTable.userId,
-      coMonitorName: coMonitorUsers.firstName,
+      monitorId: coursesTable.monitorId,
+      coMonitorId: coursesTable.coMonitorId,
+      monitorName: monitorUser.firstName,
+      coMonitorName: coMonitorUser.firstName,
       studentCount: sql<number>`COUNT(${studentsCoursesTable.studentId})`.as("studentCount"),
     })
     .from(coursesTable)
     .leftJoin(studentsCoursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
-    .leftJoin(monitorsTable, eq(coursesTable.id, monitorsTable.id))
-    .leftJoin(monitorUsers, eq(monitorsTable.userId, monitorUsers.id))
-    .leftJoin(coMonitorsTable, eq(coursesTable.id, coMonitorsTable.id))
-    .leftJoin(coMonitorUsers, eq(coMonitorsTable.userId, coMonitorUsers.id))
+    .leftJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
+    .leftJoin(monitorUser, eq(monitorsTable.userId, monitorUser.id))
+    .leftJoin(coMonitorsTable, eq(coursesTable.coMonitorId, coMonitorsTable.id))
+    .leftJoin(coMonitorUser, eq(coMonitorsTable.userId, coMonitorUser.id))
     .groupBy(
       coursesTable.id,
-      monitorUsers.firstName,
-      coMonitorUsers.firstName
-    )
-    .limit(pageSize)
-    .offset(offset)
+      monitorUser.firstName,
+      coMonitorUser.firstName
+    ).limit(pageSize).offset(offset)
     .all();
 
   const totalCount = await db  .select({
@@ -416,21 +414,21 @@ export async function getCoursesWithStudentCount(
     title: coursesTable.title,
     difficulty: coursesTable.difficulty,
     monitorId: monitorsTable.userId,
-    monitorName: monitorUsers.firstName,
+    monitorName: monitorUser.firstName,
     coMonitorId: coMonitorsTable.userId,
-    coMonitorName: coMonitorUsers.firstName,
+    coMonitorName: coMonitorUser.firstName,
     studentCount: sql<number>`COUNT(${studentsCoursesTable.studentId})`.as("studentCount"),
   })
   .from(coursesTable)
   .leftJoin(studentsCoursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
   .leftJoin(monitorsTable, eq(coursesTable.id, monitorsTable.id))
-  .leftJoin(monitorUsers, eq(monitorsTable.userId, monitorUsers.id))
+  .leftJoin(monitorUser, eq(monitorsTable.userId, monitorUser.id))
   .leftJoin(coMonitorsTable, eq(coursesTable.id, coMonitorsTable.id))
-  .leftJoin(coMonitorUsers, eq(coMonitorsTable.userId, coMonitorUsers.id))
+  .leftJoin(coMonitorUser, eq(coMonitorsTable.userId, coMonitorUser.id))
   .groupBy(
     coursesTable.id,
-    monitorUsers.firstName,
-    coMonitorUsers.firstName
+    monitorUser.firstName,
+    coMonitorUser.firstName
   ).all();
    
 
