@@ -38,6 +38,52 @@ export async function submitUser(
     };
   }
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return {
+      success: false,
+      message: "Invalid email format",
+      error: "Invalid email format",
+      userId: undefined,
+    };
+  }
+
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  if (!passwordRegex.test(password)) {
+    return {
+      success: false,
+      message:
+        "Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters",
+      error:
+        "Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters",
+      userId: undefined,
+    };
+  }
+
+  const nameRegex = /^[A-Za-z]+$/;
+  if (!nameRegex.test(first_name) || !nameRegex.test(last_name)) {
+    return {
+      success: false,
+      message: "First name and last name must contain only letters",
+      error: "First name and last name must contain only letters",
+      userId: undefined,
+    };
+  }
+
+  const birthDate = new Date(dateOfBirth);
+  const today = new Date();
+  const age = today.getFullYear() - birthDate.getFullYear();
+
+  if (age < 16 || (age === 16 && today < new Date(birthDate.setFullYear(today.getFullYear())))) {
+    return {
+      success: false,
+      message: "You must be at least 16 years old to register",
+      error: "You must be at least 16 years old to register",
+      userId: undefined,
+    };
+  }
+  
   const newUser = await createNewUser(
     city,
     dateOfBirth,
@@ -45,7 +91,7 @@ export async function submitUser(
     first_name,
     last_name,
     password
-  )
+  );
 
   return Promise.resolve({
     success: true,
