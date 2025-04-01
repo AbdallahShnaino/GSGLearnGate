@@ -102,7 +102,7 @@ export const announcementsTable = sqliteTable("announcements", {
     .references((): AnySQLiteColumn => usersTable.id),
   courseId: int("course_id")
     .notNull()
-    .references((): AnySQLiteColumn => coursesTable.id),
+    .references((): AnySQLiteColumn => coursesTable.id,{onDelete: "cascade"}),
   title: text("title").notNull(),
   description: text("description").notNull(),
   ...timestamps,
@@ -145,7 +145,7 @@ export const submissionsTable = sqliteTable("submissions", {
     .references((): AnySQLiteColumn => studentsTable.id),
   courseId: int("course_id")
     .notNull()
-    .references((): AnySQLiteColumn => coursesTable.id),
+    .references((): AnySQLiteColumn => coursesTable.id, {onDelete:"cascade"}),
   grade: int("grade"),
   feedback: text("feedback").notNull(),
   gradedAt: integer("graded_at", { mode: "timestamp" }).notNull(),
@@ -162,15 +162,12 @@ export const submissionsTable = sqliteTable("submissions", {
 
 export const tasksTable = sqliteTable("tasks", {
   id: int().primaryKey({ autoIncrement: true }),
-  creatorId: int("creator_id")
-    .notNull()
-    .references((): AnySQLiteColumn => usersTable.id),
-  courseId: int("course_id")
-    .notNull()
-    .references((): AnySQLiteColumn => coursesTable.id),
   title: text("title").notNull(),
   description: text("description").notNull(),
-  startedAt: integer("started_at", { mode: "timestamp" }).notNull(),
+  startedAt: text("started_at")
+    .notNull()
+    .default(sql`(current_timestamp)`),
+
   deadline: integer("deadline", { mode: "timestamp" }).notNull(),
   points: int("grade"),
   ...timestamps,
@@ -181,13 +178,12 @@ export const attachmentsTable = sqliteTable("attachments", {
   taskId: int("task_id")
     .notNull()
     .references((): AnySQLiteColumn => tasksTable.id),
-  creatorId: int("creator_id")
+  studentId: int("student_id")
     .notNull()
-    .references((): AnySQLiteColumn => usersTable.id),
+    .references((): AnySQLiteColumn => studentsTable.id),
   courseId: int("course_id")
     .notNull()
-    .references((): AnySQLiteColumn => coursesTable.id),
-  submissionId: int("submission_id"),
+    .references((): AnySQLiteColumn => coursesTable.id, {onDelete: "cascade"}),
   type: text("status", {
     enum: [Attachments.FILE, Attachments.LINK],
   }).notNull(),
@@ -202,7 +198,7 @@ export const attendancesTable = sqliteTable("attendances", {
     .references((): AnySQLiteColumn => studentsTable.id),
   courseId: int("course_id")
     .notNull()
-    .references((): AnySQLiteColumn => coursesTable.id),
+    .references((): AnySQLiteColumn => coursesTable.id, {onDelete: "cascade"}),
   absence: int("absence"),
   ...timestamps,
 });
@@ -213,7 +209,7 @@ export const joiningRequestsTable = sqliteTable("joining_requests", {
     .references((): AnySQLiteColumn => studentsTable.id),
   courseId: int("course_id")
     .notNull()
-    .references((): AnySQLiteColumn => coursesTable.id),
+    .references((): AnySQLiteColumn => coursesTable.id, {onDelete: "cascade"}),
   interviewStatus: text("interview_status", {
     enum: [Status.ACCEPTED, Status.PENDING, Status.REJECTED],
   }).notNull(),
