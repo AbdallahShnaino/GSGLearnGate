@@ -80,7 +80,9 @@ export type Course = {
   courseStartDate: Date;
   courseEndDate: Date;
   monitorId: number | null;
+  monitorName?: string;
   coMonitorId: number | null;
+  coMonitorName?: string;
   adminId: number | null;
   details: string;
   entryRequirements: string;

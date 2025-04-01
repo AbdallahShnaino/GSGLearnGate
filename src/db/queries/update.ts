@@ -1,8 +1,8 @@
 
 import { db } from "..";
 import { eq } from "drizzle-orm";
-import { appointmentsTable, usersTable } from "../schema";
-import { AppointmentWithStudent } from "@/types";
+import { appointmentsTable, coursesTable, usersTable } from "../schema";
+import { AppointmentWithStudent, Course } from "@/types";
 
 export async function updateMeetingRequest(
     id: number,
@@ -25,3 +25,13 @@ export async function updateMeetingRequest(
             studentEmail: usersTable.email,
         });
 }
+
+export async function updateCourse(id: number, data: Partial<Omit<Course, "id">>): Promise<Course | null> {
+    const [updated] = await db
+      .update(coursesTable)
+      .set(data)
+      .where(eq(coursesTable.id, id))
+      .returning();
+  
+    return updated ?? null;
+  }

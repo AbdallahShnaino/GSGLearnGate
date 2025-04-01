@@ -80,9 +80,6 @@ export async function getMonitorsNames(): Promise<UsersNames[]> {
   .all();
 }
 
-export async function getMonitors (page: number = 1,
-  pageSize: number = 10):Promise<{users:MonitorsJoinUsers[], totalCount:number}| null>{
-    const offset = (page - 1) * pageSize;
 
 export async function getMonitors(page: number = 1,
   pageSize: number = 10): Promise<{ users: MonitorsJoinUsers[], totalCount: number } | null> {
@@ -129,10 +126,7 @@ export async function getCoMonitorsNames(): Promise<UsersNames[]> {
   .leftJoin(usersTable, eq(usersTable.id, coMonitorsTable.userId))
   .all();
 }
-export async function getCoMonitors (page: number = 1,
-  pageSize: number = 10):Promise<{users:MonitorsJoinUsers[], totalCount:number}| null>{
-    const offset = (page - 1) * pageSize;
-  
+
 export async function getCoMonitors(page: number = 1,
   pageSize: number = 10): Promise<{ users: MonitorsJoinUsers[], totalCount: number } | null> {
   const offset = (page - 1) * pageSize;
@@ -197,6 +191,42 @@ export async function getStudents(page: number = 1,
 
 export async function getAllCourses(): Promise<Course[]> {
   return await db.select().from(coursesTable).all();
+}
+
+
+export async function getCourseById(id: number): Promise<Course | null> {
+    const monitorUsers = alias(usersTable, "monitorUsers");
+    const coMonitorUsers = alias(usersTable, "coMonitorUsers");
+  
+    const result = await db
+      .select({
+        id: coursesTable.id,
+        image: coursesTable.image,
+        title: coursesTable.title,
+        duration: coursesTable.duration,
+        description: coursesTable.description,
+        entryRequirements: coursesTable.entryRequirements,
+        details: coursesTable.details,
+        difficulty: coursesTable.difficulty,
+        monitorId: monitorsTable.userId,
+        monitorName: monitorUsers.firstName,
+        coMonitorId: coMonitorsTable.userId,
+        coMonitorName: coMonitorUsers.firstName,
+        adminId: coursesTable.adminId,
+        applyStartDate: coursesTable.applyStartDate,
+        applyEndDate: coursesTable.applyEndDate,
+        courseStartDate: coursesTable.courseStartDate,
+        courseEndDate: coursesTable.courseEndDate, 
+      })
+      .from(coursesTable)
+      .leftJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
+      .leftJoin(monitorUsers, eq(monitorsTable.userId, monitorUsers.id))
+      .leftJoin(coMonitorsTable, eq(coursesTable.coMonitorId, coMonitorsTable.id))
+      .leftJoin(coMonitorUsers, eq(coMonitorsTable.userId, coMonitorUsers.id))
+      .where(eq(coursesTable.id, id))
+      .get();
+  
+    return result || null;
 }
 
 export async function getCoursesByStudent(
