@@ -1,3 +1,5 @@
+
+
 export interface Student {
   id: number;
   name: string;
@@ -19,10 +21,4 @@ export interface MeetingRequest {
   statusRequest: "Pending" | "Accepted" | "Rejected";
   profilePicture: string;
   caption: string;
-}
-export interface ApproveModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onApprove: (id: number) => void;
-  request: MeetingRequest;
 }
