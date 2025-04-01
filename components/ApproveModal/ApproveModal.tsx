@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { ApproveModalProps } from '@/types/students';
+import { ApproveModalProps } from '@/types';
 import { X } from 'phosphor-react';
 
 const ApproveModal: React.FC<ApproveModalProps> = ({ isOpen, onClose, request, onApprove }: ApproveModalProps) => {
@@ -24,24 +24,24 @@ const ApproveModal: React.FC<ApproveModalProps> = ({ isOpen, onClose, request, o
        
         <div className="flex items-center gap-3 border-b pb-3 mb-4">
           <Image
-            src={request.profilePicture}
+            src={request.profileImage}
             alt="User"
             width={50}
             height={50}
             className="rounded-full border border-gray-300"
           />
           <div>
-            <h2 className="text-lg font-semibold text-gray-800">{request.name}</h2>
-            <p className="text-sm text-gray-500">{request.email}</p>
+            <h2 className="text-lg font-semibold text-gray-800">{request.studentName}</h2>
+            <p className="text-sm text-gray-500">{request.studentEmail}</p>
           </div>
         </div>
 
      
         <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-          <p><span className="font-semibold text-gray-700">Request Date:</span> {request.RequestDate}</p>
-          <p><span className="font-semibold text-gray-700">Meeting Date:</span> {request.MeetingDate}</p>
-          <p><span className="font-semibold text-gray-700">Day:</span> {request.day}</p>
-          <p><span className="font-semibold text-gray-700">Time:</span> {request.time}</p>
+          <p><span className="font-semibold text-gray-700">Request Date:</span>{request.createdAt}</p>
+          <p><span className="font-semibold text-gray-700">Meeting Date:</span>{request.date.toISOString().split("T")[0]}</p>
+          <p><span className="font-semibold text-gray-700">Day:</span> {request.date.toLocaleDateString("en-US", { weekday: "long" })}</p>
+          <p><span className="font-semibold text-gray-700">Time:</span> {request.date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</p>
           <p className="col-span-2 border-t pt-3 text-gray-600">
             <span className="font-semibold text-gray-700">Caption:</span> {request.caption}
           </p>
