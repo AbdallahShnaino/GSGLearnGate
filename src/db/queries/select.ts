@@ -80,9 +80,6 @@ export async function getMonitorsNames(): Promise<UsersNames[]> {
   .all();
 }
 
-export async function getMonitors (page: number = 1,
-  pageSize: number = 10):Promise<{users:MonitorsJoinUsers[], totalCount:number}| null>{
-    const offset = (page - 1) * pageSize;
 
 export async function getMonitors(page: number = 1,
   pageSize: number = 10): Promise<{ users: MonitorsJoinUsers[], totalCount: number } | null> {
@@ -129,10 +126,7 @@ export async function getCoMonitorsNames(): Promise<UsersNames[]> {
   .leftJoin(usersTable, eq(usersTable.id, coMonitorsTable.userId))
   .all();
 }
-export async function getCoMonitors (page: number = 1,
-  pageSize: number = 10):Promise<{users:MonitorsJoinUsers[], totalCount:number}| null>{
-    const offset = (page - 1) * pageSize;
-  
+
 export async function getCoMonitors(page: number = 1,
   pageSize: number = 10): Promise<{ users: MonitorsJoinUsers[], totalCount: number } | null> {
   const offset = (page - 1) * pageSize;
