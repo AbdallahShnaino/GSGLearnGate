@@ -40,7 +40,7 @@ import {
 
   MonitorsJoinUsers,
   CourseJoinStudent,
-
+  UsersNames,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 export async function getAllUsers(): Promise<User[]> {
@@ -67,9 +67,27 @@ export async function getAllMonitors(): Promise<Monitor[]> {
   return await db.select().from(monitorsTable).all();
 }
 
+export async function getMonitorsNames(): Promise<UsersNames[]> {
+  return await db
+  .select({
+    id: monitorsTable.id,
+    userId: monitorsTable.userId,
+    firstName: usersTable.firstName,
+    lastName: usersTable.lastName,
+  })
+  .from(monitorsTable)
+  .leftJoin(usersTable, eq(usersTable.id, monitorsTable.userId))
+  .all();
+}
+
+export async function getMonitors (page: number = 1,
+  pageSize: number = 10):Promise<{users:MonitorsJoinUsers[], totalCount:number}| null>{
+    const offset = (page - 1) * pageSize;
+
 export async function getMonitors(page: number = 1,
   pageSize: number = 10): Promise<{ users: MonitorsJoinUsers[], totalCount: number } | null> {
   const offset = (page - 1) * pageSize;
+
   const result = await db
     .select({
       id: monitorsTable.id,
@@ -99,6 +117,22 @@ export async function getMonitors(page: number = 1,
 export async function getAllCoMonitors(): Promise<CoMonitor[]> {
   return await db.select().from(coMonitorsTable).all();
 }
+export async function getCoMonitorsNames(): Promise<UsersNames[]> {
+  return await db
+  .select({
+    id: coMonitorsTable.id,
+    userId: coMonitorsTable.userId,
+    firstName: usersTable.firstName,
+    lastName: usersTable.lastName,
+  })
+  .from(coMonitorsTable)
+  .leftJoin(usersTable, eq(usersTable.id, coMonitorsTable.userId))
+  .all();
+}
+export async function getCoMonitors (page: number = 1,
+  pageSize: number = 10):Promise<{users:MonitorsJoinUsers[], totalCount:number}| null>{
+    const offset = (page - 1) * pageSize;
+  
 export async function getCoMonitors(page: number = 1,
   pageSize: number = 10): Promise<{ users: MonitorsJoinUsers[], totalCount: number } | null> {
   const offset = (page - 1) * pageSize;
@@ -450,33 +484,31 @@ export async function getCoursesWithStudentCount(
   pageSize: number = 10
 ): Promise<{ courses: CourseJoinStudent[]; totalCount: number } | null> {
   const offset = (page - 1) * pageSize;
-  const monitorUsers = alias(usersTable, "monitorUsers");
-  const coMonitorUsers = alias(usersTable, "coMonitorUsers");
+  const monitorUser = alias(usersTable, "monitorUser");
+  const coMonitorUser = alias(usersTable, "coMonitorUser");
 
   const results = await db
     .select({
       id: coursesTable.id,
       title: coursesTable.title,
       difficulty: coursesTable.difficulty,
-      monitorId: monitorsTable.userId,
-      monitorName: monitorUsers.firstName,
-      coMonitorId: coMonitorsTable.userId,
-      coMonitorName: coMonitorUsers.firstName,
+      monitorId: coursesTable.monitorId,
+      coMonitorId: coursesTable.coMonitorId,
+      monitorName: monitorUser.firstName,
+      coMonitorName: coMonitorUser.firstName,
       studentCount: sql<number>`COUNT(${studentsCoursesTable.studentId})`.as("studentCount"),
     })
     .from(coursesTable)
     .leftJoin(studentsCoursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
-    .leftJoin(monitorsTable, eq(coursesTable.id, monitorsTable.id))
-    .leftJoin(monitorUsers, eq(monitorsTable.userId, monitorUsers.id))
-    .leftJoin(coMonitorsTable, eq(coursesTable.id, coMonitorsTable.id))
-    .leftJoin(coMonitorUsers, eq(coMonitorsTable.userId, coMonitorUsers.id))
+    .leftJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
+    .leftJoin(monitorUser, eq(monitorsTable.userId, monitorUser.id))
+    .leftJoin(coMonitorsTable, eq(coursesTable.coMonitorId, coMonitorsTable.id))
+    .leftJoin(coMonitorUser, eq(coMonitorsTable.userId, coMonitorUser.id))
     .groupBy(
       coursesTable.id,
-      monitorUsers.firstName,
-      coMonitorUsers.firstName
-    )
-    .limit(pageSize)
-    .offset(offset)
+      monitorUser.firstName,
+      coMonitorUser.firstName
+    ).limit(pageSize).offset(offset)
     .all();
 
   const totalCount = await db.select({
@@ -484,24 +516,24 @@ export async function getCoursesWithStudentCount(
     title: coursesTable.title,
     difficulty: coursesTable.difficulty,
     monitorId: monitorsTable.userId,
-    monitorName: monitorUsers.firstName,
+    monitorName: monitorUser.firstName,
     coMonitorId: coMonitorsTable.userId,
-    coMonitorName: coMonitorUsers.firstName,
+    coMonitorName: coMonitorUser.firstName,
     studentCount: sql<number>`COUNT(${studentsCoursesTable.studentId})`.as("studentCount"),
   })
-    .from(coursesTable)
-    .leftJoin(studentsCoursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
-    .leftJoin(monitorsTable, eq(coursesTable.id, monitorsTable.id))
-    .leftJoin(monitorUsers, eq(monitorsTable.userId, monitorUsers.id))
-    .leftJoin(coMonitorsTable, eq(coursesTable.id, coMonitorsTable.id))
-    .leftJoin(coMonitorUsers, eq(coMonitorsTable.userId, coMonitorUsers.id))
-    .groupBy(
-      coursesTable.id,
-      monitorUsers.firstName,
-      coMonitorUsers.firstName
-    ).all();
 
-
+  .from(coursesTable)
+  .leftJoin(studentsCoursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
+  .leftJoin(monitorsTable, eq(coursesTable.id, monitorsTable.id))
+  .leftJoin(monitorUser, eq(monitorsTable.userId, monitorUser.id))
+  .leftJoin(coMonitorsTable, eq(coursesTable.id, coMonitorsTable.id))
+  .leftJoin(coMonitorUser, eq(coMonitorsTable.userId, coMonitorUser.id))
+  .groupBy(
+    coursesTable.id,
+    monitorUser.firstName,
+    coMonitorUser.firstName
+  ).all();
+   
   return { courses: results, totalCount: totalCount.length };
 }
 

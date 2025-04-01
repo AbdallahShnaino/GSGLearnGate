@@ -217,3 +217,11 @@ export type MonitorsJoinUsers = {
   city: string | null;
 };
 
+export type UsersNames={
+  id: number;
+  userId: number;
+  firstName: string | null;
+  lastName: string | null;
+}
+
+
