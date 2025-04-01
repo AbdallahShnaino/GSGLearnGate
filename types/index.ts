@@ -1,5 +1,3 @@
-
-
 export enum Role {
   ADMIN = "ADMIN",
   STUDENT = "STUDENT",
@@ -129,7 +127,7 @@ export type CourseJoinStudent = {
   coMonitorId: number | null;
   coMonitorName: string | null;
   studentCount: number;
-}
+};
 
 export type Submission = {
   id: number;
@@ -194,8 +192,7 @@ export interface AppointmentWithStudent {
   caption: string;
   date: Date;
   status: Status;
-  createdAt: string,
-
+  createdAt: string;
 }
 export interface ApproveModalProps {
   isOpen: boolean;
@@ -203,7 +200,6 @@ export interface ApproveModalProps {
   onApprove: (id: number) => void;
   request: AppointmentWithStudent;
 }
-
 
 export type MonitorsJoinUsers = {
   id: number;
@@ -217,11 +213,16 @@ export type MonitorsJoinUsers = {
   city: string | null;
 };
 
-export type UsersNames={
+export type UsersNames = {
   id: number;
   userId: number;
   firstName: string | null;
   lastName: string | null;
-}
+};
 
-
+export type StudentCourseSmallCard = {
+  id: number;
+  title: string;
+  monitorName: string;
+  absence: number;
+};
