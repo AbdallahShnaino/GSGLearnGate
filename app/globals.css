@@ -30,7 +30,7 @@ body {
   font-family: var(--font-oxygen);
 }
 
-/* لإزالة الأسهم في متصفحات WebKit (Chrome, Safari, Edge) */
+
 ::-webkit-outer-spin-button,
 ::-webkit-inner-spin-button {
   -webkit-appearance: none;

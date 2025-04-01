@@ -35,8 +35,12 @@ import {
   Submission,
   Task,
   User,
+
+  AppointmentWithStudent,
+
   MonitorsJoinUsers,
   CourseJoinStudent,
+
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 export async function getAllUsers(): Promise<User[]> {
@@ -63,9 +67,9 @@ export async function getAllMonitors(): Promise<Monitor[]> {
   return await db.select().from(monitorsTable).all();
 }
 
-export async function getMonitors (page: number = 1,
-  pageSize: number = 10):Promise<{users:MonitorsJoinUsers[], totalCount:number}| null>{
-    const offset = (page - 1) * pageSize;
+export async function getMonitors(page: number = 1,
+  pageSize: number = 10): Promise<{ users: MonitorsJoinUsers[], totalCount: number } | null> {
+  const offset = (page - 1) * pageSize;
   const result = await db
     .select({
       id: monitorsTable.id,
@@ -79,24 +83,25 @@ export async function getMonitors (page: number = 1,
       city: usersTable.city,
     })
     .from(monitorsTable)
-    .leftJoin(usersTable, eq(usersTable.id,monitorsTable.userId)).limit(pageSize).offset(offset).all();
+    .leftJoin(usersTable, eq(usersTable.id, monitorsTable.userId)).limit(pageSize).offset(offset).all();
 
-    const totalCount = await db
+  const totalCount = await db
     .select({
       monitorId: monitorsTable.id,
-      userId: monitorsTable.userId})
+      userId: monitorsTable.userId
+    })
     .from(monitorsTable)
-    .leftJoin(usersTable, eq(usersTable.id,monitorsTable.userId)).all();
+    .leftJoin(usersTable, eq(usersTable.id, monitorsTable.userId)).all();
 
-  return {users:result, totalCount: totalCount.length};
+  return { users: result, totalCount: totalCount.length };
 };
 
 export async function getAllCoMonitors(): Promise<CoMonitor[]> {
   return await db.select().from(coMonitorsTable).all();
 }
-export async function getCoMonitors (page: number = 1,
-  pageSize: number = 10):Promise<{users:MonitorsJoinUsers[], totalCount:number}| null>{
-    const offset = (page - 1) * pageSize;
+export async function getCoMonitors(page: number = 1,
+  pageSize: number = 10): Promise<{ users: MonitorsJoinUsers[], totalCount: number } | null> {
+  const offset = (page - 1) * pageSize;
   const result = await db
     .select({
       id: coMonitorsTable.id,
@@ -110,25 +115,26 @@ export async function getCoMonitors (page: number = 1,
       city: usersTable.city,
     })
     .from(coMonitorsTable)
-    .leftJoin(usersTable, eq(usersTable.id,coMonitorsTable.userId)).limit(pageSize).offset(offset).all();
+    .leftJoin(usersTable, eq(usersTable.id, coMonitorsTable.userId)).limit(pageSize).offset(offset).all();
 
-    const totalCount = await db
+  const totalCount = await db
     .select({
       monitorId: coMonitorsTable.id,
-      userId: coMonitorsTable.userId})
+      userId: coMonitorsTable.userId
+    })
     .from(coMonitorsTable)
-    .leftJoin(usersTable, eq(usersTable.id,coMonitorsTable.userId)).all();
+    .leftJoin(usersTable, eq(usersTable.id, coMonitorsTable.userId)).all();
 
-  return {users:result, totalCount: totalCount.length};
+  return { users: result, totalCount: totalCount.length };
 };
 
 export async function getAllStudents(): Promise<Student[]> {
   return await db.select().from(studentsTable).all();
 }
 
-export async function getStudents (page: number = 1,
-  pageSize: number = 10):Promise<{users:MonitorsJoinUsers[], totalCount:number}| null>{
-    const offset = (page - 1) * pageSize;
+export async function getStudents(page: number = 1,
+  pageSize: number = 10): Promise<{ users: MonitorsJoinUsers[], totalCount: number } | null> {
+  const offset = (page - 1) * pageSize;
   const result = await db
     .select({
       id: studentsTable.id,
@@ -142,16 +148,17 @@ export async function getStudents (page: number = 1,
       city: usersTable.city,
     })
     .from(studentsTable)
-    .leftJoin(usersTable, eq(usersTable.id,studentsTable.userId)).limit(pageSize).offset(offset).all();
+    .leftJoin(usersTable, eq(usersTable.id, studentsTable.userId)).limit(pageSize).offset(offset).all();
 
-    const totalCount = await db
+  const totalCount = await db
     .select({
       monitorId: studentsTable.id,
-      userId: studentsTable.userId})
+      userId: studentsTable.userId
+    })
     .from(studentsTable)
-    .leftJoin(usersTable, eq(usersTable.id,studentsTable.userId)).all();
+    .leftJoin(usersTable, eq(usersTable.id, studentsTable.userId)).all();
 
-  return {users:result, totalCount: totalCount.length};
+  return { users: result, totalCount: totalCount.length };
 };
 
 export async function getAllCourses(): Promise<Course[]> {
@@ -239,6 +246,28 @@ export async function getCoursesNamesByMonitor(
     return null;
   }
 }
+export async function getCoursesNamesByCoMonitor(
+  coMonitorId: number
+): Promise<{ courseId: number; courseName: string }[] | null> {
+  const results = await db
+    .select({
+      title: coursesTable.title,
+      id: coursesTable.id,
+    })
+    .from(coursesTable)
+    .where(eq(coursesTable.coMonitorId, coMonitorId));
+  try {
+    return results.map((course: { id: any; title: any }) => ({
+      courseId: course.id,
+      courseName: course.title,
+    }));
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+
+}
+
 
 export async function getCoursesByCoMonitor(
   coMonitorId: number
@@ -330,6 +359,64 @@ export async function getAppointmentsByCoMonitor(
 
   return results.length > 0 ? results : null;
 }
+export async function getCoMonitorAppointments(
+  coMonitorId: number,
+  courseId?: number,
+  page: number = 1,
+  pageSize: number = 10
+): Promise<{ coMonitorId: number; appointments: AppointmentWithStudent[]; totalCount: number }> {
+  const offset = (page - 1) * pageSize;
+
+  const whereConditions = [eq(appointmentsTable.coMonitorId, coMonitorId)];
+
+  if (courseId !== undefined) {
+    whereConditions.push(eq(coursesTable.id, courseId));
+  }
+
+  const results = await db
+    .select({
+      id: appointmentsTable.id,
+      studentId: appointmentsTable.studentId,
+      date: appointmentsTable.date,
+      caption: appointmentsTable.caption,
+      coMonitorId: appointmentsTable.coMonitorId,
+      status: appointmentsTable.status,
+      createdAt: appointmentsTable.createdAt,
+      profileImage: usersTable.image,
+      studentName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      studentEmail: usersTable.email,
+      courseName: coursesTable.title,
+      courseId: coursesTable.id,
+    })
+    .from(appointmentsTable)
+    .innerJoin(studentsTable, eq(appointmentsTable.studentId, studentsTable.id))
+    .innerJoin(usersTable, eq(studentsTable.userId, usersTable.id))
+    .innerJoin(coursesTable, eq(coursesTable.coMonitorId, appointmentsTable.coMonitorId))
+    .where(and(...whereConditions))
+    .limit(pageSize)
+    .offset(offset);
+
+  // إزالة التكرار بناءً على studentId
+  const uniqueResults = Array.from(
+    new Map(results.map((item) => [item.studentId, item])).values()
+  );
+
+  const countResults = await db
+    .select({ count: sql<number>`COUNT(*)` })
+    .from(appointmentsTable)
+    .innerJoin(studentsTable, eq(appointmentsTable.studentId, studentsTable.id))
+    .innerJoin(usersTable, eq(studentsTable.userId, usersTable.id))
+    .innerJoin(coursesTable, eq(coursesTable.coMonitorId, appointmentsTable.coMonitorId))
+    .where(and(...whereConditions));
+
+  return {
+    coMonitorId,
+    appointments: uniqueResults.length > 0 ? uniqueResults : [],
+    totalCount: countResults[0]?.count || 0,
+  };
+}
+
+
 
 export async function getAllStudentsCourses(): Promise<StudentCourse[]> {
   return await db.select().from(studentsCoursesTable).all();
@@ -392,7 +479,7 @@ export async function getCoursesWithStudentCount(
     .offset(offset)
     .all();
 
-  const totalCount = await db  .select({
+  const totalCount = await db.select({
     id: coursesTable.id,
     title: coursesTable.title,
     difficulty: coursesTable.difficulty,
@@ -402,18 +489,18 @@ export async function getCoursesWithStudentCount(
     coMonitorName: coMonitorUsers.firstName,
     studentCount: sql<number>`COUNT(${studentsCoursesTable.studentId})`.as("studentCount"),
   })
-  .from(coursesTable)
-  .leftJoin(studentsCoursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
-  .leftJoin(monitorsTable, eq(coursesTable.id, monitorsTable.id))
-  .leftJoin(monitorUsers, eq(monitorsTable.userId, monitorUsers.id))
-  .leftJoin(coMonitorsTable, eq(coursesTable.id, coMonitorsTable.id))
-  .leftJoin(coMonitorUsers, eq(coMonitorsTable.userId, coMonitorUsers.id))
-  .groupBy(
-    coursesTable.id,
-    monitorUsers.firstName,
-    coMonitorUsers.firstName
-  ).all();
-   
+    .from(coursesTable)
+    .leftJoin(studentsCoursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
+    .leftJoin(monitorsTable, eq(coursesTable.id, monitorsTable.id))
+    .leftJoin(monitorUsers, eq(monitorsTable.userId, monitorUsers.id))
+    .leftJoin(coMonitorsTable, eq(coursesTable.id, coMonitorsTable.id))
+    .leftJoin(coMonitorUsers, eq(coMonitorsTable.userId, coMonitorUsers.id))
+    .groupBy(
+      coursesTable.id,
+      monitorUsers.firstName,
+      coMonitorUsers.firstName
+    ).all();
+
 
   return { courses: results, totalCount: totalCount.length };
 }
