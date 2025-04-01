@@ -102,7 +102,7 @@ export const announcementsTable = sqliteTable("announcements", {
     .references((): AnySQLiteColumn => usersTable.id),
   courseId: int("course_id")
     .notNull()
-    .references((): AnySQLiteColumn => coursesTable.id),
+    .references((): AnySQLiteColumn => coursesTable.id,{onDelete: "cascade"}),
   title: text("title").notNull(),
   description: text("description").notNull(),
   ...timestamps,
@@ -145,7 +145,7 @@ export const submissionsTable = sqliteTable("submissions", {
     .references((): AnySQLiteColumn => studentsTable.id),
   courseId: int("course_id")
     .notNull()
-    .references((): AnySQLiteColumn => coursesTable.id),
+    .references((): AnySQLiteColumn => coursesTable.id, {onDelete:"cascade"}),
   grade: int("grade"),
   feedback: text("feedback").notNull(),
   gradedAt: integer("graded_at", { mode: "timestamp" }).notNull(),
@@ -183,7 +183,7 @@ export const attachmentsTable = sqliteTable("attachments", {
     .references((): AnySQLiteColumn => studentsTable.id),
   courseId: int("course_id")
     .notNull()
-    .references((): AnySQLiteColumn => coursesTable.id),
+    .references((): AnySQLiteColumn => coursesTable.id, {onDelete: "cascade"}),
   type: text("status", {
     enum: [Attachments.FILE, Attachments.LINK],
   }).notNull(),
@@ -198,7 +198,7 @@ export const attendancesTable = sqliteTable("attendances", {
     .references((): AnySQLiteColumn => studentsTable.id),
   courseId: int("course_id")
     .notNull()
-    .references((): AnySQLiteColumn => coursesTable.id),
+    .references((): AnySQLiteColumn => coursesTable.id, {onDelete: "cascade"}),
   absence: int("absence"),
   ...timestamps,
 });
@@ -209,7 +209,7 @@ export const joiningRequestsTable = sqliteTable("joining_requests", {
     .references((): AnySQLiteColumn => studentsTable.id),
   courseId: int("course_id")
     .notNull()
-    .references((): AnySQLiteColumn => coursesTable.id),
+    .references((): AnySQLiteColumn => coursesTable.id, {onDelete: "cascade"}),
   interviewStatus: text("interview_status", {
     enum: [Status.ACCEPTED, Status.PENDING, Status.REJECTED],
   }).notNull(),

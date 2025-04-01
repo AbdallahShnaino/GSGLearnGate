@@ -21,11 +21,11 @@ import { drizzle } from "drizzle-orm/libsql";
 async function main() {
   const db = drizzle({
     connection: {
-      url: process.env.TURSO_CONNECTION_URL!,
-      authToken: process.env.TURSO_AUTH_TOKEN!,
+      url: "libsql://gsglearngatedb-abdallah-shnaino.turso.io",
+      authToken:
+        "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJleHAiOjE3NDU2NDkxMTcsImlhdCI6MTc0MzA1NzExNywiaWQiOiI2ZGUyNWIxMy1hOGUyLTRiNjctODFhYy0wZjI0ZjU2ZjIxYTkifQ.TFFetvTi_UT1DLmJK0hIhDo1x3XqmO-EFD6oxeV6UMvStrFQbxxxak7KokQEfQhZ3VhnwbFZ6TYq_FI_ItZ3AA",
     },
   });
-
   await seed(db, {
     usersTable,
     adminsTable,

@@ -1,3 +1,5 @@
+
+
 export enum Role {
   ADMIN = "ADMIN",
   STUDENT = "STUDENT",
@@ -107,14 +109,25 @@ export type StudentCourse = {
   studentId: number;
 } & Timestamps;
 
+export type Task = {
+  id: number;
+  creatorId: number;
+  courseId: number;
+  title: string;
+  description: string;
+  startedAt: Date;
+  deadline: Date;
+  points?: number;
+} & Timestamps;
+
 export type CourseJoinStudent = {
   id: number;
   title: string;
   difficulty: Difficulty;
   monitorId: number | null;
-  monitorName:string| null;
+  monitorName: string | null;
   coMonitorId: number | null;
-  coMonitorName:string | null;
+  coMonitorName: string | null;
   studentCount: number;
 }
 
@@ -129,22 +142,14 @@ export type Submission = {
   status: AssignmentStatus;
 } & Timestamps;
 
-export type Task = {
-  id: number;
-  title: string;
-  description: string;
-  startedAt: string;
-  deadline: Date;
-  points: number | null;
-} & Timestamps;
-
 export type Attachment = {
   id: number;
   taskId: number;
-  studentId: number;
+  creatorId: number;
   courseId: number;
   type: Attachments;
   path: string;
+  submissionId: number; // if its from student or not
 } & Timestamps;
 
 export type Attendance = {
@@ -179,6 +184,27 @@ export interface StudentCourseChart {
   students: number;
 }
 
+export interface AppointmentWithStudent {
+  id: number;
+  coMonitorId: number;
+  studentId: number;
+  studentName: string;
+  studentEmail: string;
+  profileImage: string;
+  caption: string;
+  date: Date;
+  status: Status;
+  createdAt: string,
+
+}
+export interface ApproveModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onApprove: (id: number) => void;
+  request: AppointmentWithStudent;
+}
+
+
 export type MonitorsJoinUsers = {
   id: number;
   userId: number;
@@ -197,3 +223,5 @@ export type UsersNames={
   firstName: string | null;
   lastName: string | null;
 }
+
+

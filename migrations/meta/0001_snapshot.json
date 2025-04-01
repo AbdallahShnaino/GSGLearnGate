@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "59485f92-044c-4ade-a5bb-a7a8dd886410",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "a3370c77-5f70-402a-94aa-ef3481fcdd16",
+  "prevId": "59485f92-044c-4ade-a5bb-a7a8dd886410",
   "tables": {
     "admins": {
       "name": "admins",
@@ -276,7 +276,7 @@
           "name": "submission_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "status": {
@@ -352,19 +352,6 @@
           "tableTo": "courses",
           "columnsFrom": [
             "course_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "attachments_submission_id_submissions_id_fk": {
-          "name": "attachments_submission_id_submissions_id_fk",
-          "tableFrom": "attachments",
-          "tableTo": "submissions",
-          "columnsFrom": [
-            "submission_id"
           ],
           "columnsTo": [
             "id"
