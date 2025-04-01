@@ -4,7 +4,11 @@ import { useState } from "react";
 
 const Task = () => {
   const [showPopup, setShowPopup] = useState<string | null>(null);
-  const handleSubmissionType = (type: string) => setShowPopup(type);
+  const [submissionType, setSubmissionType] = useState("");
+  const handleSubmissionType = (type: string) => {
+    setSubmissionType(type);
+    setShowPopup(type);
+  };
   return (
     <div className="min-h-screen bg-[#FFF5E8] p-6">
       <header className="mb-8">
@@ -94,9 +98,10 @@ const Task = () => {
                 <select
                   id="submissionType"
                   className="w-full p-3 border border-[#E99375] rounded-lg focus:ring-2 focus:ring-[#FFA41F] focus:outline-none"
+                  value={submissionType}
                   onChange={(e) => handleSubmissionType(e.target.value)}
                 >
-                  <option value="" disabled selected>
+                  <option value="" disabled hidden>
                     Select type...
                   </option>
                   <option value="link">Link</option>
