@@ -1,3 +1,5 @@
+
+
 export enum Role {
   ADMIN = "ADMIN",
   STUDENT = "STUDENT",
@@ -123,9 +125,9 @@ export type CourseJoinStudent = {
   title: string;
   difficulty: Difficulty;
   monitorId: number | null;
-  monitorName:string| null;
+  monitorName: string | null;
   coMonitorId: number | null;
-  coMonitorName:string | null;
+  coMonitorName: string | null;
   studentCount: number;
 }
 
@@ -182,6 +184,27 @@ export interface StudentCourseChart {
   students: number;
 }
 
+export interface AppointmentWithStudent {
+  id: number;
+  coMonitorId: number;
+  studentId: number;
+  studentName: string;
+  studentEmail: string;
+  profileImage: string;
+  caption: string;
+  date: Date;
+  status: Status;
+  createdAt: string,
+
+}
+export interface ApproveModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onApprove: (id: number) => void;
+  request: AppointmentWithStudent;
+}
+
+
 export type MonitorsJoinUsers = {
   id: number;
   userId: number;
@@ -193,3 +216,4 @@ export type MonitorsJoinUsers = {
   role: Role | null;
   city: string | null;
 };
+
