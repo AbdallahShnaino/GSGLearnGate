@@ -21,7 +21,6 @@ export enum Status {
 
 export enum AssignmentStatus {
   PENDING = "PENDING",
-  SUBMITTED = "SUBMITTED",
   GRADED = "GRADED",
 }
 
@@ -130,6 +129,20 @@ export type CourseJoinStudent = {
   coMonitorName: string | null;
   studentCount: number;
 }
+export type SubmissionsTask = {
+  submissionId: number;
+  studentId: number;
+  studentName: string;
+  email: string;
+  submissionDate: string;
+  status: AssignmentStatus
+  grade: number | null;
+  profilePicture: string;
+  taskName: string;
+  courseName: string;
+  taskId: number;
+} & Timestamps;
+
 
 export type Submission = {
   id: number;
@@ -216,4 +229,5 @@ export type MonitorsJoinUsers = {
   role: Role | null;
   city: string | null;
 };
+
 

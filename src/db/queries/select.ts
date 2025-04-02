@@ -40,6 +40,7 @@ import {
 
   MonitorsJoinUsers,
   CourseJoinStudent,
+  SubmissionsTask,
 
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
@@ -396,7 +397,7 @@ export async function getCoMonitorAppointments(
     .limit(pageSize)
     .offset(offset);
 
-  // إزالة التكرار بناءً على studentId
+
   const uniqueResults = Array.from(
     new Map(results.map((item) => [item.studentId, item])).values()
   );
@@ -614,4 +615,73 @@ export async function updateJoiningRequest(
     .set(updates)
     .where(eq(joiningRequestsTable.id, id))
     .returning();
+}
+
+
+export async function getSubmissionsForTasks(
+  taskId?: number,
+  page: number = 1,
+  pageSize: number = 10
+): Promise<{ submissions: SubmissionsTask[]; totalCount: number } | null> {
+  const offset = (page - 1) * pageSize;
+
+  const whereConditions = [
+    taskId ? eq(submissionsTable.taskId, taskId) : undefined,
+  ].filter(Boolean);
+
+  const results = await db
+    .select({
+      submissionId: submissionsTable.id,
+      studentId: studentsTable.id,
+      studentName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      email: usersTable.email,
+      submissionDate: submissionsTable.createdAt,
+      status: submissionsTable.status,
+      grade: submissionsTable.grade,
+      profilePicture: usersTable.image,
+      taskName: tasksTable.title,
+      courseName: coursesTable.title,
+      taskId: submissionsTable.taskId,
+    })
+    .from(submissionsTable)
+    .leftJoin(studentsTable, eq(submissionsTable.studentId, studentsTable.id))
+    .leftJoin(usersTable, eq(studentsTable.userId, usersTable.id))
+    .leftJoin(tasksTable, eq(submissionsTable.taskId, tasksTable.id))
+    .leftJoin(coursesTable, eq(tasksTable.courseId, coursesTable.id))
+    .where(and(...whereConditions))
+    .groupBy(
+      submissionsTable.id,
+      studentsTable.id,
+      usersTable.id,
+      tasksTable.id,
+      coursesTable.id
+    )
+    .limit(pageSize)
+    .offset(offset)
+    .all();
+
+  const totalCountResult = await db
+    .select({ count: sql<number>`COUNT(*)` })
+    .from(submissionsTable)
+    .where(and(...whereConditions))
+    .all();
+
+  const totalCount = totalCountResult.length > 0 ? totalCountResult[0].count : 0;
+
+  return {
+    submissions: results.map(result => ({
+      submissionId: result.submissionId,
+      studentId: result.studentId ?? 0,
+      studentName: result.studentName || "",
+      email: result.email || "",
+      submissionDate: result.submissionDate,
+      status: result.status,
+      grade: result.grade,
+      profilePicture: result.profilePicture || "",
+      taskName: result.taskName || "",
+      courseName: result.courseName || "",
+      taskId: result.taskId ?? 0,
+    })),
+    totalCount
+  };
 }
