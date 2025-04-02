@@ -41,6 +41,7 @@ import {
   MonitorsJoinUsers,
   CourseJoinStudent,
   UsersNames,
+  CourseWithNames,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 export async function getAllUsers(): Promise<User[]> {
@@ -194,7 +195,7 @@ export async function getAllCourses(): Promise<Course[]> {
 }
 
 
-export async function getCourseById(id: number): Promise<Course | null> {
+export async function getCourseById(id: number): Promise<CourseWithNames | null> {
     const monitorUsers = alias(usersTable, "monitorUsers");
     const coMonitorUsers = alias(usersTable, "coMonitorUsers");
   

@@ -226,4 +226,24 @@ export type UsersNames={
   lastName: string | null;
 }
 
+export type CourseWithNames = {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+  difficulty: Difficulty;
+  duration: number;
+  applyStartDate: Date;
+  applyEndDate: Date;
+  courseStartDate: Date;
+  courseEndDate: Date;
+  monitorId: number | null;
+  monitorName?: string | null;
+  coMonitorId: number | null;
+  coMonitorName?: string | null;
+  adminId: number | null;
+  details: string;
+  entryRequirements: string;
+} & Timestamps;
+
 
