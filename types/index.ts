@@ -221,8 +221,21 @@ export type UsersNames = {
 };
 
 export type StudentCourseSmallCard = {
-  id: number;
-  title: string;
-  monitorName: string;
-  absence: number;
+  id: number | null;
+  title: string | null;
+  monitorName: string | null;
+  absence: number | null;
 };
+
+export enum CourseStatus {
+  "NOT STARTED" = "Not Started",
+  "IN PROGRESS" = "In Progress",
+  "FINISHED" = "Finished",
+}
+export type StudentCourseBigCard = {
+  status: CourseStatus;
+  startDate: Date;
+  endDate: Date;
+  totalTasks: number;
+  completedTasks: number;
+} & StudentCourseSmallCard;
