@@ -14,15 +14,6 @@ export default async function ActiveTasksCard() {
       <p className="text-2xl font-bold text-[#FFA41F] mt-2">
         {activeTasksCount}
       </p>
-      <div className="flex items-center mt-1 text-sm text-gray-500">
-        <span>Submissions: 23/84</span>
-        <div className="w-16 h-1.5 bg-gray-200 rounded-full ml-2">
-          <div
-            className="h-full bg-[#FFA41F] rounded-full"
-            style={{ width: "27%" }}
-          ></div>
-        </div>
-      </div>
     </div>
   );
 }

@@ -12,9 +12,6 @@ export default async function LateSubmissionsCard() {
         </div>
       </div>
       <p className="text-2xl font-bold text-[#FFA41F] mt-2">{count}</p>
-      <div className="flex items-center mt-1 text-sm text-gray-500">
-        <span>From 3 different tasks</span>
-      </div>
     </div>
   );
 }

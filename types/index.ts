@@ -17,6 +17,12 @@ export enum Status {
   REJECTED = "REJECTED",
 }
 
+export enum TaskStatus {
+  IN_PROGRESS = "In Progress",
+  COMPLETED = "Completed",
+  ALL = "All",
+}
+
 export enum AssignmentStatus {
   PENDING = "PENDING",
   SUBMITTED = "SUBMITTED",
@@ -123,11 +129,11 @@ export type CourseJoinStudent = {
   title: string;
   difficulty: Difficulty;
   monitorId: number | null;
-  monitorName:string| null;
+  monitorName: string | null;
   coMonitorId: number | null;
-  coMonitorName:string | null;
+  coMonitorName: string | null;
   studentCount: number;
-}
+};
 
 export type Submission = {
   id: number;

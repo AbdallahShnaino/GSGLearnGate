@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import Submit from "./Submit";
 import SelectCourse from "@/components/Dropdowns/SelectCourse";
 import { AttachmentSelector } from "../AttachmentSelector/AttachmentSelector";
-import { useFormState } from "react-dom";
+import { useActionState } from "react";
 
 type AttachmentType = "none" | "link" | "file";
 
@@ -28,7 +28,7 @@ export default function CreateTaskForm({ coursesList }: IProps) {
     taskId: undefined,
   };
 
-  const [formState, formAction] = useFormState(submitTask, initialState);
+  const [formState, formAction] = useActionState(submitTask, initialState);
   const handleSubmit = (formData: FormData) => {
     if (attachment.type === "link" && attachment.value) {
       formData.set("url", attachment.value as string);

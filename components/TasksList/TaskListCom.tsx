@@ -1,4 +1,5 @@
-import { Task } from "@/types/index";
+"use client";
+import { useState } from "react";
 import {
   CalendarBlank,
   DotsThree,
@@ -6,11 +7,18 @@ import {
 } from "@phosphor-icons/react/dist/ssr";
 import { isTaskActive } from "@/utils/index";
 import { MonitorsTasks } from "@/types/tasksOperations";
-interface TaskListProps {
+import Link from "next/link";
+
+interface IProps {
   tasks: MonitorsTasks[];
+  courseStudentCount: { [key: number]: number };
 }
 
-const TaskListCom: React.FC<TaskListProps> = ({ tasks }) => {
+export default function TaskListCom({ tasks, courseStudentCount }: IProps) {
+  const [studentCounts, setStudentCounts] = useState<{ [key: number]: number }>(
+    courseStudentCount
+  );
+
   return (
     <div className="bg-white border border-[#FFA41F]/30 rounded-lg overflow-hidden mb-6 shadow-sm">
       <div className="grid grid-cols-12 bg-[#FFA41F]/10 p-4 border-b border-[#FFA41F]/20 font-medium text-[#FFA41F]">
@@ -30,7 +38,9 @@ const TaskListCom: React.FC<TaskListProps> = ({ tasks }) => {
           <div className="col-span-12 md:col-span-6 mb-2 md:mb-0">
             <div className="flex items-start">
               <div className="flex-1">
-                <h3 className="font-medium text-[#FFA41F]">{task.title}</h3>
+                <Link href={`monitor/tasks/${task.id}`}>
+                  <h3 className="font-medium text-[#FFA41F]">{task.title}</h3>
+                </Link>
                 <div className="flex items-center mt-1 text-sm text-gray-500 md:hidden">
                   <CalendarBlank size={14} className="mr-1" />
                   <span className="mr-3">
@@ -43,14 +53,17 @@ const TaskListCom: React.FC<TaskListProps> = ({ tasks }) => {
                 </div>
                 <div className="flex items-center mt-1 text-sm text-gray-500">
                   <span>
-                    Submissions: {task.submissionCount}/{task.studentCount}
+                    Submissions: {task.submissionCount}/
+                    {studentCounts[task.courseId]}
                   </span>
                   <div className="w-24 h-1.5 bg-gray-200 rounded-full ml-2">
                     <div
                       className="h-full bg-[#FFA41F] rounded-full"
                       style={{
                         width: `${
-                          (task.submissionCount / task.studentCount) * 100
+                          (task.submissionCount /
+                            studentCounts[task.courseId]) *
+                          100
                         }%`,
                       }}
                     ></div>
@@ -82,7 +95,7 @@ const TaskListCom: React.FC<TaskListProps> = ({ tasks }) => {
                   : "bg-gray-100 text-gray-700"
               }`}
             >
-              {isTaskActive(task) === true ? "Completed" : "In Progress"}
+              {isTaskActive(task) ? "Completed" : "In Progress"}
             </span>
           </div>
           <div className="col-span-2 hidden md:flex">
@@ -96,11 +109,4 @@ const TaskListCom: React.FC<TaskListProps> = ({ tasks }) => {
       ))}
     </div>
   );
-};
-
-export default TaskListCom;
-
-/* 
-
-
-*/
+}

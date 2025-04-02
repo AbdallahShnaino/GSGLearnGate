@@ -3,9 +3,10 @@
 import { insertTask } from "@/src/db/queries/insert";
 import {
   getMonitorTasksDeadlines,
-  getMonitorTasksNotGradedCount,
+  getMonitorSubmissionsNotGradedCount,
   getTasksByMonitor,
 } from "@/src/db/queries/select";
+import { TaskStatus } from "@/types";
 
 export async function createTaskByMonitor(
   creatorId: number,
@@ -26,8 +27,13 @@ export async function createTaskByMonitor(
     points,
   });
 }
-export async function getMonitorTasks(monitorId: number) {
-  return await getTasksByMonitor(monitorId);
+export async function getMonitorTasks(
+  monitorId: number,
+  status: TaskStatus,
+  page: number = 1,
+  pageSize: number = 10
+) {
+  return await getTasksByMonitor(monitorId, status, page, pageSize);
 }
 export async function getActiveTasksCount(monitorId: number) {
   const today = new Date();
@@ -41,6 +47,6 @@ export async function getActiveTasksCount(monitorId: number) {
   return count;
 }
 
-export async function getNotGradedTasksCount(monitorId: number) {
-  return await getMonitorTasksNotGradedCount(monitorId);
+export async function getNotGradedSubmissionsCount(monitorId: number) {
+  return await getMonitorSubmissionsNotGradedCount(monitorId);
 }

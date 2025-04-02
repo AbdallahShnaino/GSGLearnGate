@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "./../index";
-import { eq, sql, and, count, lte, gt } from "drizzle-orm";
+import { eq, sql, and, count, lte, gt, or, gte, lt } from "drizzle-orm";
 
 import {
   usersTable,
@@ -37,9 +37,11 @@ import {
   User,
   MonitorsJoinUsers,
   CourseJoinStudent,
+  TaskStatus,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorsTasks } from "@/types/tasksOperations";
+import { MonitorTasksResponse } from "@/types/tasks";
 export async function getAllUsers(): Promise<User[]> {
   return await db.select().from(usersTable).all();
 }
@@ -254,7 +256,6 @@ export async function getCoursesNamesByMonitor(
       courseName: course.title,
     }));
   } catch (e) {
-    console.log(e);
     return null;
   }
 }
@@ -456,7 +457,7 @@ export async function getMonitorTasksDeadlines(
   );
   return deadlines;
 }
-export async function getMonitorTasksNotGradedCount(
+export async function getMonitorSubmissionsNotGradedCount(
   monitorId: number
 ): Promise<number> {
   const result = await db
@@ -466,13 +467,42 @@ export async function getMonitorTasksNotGradedCount(
     .where(
       and(eq(coursesTable.monitorId, monitorId), lte(submissionsTable.grade, 0))
     );
-
   return result[0]?.total || 0;
 }
 
 export async function getTasksByMonitor(
-  monitorId: number
-): Promise<MonitorsTasks[]> {
+  monitorId: number,
+  status: TaskStatus,
+  page: number = 1,
+  pageSize: number = 10
+): Promise<MonitorTasksResponse> {
+  const offset = (page - 1) * pageSize;
+
+  const whereCondition = and(
+    eq(monitorsTable.userId, monitorId),
+    status === TaskStatus.IN_PROGRESS
+      ? and(
+          lte(tasksTable.startedAt, new Date()),
+          gte(tasksTable.deadline, new Date())
+        )
+      : status === TaskStatus.COMPLETED
+      ? or(
+          gt(tasksTable.startedAt, new Date()),
+          lt(tasksTable.deadline, new Date())
+        )
+      : undefined
+  );
+
+  const countQuery = await db
+    .select({
+      total: sql<number>`count(distinct ${tasksTable.id})`.as("total"),
+    })
+    .from(tasksTable)
+    .innerJoin(monitorsTable, eq(monitorsTable.userId, tasksTable.creatorId))
+    .where(whereCondition);
+
+  const total = countQuery[0]?.total || 0;
+
   const tasks = await db
     .select({
       id: tasksTable.id,
@@ -500,7 +530,7 @@ export async function getTasksByMonitor(
       studentsCoursesTable,
       eq(tasksTable.courseId, studentsCoursesTable.courseId)
     )
-    .where(eq(monitorsTable.userId, monitorId))
+    .where(whereCondition)
     .groupBy(
       tasksTable.id,
       tasksTable.title,
@@ -512,31 +542,23 @@ export async function getTasksByMonitor(
       tasksTable.createdAt,
       tasksTable.updatedAt,
       coursesTable.title
-    );
-  return tasks;
+    )
+    .limit(pageSize)
+    .offset(offset);
+
+  return {
+    tasks,
+    total,
+  };
+}
+export async function getStudentCountByCourse(courseId: number) {
+  const result = await db
+    .select({ count: count() })
+    .from(studentsCoursesTable)
+    .where(eq(studentsCoursesTable.courseId, courseId));
+  return result[0]?.count || 0;
 }
 
-/*
-export async function getTasksByMonitor(monitorId: number) {
-  const tasks = await db
-    .select({
-      id: tasksTable.id,
-      title: tasksTable.title,
-      description: tasksTable.description,
-      courseId: tasksTable.courseId,
-      startedAt: tasksTable.startedAt,
-      deadline: tasksTable.deadline,
-      points: tasksTable.points,
-      createdAt: tasksTable.createdAt,
-      updatedAt: tasksTable.updatedAt,
-    })
-    .from(tasksTable)
-    .innerJoin(monitorsTable, eq(monitorsTable.userId, tasksTable.creatorId))
-    .where(eq(monitorsTable.userId, monitorId));
-
-  return tasks as Task[];
-}
-*/
 export async function getAllSubmissions(): Promise<Submission[]> {
   return await db.select().from(submissionsTable).all();
 }
@@ -661,4 +683,13 @@ export async function getLateSubmissionsCountByMonitor(monitorId: number) {
     );
 
   return result[0]?.count ?? 0;
+}
+export async function getTaskById(taskId: number) {
+  const task = await db
+    .select()
+    .from(tasksTable)
+    .where(eq(tasksTable.id, taskId))
+    .limit(1);
+
+  return task[0] || null; // Return the first result or null if not found
 }
