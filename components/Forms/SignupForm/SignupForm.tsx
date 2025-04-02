@@ -76,7 +76,7 @@ const SignupForm = () => {
       </div>
       <div className="flex flex-col md:flex-row justify-between mt-4">
         <div className="flex flex-col gap-1.5 w-full md:w-[48%]">
-          <label htmlFor="idNumber">City*</label>
+          <label htmlFor="city">City*</label>
           <input
             type="text"
             name="city"
