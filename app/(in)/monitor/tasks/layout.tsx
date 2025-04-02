@@ -25,16 +25,16 @@ export default function Layout({
         </h1>
         <CreateTaskButton link="/monitor/tasks/create" />
       </div>
-      <div className="bg-white border border-[#FFA41F]/30 rounded-lg p-3  mb-6 shadow-sm">
-        <div className="flex justify-end flex-col md:flex-row gap-4">
-          <SelectTaskStatus value={1} appendSearchParams={true} />
-        </div>
-      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {activeTasksCard}
         {submissionsAwaitingReview}
         {lateSubmissionsCard}
+      </div>
+      <div className="bg-white border border-[#FFA41F]/30 rounded-lg p-3  mb-6 shadow-sm">
+        <div className="flex justify-end flex-col md:flex-row gap-4">
+          <SelectTaskStatus value={1} appendSearchParams={true} />
+        </div>
       </div>
       {tasksList}
     </div>
