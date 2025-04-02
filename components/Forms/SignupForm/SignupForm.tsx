@@ -99,11 +99,11 @@ const SignupForm = () => {
           />
         </div>
       </div>
-      {!formState.success && <div>{formState.message}</div>}
+      {!formState.success && <div className="text-red-600 mt-3 text-center">{formState.message}</div>}
       <input
         type="submit"
         value="Continue"
-        className="border-2 w-full rounded-md mt-4 p-2.5 text-lg cursor-pointer bg-[#1f2328] text-white hover:bg-[#32383f] mb-8 "
+        className="border-2 w-full rounded-md mt-4 p-2.5 text-lg cursor-pointer bg-[#1f2328] text-white hover:bg-[#32383f]"
       />
     </form>
   );
