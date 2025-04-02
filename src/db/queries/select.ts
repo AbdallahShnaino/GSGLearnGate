@@ -39,6 +39,8 @@ import {
   MonitorsJoinUsers,
   CourseJoinStudent,
   UsersNames,
+  StudentCourseBigCard,
+  CourseStatus,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { StudentCourseSmallCard } from "../../../types";
@@ -668,6 +670,7 @@ export async function updateJoiningRequest(
     .where(eq(joiningRequestsTable.id, id))
     .returning();
 }
+
 export async function getLimitCoursesByStudent(
   studentId: number,
   limit?: number
@@ -692,6 +695,41 @@ export async function getLimitCoursesByStudent(
       usersTable.lastName
     )
     .limit(limit);
+
+  return results.length > 0 ? results : null;
+}
+
+export async function getCoursesDataByStudent(
+  studentId: number
+): Promise<StudentCourseBigCard[] | null> {
+  const results = await db
+    .selectDistinct({
+      id: coursesTable.id,
+      title: coursesTable.title,
+      monitorName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      absence: attendancesTable.absence,
+      startDate: coursesTable.courseStartDate,
+      endDate: coursesTable.courseEndDate,
+      status: sql<CourseStatus>`CASE 
+      WHEN ${coursesTable.courseStartDate} > CURRENT_DATE THEN 'Not Started'
+      WHEN ${coursesTable.courseEndDate} < CURRENT_DATE THEN 'Finished'
+      ELSE 'In Progress'
+      END`,
+      totalTasks: sql<number>`(SELECT COUNT(*) FROM tasks WHERE course_id = ${coursesTable.id})`,
+      completedTasks: sql<number>`(SELECT COUNT(*) FROM submissions WHERE course_id = ${coursesTable.id} AND status = "submitted" AND student_id = ${studentId})`,
+    })
+    .from(studentsCoursesTable)
+    .innerJoin(coursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
+    .innerJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
+    .innerJoin(usersTable, eq(monitorsTable.userId, usersTable.id))
+    .innerJoin(attendancesTable, eq(coursesTable.id, attendancesTable.courseId))
+    .where(eq(studentsCoursesTable.studentId, studentId))
+    .groupBy(
+      coursesTable.id,
+      coursesTable.title,
+      usersTable.firstName,
+      usersTable.lastName
+    );
 
   return results.length > 0 ? results : null;
 }
