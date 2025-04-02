@@ -1,51 +1,46 @@
 "use client";
-import { Image } from "@phosphor-icons/react/dist/ssr";
-import { useState } from "react";
+import { submitUser, UserState } from "@/controllers/actions/addUserAction";
+import { Role } from "@/types";
+import { Image as ImageIcon } from "@phosphor-icons/react/dist/ssr";
+import Image from "next/image";
+import { useActionState, useEffect, useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function AddMonitorForm() {
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    dateOfBirth: "",
-    city: "",
-    role: "",
-    image: null as File | null,
-  });
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+  const initialState: UserState = {
+    success: false,
+    error: "",
+    message: "",
+    id: undefined,
   };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const file = e.target.files[0];
-      setFormData((prevData) => ({
-        ...prevData,
-        image: file,
-      }));
+  const [formState, formAction, isPending] = useActionState(
+    submitUser,
+    initialState
+  );
+  const [selectedImg, setSelectedImg] = useState("");
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setSelectedImg(imageUrl);
     }
   };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
-    if (formData.image) {
-      console.log("Image file:", formData.image);
+  useEffect(() => {
+    if (formState.error) {
+      toast.error(formState.message);
+    } else if (formState.success) {
+      toast.success("User Added successfully!");
+      setSelectedImg("");
     }
-  };
+  }, [formState]);
+
   return (
     <div className="w-full max-w-2xl mx-auto py-2 px-4">
-      <div className="bg-white rounded-lg shadow-2xl overflow-hidden">
-        <div className="px-6 pb-2">
-          <form onSubmit={handleSubmit} className="space-y-2">
+      <ToastContainer position="top-right" autoClose={3000} />
+      <div className="bg-white rounded-lg shadow-2xl overflow-hidden px-6 py-4">
+        <h1 className="text-xl font-semibold text-[#FFA41F]">Add User</h1>
+          <form action={formAction} className="space-y-2">
             <div className="flex flex-col items-center">
               <input
                 type="file"
@@ -54,12 +49,23 @@ export default function AddMonitorForm() {
                 accept="image/*"
                 onChange={handleImageChange}
                 className="opacity-0 w-16 h-16 rounded-full cursor-pointer border-2 border-gray-300 bg-gray-100"
+                required
               />
               <label
                 htmlFor="image"
                 className="flex justify-center items-center w-16 h-16 rounded-full cursor-pointer bg-gray-100 border-2 border-gray-300"
               >
-                <Image className="w-8 h-8 text-gray-500" />
+                {selectedImg ? (
+                <Image
+                  src={selectedImg}
+                  alt="Selected"
+                  className="rounded-full object-cover"
+                  width={70}
+                  height={70}
+                />
+              ) : (
+                <ImageIcon className="w-8 h-8 text-gray-500" />
+              )}
               </label>
             </div>
 
@@ -75,8 +81,6 @@ export default function AddMonitorForm() {
                   type="text"
                   id="firstName"
                   name="firstName"
-                  value={formData.firstName}
-                  onChange={handleChange}
                   placeholder="Enter first name"
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
@@ -94,8 +98,6 @@ export default function AddMonitorForm() {
                   type="text"
                   id="lastName"
                   name="lastName"
-                  value={formData.lastName}
-                  onChange={handleChange}
                   placeholder="Enter last name"
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
@@ -114,8 +116,6 @@ export default function AddMonitorForm() {
                 type="email"
                 id="email"
                 name="email"
-                value={formData.email}
-                onChange={handleChange}
                 placeholder="Enter email address"
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
@@ -133,8 +133,6 @@ export default function AddMonitorForm() {
                 type="password"
                 id="password"
                 name="password"
-                value={formData.password}
-                onChange={handleChange}
                 placeholder="Create a password"
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
@@ -153,8 +151,6 @@ export default function AddMonitorForm() {
                   type="date"
                   id="dateOfBirth"
                   name="dateOfBirth"
-                  value={formData.dateOfBirth}
-                  onChange={handleChange}
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
                 />
@@ -171,8 +167,6 @@ export default function AddMonitorForm() {
                   type="text"
                   id="city"
                   name="city"
-                  value={formData.city}
-                  onChange={handleChange}
                   placeholder="Enter your city"
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
@@ -190,13 +184,11 @@ export default function AddMonitorForm() {
               <select
                 id="role"
                 name="role"
-                value={formData.role}
-                onChange={handleChange}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               >
-                <option value="monitor">Monitor</option>
-                <option value="co-monitor">Co-Monitor</option>
+                <option value={Role.MONITOR}>Monitor</option>
+                <option value={Role.CO_MONITOR}>Co-Monitor</option>
               </select>
             </div>
 
@@ -205,12 +197,11 @@ export default function AddMonitorForm() {
                 type="submit"
                 className=" w-1/3 px-4 py-2 border border-none rounded-md shadow-sm text-sm font-medium text-white bg-[#FFA41F]"
               >
-                Submit
+                {isPending ? "submitting" : "submit"}
               </button>
             </div>
           </form>
         </div>
-      </div>
     </div>
   );
 }

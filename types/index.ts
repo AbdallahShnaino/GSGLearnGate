@@ -188,6 +188,25 @@ export interface StudentCourseChart {
   students: number;
 }
 
+export interface AppointmentWithStudent {
+  id: number;
+  coMonitorId: number;
+  studentId: number;
+  studentName: string;
+  studentEmail: string;
+  profileImage: string;
+  caption: string;
+  date: Date;
+  status: Status;
+  createdAt: string;
+}
+export interface ApproveModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onApprove: (id: number) => void;
+  request: AppointmentWithStudent;
+}
+
 export type MonitorsJoinUsers = {
   id: number;
   userId: number;
@@ -199,3 +218,31 @@ export type MonitorsJoinUsers = {
   role: Role | null;
   city: string | null;
 };
+
+
+export type UsersNames = {
+  id: number;
+  userId: number;
+  firstName: string | null;
+  lastName: string | null;
+};
+
+export type StudentCourseSmallCard = {
+  id: number | null;
+  title: string | null;
+  monitorName: string | null;
+  absence: number | null;
+};
+
+export enum CourseStatus {
+  "NOT STARTED" = "Not Started",
+  "IN PROGRESS" = "In Progress",
+  "FINISHED" = "Finished",
+}
+export type StudentCourseBigCard = {
+  status: CourseStatus;
+  startDate: Date;
+  endDate: Date;
+  totalTasks: number;
+  completedTasks: number;
+} & StudentCourseSmallCard;
