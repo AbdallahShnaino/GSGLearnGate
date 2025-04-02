@@ -1,27 +1,7 @@
-const upcomingLessons = [
-  {
-    id: 1,
-    course: "React & Next.js",
-    date: "March 22, 2025",
-    time: "10:00 AM",
-    monitor: "Ahmad Ali",
-  },
-  {
-    id: 2,
-    course: "UI/UX Design",
-    date: "March 23, 2025",
-    time: "2:00 PM",
-    monitor: "Ahmad Ali",
-  },
-  {
-    id: 3,
-    course: "JavaScript Fundamentals",
-    date: "March 25, 2025",
-    time: "9:00 AM",
-    monitor: "Ahmad Ali",
-  },
-];
-export default function Table() {
+import { getLimitCoursesByStudent } from "@/src/db/queries/select";
+
+const Table = async () => {
+  const courses = await getLimitCoursesByStudent(1, 3);
   return (
     <div className="w-full max-w-4xl overflow-x-auto">
       <div className="overflow-x-auto border border-gray-200 shadow-sm rounded-b-xl">
@@ -40,13 +20,13 @@ export default function Table() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {upcomingLessons.map((lesson) => (
-              <tr key={lesson.id} className="hover:bg-gray-50">
+            {courses?.map((course) => (
+              <tr key={course.id} className="hover:bg-gray-50">
                 <td className="px-8 py-8 font-medium text-gray-900">
-                  {lesson.course}
+                  {course.title}
                 </td>
-                <td className="px-8 py-8 text-gray-700">{lesson.date}</td>
-                <td className="px-8 py-8 text-gray-700">{lesson.time}</td>
+                <td className="px-8 py-8 text-gray-700">Date</td>
+                <td className="px-8 py-8 text-gray-700">Time</td>
               </tr>
             ))}
           </tbody>
@@ -54,4 +34,6 @@ export default function Table() {
       </div>
     </div>
   );
-}
+};
+
+export default Table;
