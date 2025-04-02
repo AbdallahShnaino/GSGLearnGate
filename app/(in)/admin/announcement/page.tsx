@@ -1,8 +1,11 @@
 import React from "react";
 import { UserCircle } from "@phosphor-icons/react/dist/ssr";
 import SendAnnouncementForm from "@/components/SendAnnouncementForm/SendAnnouncementForm";
+import { Course } from "@/types";
+import { fetchAllCourses } from "@/services/courses";
 
-const SendAnnouncementPage = () => {
+const SendAnnouncementPage = async() => {
+  const courses: Course[]= await fetchAllCourses();
   return (
     <div className="flex flex-col">
       <div className="flex items-center justify-between p-2">
@@ -12,7 +15,7 @@ const SendAnnouncementPage = () => {
           <UserCircle size={32} weight="duotone" className="text-[#FFA41F]" />
         </div>
       </div>
-      <SendAnnouncementForm />
+      <SendAnnouncementForm courses={courses} />
     </div>
   );
 };

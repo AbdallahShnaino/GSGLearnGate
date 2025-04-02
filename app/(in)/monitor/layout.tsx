@@ -23,11 +23,6 @@ export const links: SidebarLink[] = [
     icon: <UserCirclePlus size={24} weight="bold" />,
   },
   {
-    href: "/monitor/create-task",
-    label: "Create Task",
-    icon: <ReadCvLogo size={24} weight="bold" />,
-  },
-  {
     href: "/monitor/tasks",
     label: "Tasks",
     icon: <Student size={24} weight="bold" />,
