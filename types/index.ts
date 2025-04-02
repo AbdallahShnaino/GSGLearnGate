@@ -22,6 +22,7 @@ export enum Status {
 export enum AssignmentStatus {
   PENDING = "PENDING",
   GRADED = "GRADED",
+  NOTSUBMITTED = "NOT SUBMITTED",
 }
 
 export enum Attachments {
@@ -162,7 +163,7 @@ export type Attachment = {
   courseId: number;
   type: Attachments;
   path: string;
-  submissionId: number; // if its from student or not
+  submissionId: number; 
 } & Timestamps;
 
 export type Attendance = {

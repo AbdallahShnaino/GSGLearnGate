@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { CheckCircle, Clock, Users, Funnel } from "phosphor-react";
+import { CheckCircle, Clock, Users, Funnel, BellRinging } from "phosphor-react";
 import { Share } from "@phosphor-icons/react/dist/ssr";
 import StatusCard from "../StatusTaskCards/StatusCard";
 import { useStudentSubmissions } from "@/hooks/useStudentSubmissions";
@@ -10,9 +10,11 @@ import TempPagination from "../Pagination/TempPagination";
 import Loader from "../Shared/Loader";
 import SearchBar from "../SearchBar/SearchBar";
 import { useSearch } from "@/hooks/useSearch";
+
 interface IdTaskIprops {
   TaskId: number;
 }
+
 export default function StudentSubmissionsTable({ TaskId }: IdTaskIprops) {
   const { value: searchQuery, updateSearchParam } = useSearch("search");
   const {
@@ -21,6 +23,7 @@ export default function StudentSubmissionsTable({ TaskId }: IdTaskIprops) {
     submissions,
     evaluatedCount,
     pendingCount,
+    notSubmittedCount,
     countSubmisson,
     currentPage,
     totalPages,
@@ -37,14 +40,18 @@ export default function StudentSubmissionsTable({ TaskId }: IdTaskIprops) {
   return (
     <div className="min-h-screen">
       <div className="container mx-auto flex-col gap-6 mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <StatusCard
             title="Total Submissions"
             icon={<Users size={22} className="text-orange-600" />}
             iconColor="orange"
             subtitle="Active submissions"
-            value={countSubmisson}
-            progress={100}
+            value={evaluatedCount + pendingCount}
+            progress={
+              countSubmisson > 0
+                ? ((evaluatedCount + pendingCount) / countSubmisson) * 100
+                : 0
+            }
           />
           <StatusCard
             title="Graded"
@@ -54,7 +61,9 @@ export default function StudentSubmissionsTable({ TaskId }: IdTaskIprops) {
             iconColor="green"
             subtitle="Graded submissions"
             value={evaluatedCount}
-            progress={(evaluatedCount / countSubmisson) * 100}
+            progress={
+              countSubmisson > 0 ? (evaluatedCount / countSubmisson) * 100 : 0
+            }
           />
           <StatusCard
             title="Pending"
@@ -62,10 +71,25 @@ export default function StudentSubmissionsTable({ TaskId }: IdTaskIprops) {
             iconColor="red"
             subtitle="Awaiting review"
             value={pendingCount}
-            progress={(pendingCount / countSubmisson) * 100}
+            progress={
+              countSubmisson > 0 ? (pendingCount / countSubmisson) * 100 : 0
+            }
+          />
+          <StatusCard
+            title="Not Submitted"
+            icon={
+              <BellRinging size={22} weight="fill" className="text-gray-600" />
+            }
+            iconColor="gray"
+            subtitle="Not Submitted"
+            value={notSubmittedCount}
+            progress={
+              countSubmisson > 0
+                ? (notSubmittedCount / countSubmisson) * 100
+                : 0
+            }
           />
         </div>
-
         <div className="bg-white p-4 mb-7 shadow-md rounded-lg">
           <div className="flex flex-col sm:flex-row gap-4">
             <SearchBar
@@ -82,6 +106,7 @@ export default function StudentSubmissionsTable({ TaskId }: IdTaskIprops) {
                 <option value="All">All Submissions</option>
                 <option value="GRADED">Graded</option>
                 <option value="PENDING">Pending</option>
+                <option value="NOT SUBMITTED">Not Submitted</option>
               </select>
             </div>
           </div>
@@ -136,14 +161,23 @@ export default function StudentSubmissionsTable({ TaskId }: IdTaskIprops) {
                         className={`px-6 py-3 font-semibold ${
                           submission.status === "GRADED"
                             ? "text-green-600"
-                            : "text-red-600"
+                            : submission.status === "PENDING"
+                            ? "text-red-600"
+                            : "text-gray-600"
                         }`}
                       >
                         {submission.status}
                       </td>
                       <td className="px-6 py-3">
                         <Link href="#">
-                          <button className="bg-orange-400 hover:bg-orange-500 text-white w-[100px] rounded-xl flex h-10 justify-center items-center transition duration-300 cursor-pointer">
+                          <button
+                            className={`w-[100px] rounded-xl flex h-10 justify-center items-center transition duration-300 cursor-pointer ${
+                              submission.status === "NOT SUBMITTED"
+                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                : "bg-orange-400 hover:bg-orange-500 text-white"
+                            }`}
+                            disabled={submission.status === "NOT SUBMITTED"}
+                          >
                             <Share size={20} className="mr-2" />
                             <span>View</span>
                           </button>

@@ -40,8 +40,18 @@ export function useStudentSubmissions(taskId: number, searchQuery: string) {
   const evaluatedCount = submissions.filter(
     (sub) => sub.status.toLowerCase() === AssignmentStatus.GRADED.toLowerCase()
   ).length;
-  const pendingCount = submissions.length - evaluatedCount;
+
+  const pendingCount = submissions.filter(
+    (sub) => sub.status.toLowerCase() === AssignmentStatus.PENDING.toLowerCase()
+  ).length;
+
+  const notSubmittedCount = submissions.filter(
+    (sub) =>
+      sub.status.toLowerCase() === AssignmentStatus.NOTSUBMITTED.toLowerCase()
+  ).length;
+
   const countSubmisson = submissions.length;
+
   const currentPageData = filteredSubmissions.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
@@ -60,6 +70,7 @@ export function useStudentSubmissions(taskId: number, searchQuery: string) {
     submissions: currentPageData,
     evaluatedCount,
     pendingCount,
+    notSubmittedCount,
     loading,
     currentPage,
     totalPages,

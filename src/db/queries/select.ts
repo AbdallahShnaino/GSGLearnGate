@@ -617,19 +617,29 @@ export async function updateJoiningRequest(
     .returning();
 }
 
-
-export async function getSubmissionsForTasks(
-  taskId?: number,
+export async function getSubmissionsAndNonSubmissionsForTask(
+  taskId: number,
+  courseId: number,
   page: number = 1,
   pageSize: number = 10
-): Promise<{ submissions: SubmissionsTask[]; totalCount: number } | null> {
+): Promise<{ submissions: SubmissionsTask[]; totalCount: number }> {
   const offset = (page - 1) * pageSize;
 
-  const whereConditions = [
-    taskId ? eq(submissionsTable.taskId, taskId) : undefined,
-  ].filter(Boolean);
+  
+  const taskAndCourse = await db
+    .select({
+      taskName: tasksTable.title,
+      courseName: coursesTable.title,
+    })
+    .from(tasksTable)
+    .innerJoin(coursesTable, eq(tasksTable.courseId, coursesTable.id))
+    .where(and(eq(tasksTable.id, taskId), eq(coursesTable.id, courseId)))
+    .all();
 
-  const results = await db
+  const taskName = taskAndCourse[0]?.taskName || "Unknown Task";
+  const courseName = taskAndCourse[0]?.courseName || "Unknown Course";
+ 
+  const submissions = await db
     .select({
       submissionId: submissionsTable.id,
       studentId: studentsTable.id,
@@ -648,7 +658,7 @@ export async function getSubmissionsForTasks(
     .leftJoin(usersTable, eq(studentsTable.userId, usersTable.id))
     .leftJoin(tasksTable, eq(submissionsTable.taskId, tasksTable.id))
     .leftJoin(coursesTable, eq(tasksTable.courseId, coursesTable.id))
-    .where(and(...whereConditions))
+    .where(eq(submissionsTable.taskId, taskId))
     .groupBy(
       submissionsTable.id,
       studentsTable.id,
@@ -656,32 +666,48 @@ export async function getSubmissionsForTasks(
       tasksTable.id,
       coursesTable.id
     )
-    .limit(pageSize)
-    .offset(offset)
     .all();
 
-  const totalCountResult = await db
-    .select({ count: sql<number>`COUNT(*)` })
-    .from(submissionsTable)
-    .where(and(...whereConditions))
+ 
+  const allStudentsInCourse = await db
+    .select({
+      studentId: studentsTable.id,
+      studentName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      email: usersTable.email,
+      profilePicture: usersTable.image,
+    })
+    .from(studentsCoursesTable)
+    .innerJoin(studentsTable, eq(studentsCoursesTable.studentId, studentsTable.id))
+    .innerJoin(usersTable, eq(studentsTable.userId, usersTable.id))
+    .where(eq(studentsCoursesTable.courseId, courseId))
     .all();
 
-  const totalCount = totalCountResult.length > 0 ? totalCountResult[0].count : 0;
+  
+  const submittedStudentIds = submissions.map((submission) => submission.studentId);
+  const nonSubmissions = allStudentsInCourse
+    .filter((student) => !submittedStudentIds.includes(student.studentId))
+    .map((student) => ({
+      submissionId: `non-${student.studentId}`, 
+      studentId: student.studentId ,
+      studentName: student.studentName,
+      email: student.email ?? "", 
+      submissionDate: "__", 
+      status: "NOT SUBMITTED", 
+      grade: 0, 
+      profilePicture: student.profilePicture ?? "", 
+      taskName: taskName, 
+      courseName: courseName, 
+      taskId: taskId,
+    }));
+
+
+  const combinedResults = [...submissions, ...nonSubmissions];
+
+ 
+  const paginatedResults = combinedResults.slice(offset, offset + pageSize);
 
   return {
-    submissions: results.map(result => ({
-      submissionId: result.submissionId,
-      studentId: result.studentId ?? 0,
-      studentName: result.studentName || "",
-      email: result.email || "",
-      submissionDate: result.submissionDate,
-      status: result.status,
-      grade: result.grade,
-      profilePicture: result.profilePicture || "",
-      taskName: result.taskName || "",
-      courseName: result.courseName || "",
-      taskId: result.taskId ?? 0,
-    })),
-    totalCount
+    submissions: paginatedResults as SubmissionsTask[], // Ensure type compatibility
+    totalCount: combinedResults.length,
   };
 }
