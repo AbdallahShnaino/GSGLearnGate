@@ -30,9 +30,6 @@ export default function useStudentRequests() {
       currentPage,
       pageSize
     );
-
-
-
     setJoiningOrders(requests);
     setIsLoading(false);
   };
@@ -67,7 +64,6 @@ export default function useStudentRequests() {
     courseId: number,
     studentId: number
   ) => {
-    console.log("hi there");
     await addStudentToCourse(studentId, courseId);
     await updateJoiningRequestStatus(id, Status.ACCEPTED);
     await fetchRequests();

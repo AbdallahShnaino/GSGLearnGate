@@ -17,6 +17,12 @@ export enum Status {
   REJECTED = "REJECTED",
 }
 
+export enum TaskStatus {
+  IN_PROGRESS = "In Progress",
+  COMPLETED = "Completed",
+  ALL = "All",
+}
+
 export enum AssignmentStatus {
   PENDING = "PENDING",
   SUBMITTED = "SUBMITTED",
@@ -212,6 +218,7 @@ export type MonitorsJoinUsers = {
   role: Role | null;
   city: string | null;
 };
+
 
 export type UsersNames = {
   id: number;

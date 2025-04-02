@@ -1,8 +1,9 @@
 "use server";
+
 import { deleteCourse } from "@/src/db/queries/delete";
 import { insertCourse, insertStudentCourse } from "@/src/db/queries/insert";
 import { Course } from "@/types";
-import {getCoursesWithStudentCount, getAllCourses, getCoMonitorAppointments, getCoursesNamesByCoMonitor, getCoursesNamesByMonitor } from "@/src/db/queries/select";
+import {getStudentCountByCourse,getCoursesWithStudentCount, getAllCourses, getCoMonitorAppointments, getCoursesNamesByCoMonitor, getCoursesNamesByMonitor } from "@/src/db/queries/select";
 
 
 export async function addStudentToCourse(studentId: number, courseId: number) {
@@ -38,6 +39,10 @@ export async function getCoMonitorAppointment(coMentorId: number) {
 
 export async function getCourses(page: number, pageSize: number) {
   return await getCoursesWithStudentCount(page, pageSize);
+}
+
+export async function getStudentsCountPerCourse(courseId: number) {
+  return await getStudentCountByCourse(courseId);
 }
 
 export async function addCourse(data: Omit<Course,"id">) {
