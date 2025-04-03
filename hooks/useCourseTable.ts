@@ -1,5 +1,5 @@
 import { useSearch } from "@/hooks/useSearch";
-import { getCourses } from "@/services/courses";
+import { getCourses, removeCourse } from "@/services/courses";
 import { CourseJoinStudent } from "@/types";
 import { useState, useEffect } from "react";
 
@@ -42,9 +42,10 @@ export const useCoursesTable = () => {
 
   const confirmDelete = () => {
     if (selectedCourse) {
-      console.log(`Deleting course with ID: ${selectedCourse}`);
+      removeCourse(selectedCourse);
     }
     setOpen(false);
+    fetchCourses();
   };
 
   const handleNextPage = () => {

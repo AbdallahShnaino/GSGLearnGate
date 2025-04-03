@@ -1,30 +1,39 @@
 import CourseTask from "@/components/CourseTask/CourseTask";
+import { getCoursesById } from "@/src/db/queries/select";
 import Link from "next/link";
 import React from "react";
 
-const CourseDetails = () => {
+interface IProps {
+  params: Promise<{ courseId: string }>;
+}
+const CourseDetails = async (props: IProps) => {
+  const { courseId } = await props.params;
+  const courseData = await getCoursesById(Number(courseId));
+  const attendance = 25 - courseData![0].absence!;
+  const attendancePercent = `${(attendance / 25) * 100}%`;
+
   return (
     <div className="w-full flex flex-col min-h-screen bg-[#FFF5E8]">
       <header className="w-full bg-white shadow px-6 py-4">
         <h1 className="text-2xl font-bold text-gray-800">
-          Course: React & Nextjs
+          Course: {courseData![0].title}
         </h1>
-        <p className="text-gray-600 mt-1">Trainer: Mohammad Ali</p>
+        <p className="text-gray-600 mt-1">Monitor: {courseData![0].monitor}</p>
         <p className="text-gray-600 mt-1">
-          Co-Monitors: <span className="text-gray-600 mt-1">Yosef Jamal</span>,
-          <span className="text-gray-600 mt-1"> Hassan Malek</span>
+          Co-Monitors:{" "}
+          <span className="text-gray-600 mt-1">
+            {courseData![0].coMonitors}
+          </span>
+          {/* , */}
+          {/* <span className="text-gray-600 mt-1"> Hassan Malek</span> */}
         </p>
       </header>
 
       <div className="flex flex-1 flex-col lg:flex-row">
         <main className="flex-1 p-6">
           <section id="overview" className="mb-10">
-            <h2 className="text-2xl font-bold text-[#FFA41F]">Overview</h2>
-            <p className="text-gray-600 mt-2">
-              Master React with this advanced course covering hooks, context
-              API, and building complex web apps. Perfect for developers aiming
-              to level up.
-            </p>
+            <h2 className="text-2xl font-bold text-[#FFA41F]">Description</h2>
+            <p className="text-gray-600 mt-2">{courseData![0].description}</p>
           </section>
 
           <section id="assignments" className="mb-10">
@@ -65,12 +74,12 @@ const CourseDetails = () => {
             <div className="mt-4">
               <div className="flex justify-between items-center">
                 <p className="text-gray-700">Attendance Rate</p>
-                <p className="text-gray-600">80%</p>
+                <p className="text-gray-600">{attendancePercent}</p>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3 mt-2">
                 <div
                   className="h-full bg-[#E99375] rounded-full"
-                  style={{ width: "80%" }}
+                  style={{ width: attendancePercent }}
                 ></div>
               </div>
             </div>

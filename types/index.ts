@@ -1,5 +1,3 @@
-
-
 export enum Role {
   ADMIN = "ADMIN",
   STUDENT = "STUDENT",
@@ -17,6 +15,12 @@ export enum Status {
   ACCEPTED = "ACCEPTED",
   PENDING = "PENDING",
   REJECTED = "REJECTED",
+}
+
+export enum TaskStatus {
+  IN_PROGRESS = "In Progress",
+  COMPLETED = "Completed",
+  ALL = "All",
 }
 
 export enum AssignmentStatus {
@@ -80,7 +84,9 @@ export type Course = {
   courseStartDate: Date;
   courseEndDate: Date;
   monitorId: number | null;
+  monitorName?: string;
   coMonitorId: number | null;
+  coMonitorName?: string;
   adminId: number | null;
   details: string;
   entryRequirements: string;
@@ -129,6 +135,7 @@ export type CourseJoinStudent = {
   coMonitorId: number | null;
   coMonitorName: string | null;
   studentCount: number;
+
 }
 export type SubmissionsTask = {
   submissionId: number;
@@ -163,7 +170,6 @@ export type Attachment = {
   courseId: number;
   type: Attachments;
   path: string;
-  submissionId: number; 
 } & Timestamps;
 
 export type Attendance = {
@@ -208,8 +214,7 @@ export interface AppointmentWithStudent {
   caption: string;
   date: Date;
   status: Status;
-  createdAt: string,
-
+  createdAt: string;
 }
 export interface ApproveModalProps {
   isOpen: boolean;
@@ -217,7 +222,6 @@ export interface ApproveModalProps {
   onApprove: (id: number) => void;
   request: AppointmentWithStudent;
 }
-
 
 export type MonitorsJoinUsers = {
   id: number;
@@ -231,4 +235,79 @@ export type MonitorsJoinUsers = {
   city: string | null;
 };
 
+
+export type UsersNames = {
+  id: number;
+  userId: number;
+  firstName: string | null;
+  lastName: string | null;
+};
+
+export type CourseWithNames = {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+  difficulty: Difficulty;
+  duration: number;
+  applyStartDate: Date;
+  applyEndDate: Date;
+  courseStartDate: Date;
+  courseEndDate: Date;
+  monitorId: number | null;
+  monitorName?: string | null;
+  coMonitorId: number | null;
+  coMonitorName?: string | null;
+  adminId: number | null;
+  details: string;
+  entryRequirements: string;
+} & Timestamps;
+
+export type StudentCourseSmallCard = {
+  id: number | null;
+  title: string | null;
+  monitorName: string | null;
+  absence: number | null;
+};
+
+
+export enum CourseStatus {
+  "NOT STARTED" = "Not Started",
+  "IN PROGRESS" = "In Progress",
+  "FINISHED" = "Finished",
+}
+export type StudentCourseBigCard = {
+  status: CourseStatus;
+  startDate: Date;
+  endDate: Date;
+  totalTasks: number;
+  completedTasks: number;
+} & StudentCourseSmallCard;
+
+export type StudentCourseDetails = {
+  id: number | null;
+  title: string | null;
+  monitor: string | null;
+  absence: number | null;
+  description: string | null;
+  // tasks: string[] | null;
+  // absence: number;
+  coMonitors: string | null;
+};
+
+export enum StudentAppointmentStatus {
+  "PENDING" = "Pending",
+  "ACCEPTED" = "Accepted",
+  "REJECTED" = "Rejected",
+}
+
+export type StudentAppointments = {
+  id: number | null;
+  // courseTitle: string | null;
+  // monitor: string | null;
+  coMonitor: string | null;
+  date: Date | null;
+  // time: string | null;
+  status: StudentAppointmentStatus | null;
+};
 
