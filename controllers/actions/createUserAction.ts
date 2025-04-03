@@ -37,7 +37,7 @@ export async function submitUser(
       userId: undefined,
     };
   }
-
+  // Make authentication (check if email is used)
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return {
