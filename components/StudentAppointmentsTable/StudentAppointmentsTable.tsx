@@ -1,36 +1,60 @@
-"use client";
+// "use client";
 // import {
 //   TrashSimple,
 //   PencilSimple,
 //   //   MagnifyingGlass,
 // } from "@phosphor-icons/react/dist/ssr";
-import DeleteUserModal from "../DeleteUserModal/DeleteUserModal";
-import { useUsersTable } from "@/hooks/useUsersTable";
-import Loader from "../Shared/Loader";
-// import { Role } from "@/types";
-interface IProps {
-  role: string;
-}
-const StudentAppointmentsTable = (props: IProps) => {
-  const {
-    // value,
-    // handleSearchChange,
-    filteredUsers,
-    open,
-    setOpen,
-    selectedMonitor,
-    // handleDeleteClick,
-    confirmDelete,
-    isLoading,
-    handleNextPage,
-    handlePreviousPage,
-    currentPage,
-    totalPages,
-  } = useUsersTable(props.role);
-  if (isLoading) {
-    return <Loader />;
-  }
+// import DeleteUserModal from "../DeleteUserModal/DeleteUserModal";
+// import { useUsersTable } from "@/hooks/useUsersTable";
+// import Loader from "../Shared/Loader";
+import { getStudentAppointments } from "@/src/db/queries/select";
+// import { CalendarCheck, CalendarX, Hourglass } from "@phosphor-icons/react";
+// import { useEffect } from "react";
+// import { StudentAppointments } from "@/types";
 
+// import { Role } from "@/types";
+// interface IProps {
+//   role: string;
+// }
+const StudentAppointmentsTable = async () => {
+  //   let appointments: StudentAppointments[];
+  //   useEffect(() => {
+  const appointments = await getStudentAppointments(1);
+  console.log(appointments);
+  //   }, []);
+  //   const {
+  //     // value,
+  //     // handleSearchChange,
+  //     // filteredUsers,
+  //     open,
+  //     setOpen,
+  //     selectedMonitor,
+  //     // handleDeleteClick,
+  //     confirmDelete,
+  //     isLoading,
+  //     handleNextPage,
+  //     handlePreviousPage,
+  //     currentPage,
+  //     totalPages,
+  //   } = useUsersTable(props.role);
+  //   if (isLoading) {
+  //     return <Loader />;
+  //   }
+
+  const statusStyles = {
+    accepted: {
+      text: "Accepted",
+      color: "bg-[#FFA41F] text-white",
+    },
+    pending: {
+      text: "Pending",
+      color: "bg-[#E99375] text-white",
+    },
+    rejected: {
+      text: "Rejected",
+      color: "bg-gray-400 text-white",
+    },
+  };
   return (
     <div className="w-full max-w-4xl mx-auto p-4 space-y-4">
       {/* <div className="relative">
@@ -65,19 +89,33 @@ const StudentAppointmentsTable = (props: IProps) => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {filteredUsers.map((user) => (
-              <tr key={user.id} className="hover:bg-gray-50">
+            {appointments!.map((appointment, index) => (
+              <tr key={appointment.id} className="hover:bg-gray-50">
                 <td className="px-4 py-4 font-medium text-gray-900">
-                  {user.id}
+                  {index + 1}
+                </td>
+                <td className="px-4 py-4 text-gray-700">Course Name</td>
+                <td className="px-4 py-4 text-gray-700">
+                  {appointment.coMonitor}
+                </td>
+                <td className="px-4 py-4 text-left text-gray-700">
+                  {appointment.date?.toLocaleDateString("en-GB")}
                 </td>
                 <td className="px-4 py-4 text-gray-700">
-                  {user.firstName} {user.lastName}
+                  {appointment.date!.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </td>
-                <td className="px-4 py-4 text-gray-700">{user.email}</td>
-                <td className="px-4 py-4 text-left text-gray-700">
-                  {user.dateOfBirth?.toLocaleDateString()}
+                <td
+                  className={`px-4 py-2 rounded-lg font-semibold ${
+                    statusStyles[appointment.status.toLowerCase()]?.color ||
+                    "bg-gray-200 text-black"
+                  }`}
+                >
+                  {statusStyles[appointment.status.toLowerCase()]?.text ||
+                    "Unknown"}
                 </td>
-                <td className="px-4 py-4 text-gray-700">{user.city}</td>
                 <td>
                   <div className="flex justify-evenly">
                     {/* <button onClick={() => handleDeleteClick(user.userId)}>
@@ -91,15 +129,15 @@ const StudentAppointmentsTable = (props: IProps) => {
           </tbody>
         </table>
       </div>
-      {open && selectedMonitor && (
-        <DeleteUserModal
-          setOpen={setOpen}
-          confirmDelete={confirmDelete}
-          selectedUser={selectedMonitor.toString()}
-        />
-      )}
+      {/* {open && selectedMonitor && ( */}
+      {/* <DeleteUserModal */}
+      {/* setOpen={setOpen} */}
+      {/* confirmDelete={confirmDelete} */}
+      {/* selectedUser={selectedMonitor.toString()} */}
+      {/* /> */}
+      {/* )} */}
       {/** this pagination code will be replaced by pagination component in the next task(after merge)*/}
-      <div className="flex justify-between mt-4">
+      {/* <div className="flex justify-between mt-4">
         <button
           onClick={handlePreviousPage}
           disabled={currentPage === 1}
@@ -125,7 +163,7 @@ const StudentAppointmentsTable = (props: IProps) => {
         >
           Next
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -290,8 +290,8 @@ export type StudentAppointments = {
   id: number | null;
   // courseTitle: string | null;
   // monitor: string | null;
-  // coMonitor: string | null;
-  // date: Date | null;
+  coMonitor: string | null;
+  date: Date | null;
   // time: string | null;
-  // status: StudentAppointmentStatus | null;
+  status: StudentAppointmentStatus | null;
 };
