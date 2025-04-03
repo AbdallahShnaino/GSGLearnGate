@@ -38,6 +38,8 @@ import {
   AppointmentWithStudent,
   MonitorsJoinUsers,
   CourseJoinStudent,
+  UsersNames,
+  CourseWithNames,
   TaskStatus,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
@@ -74,16 +76,17 @@ export async function getAllMonitors(): Promise<Monitor[]> {
 
 export async function getMonitorsNames(): Promise<UsersNames[]> {
   return await db
-    .select({
-      id: monitorsTable.id,
-      userId: monitorsTable.userId,
-      firstName: usersTable.firstName,
-      lastName: usersTable.lastName,
-    })
-    .from(monitorsTable)
-    .leftJoin(usersTable, eq(usersTable.id, monitorsTable.userId))
-    .all();
+  .select({
+    id: monitorsTable.id,
+    userId: monitorsTable.userId,
+    firstName: usersTable.firstName,
+    lastName: usersTable.lastName,
+  })
+  .from(monitorsTable)
+  .leftJoin(usersTable, eq(usersTable.id, monitorsTable.userId))
+  .all();
 }
+
 
 export async function getMonitors(
   page: number = 1,
@@ -128,16 +131,17 @@ export async function getAllCoMonitors(): Promise<CoMonitor[]> {
 
 export async function getCoMonitorsNames(): Promise<UsersNames[]> {
   return await db
-    .select({
-      id: coMonitorsTable.id,
-      userId: coMonitorsTable.userId,
-      firstName: usersTable.firstName,
-      lastName: usersTable.lastName,
-    })
-    .from(coMonitorsTable)
-    .leftJoin(usersTable, eq(usersTable.id, coMonitorsTable.userId))
-    .all();
+  .select({
+    id: coMonitorsTable.id,
+    userId: coMonitorsTable.userId,
+    firstName: usersTable.firstName,
+    lastName: usersTable.lastName,
+  })
+  .from(coMonitorsTable)
+  .leftJoin(usersTable, eq(usersTable.id, coMonitorsTable.userId))
+  .all();
 }
+
 
 export async function getCoMonitors(
   page: number = 1,
@@ -215,6 +219,42 @@ export async function getStudents(
 
 export async function getAllCourses(): Promise<Course[]> {
   return await db.select().from(coursesTable).all();
+}
+
+
+export async function getCourseById(id: number): Promise<CourseWithNames | null> {
+    const monitorUsers = alias(usersTable, "monitorUsers");
+    const coMonitorUsers = alias(usersTable, "coMonitorUsers");
+  
+    const result = await db
+      .select({
+        id: coursesTable.id,
+        image: coursesTable.image,
+        title: coursesTable.title,
+        duration: coursesTable.duration,
+        description: coursesTable.description,
+        entryRequirements: coursesTable.entryRequirements,
+        details: coursesTable.details,
+        difficulty: coursesTable.difficulty,
+        monitorId: monitorsTable.userId,
+        monitorName: monitorUsers.firstName,
+        coMonitorId: coMonitorsTable.userId,
+        coMonitorName: coMonitorUsers.firstName,
+        adminId: coursesTable.adminId,
+        applyStartDate: coursesTable.applyStartDate,
+        applyEndDate: coursesTable.applyEndDate,
+        courseStartDate: coursesTable.courseStartDate,
+        courseEndDate: coursesTable.courseEndDate, 
+      })
+      .from(coursesTable)
+      .leftJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
+      .leftJoin(monitorUsers, eq(monitorsTable.userId, monitorUsers.id))
+      .leftJoin(coMonitorsTable, eq(coursesTable.coMonitorId, coMonitorsTable.id))
+      .leftJoin(coMonitorUsers, eq(coMonitorsTable.userId, coMonitorUsers.id))
+      .where(eq(coursesTable.id, id))
+      .get();
+  
+    return result || null;
 }
 
 export async function getCoursesByStudent(

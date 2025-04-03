@@ -84,7 +84,9 @@ export type Course = {
   courseStartDate: Date;
   courseEndDate: Date;
   monitorId: number | null;
+  monitorName?: string;
   coMonitorId: number | null;
+  coMonitorName?: string;
   adminId: number | null;
   details: string;
   entryRequirements: string;
@@ -227,12 +229,33 @@ export type UsersNames = {
   lastName: string | null;
 };
 
+export type CourseWithNames = {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+  difficulty: Difficulty;
+  duration: number;
+  applyStartDate: Date;
+  applyEndDate: Date;
+  courseStartDate: Date;
+  courseEndDate: Date;
+  monitorId: number | null;
+  monitorName?: string | null;
+  coMonitorId: number | null;
+  coMonitorName?: string | null;
+  adminId: number | null;
+  details: string;
+  entryRequirements: string;
+} & Timestamps;
+
 export type StudentCourseSmallCard = {
   id: number | null;
   title: string | null;
   monitorName: string | null;
   absence: number | null;
 };
+
 
 export enum CourseStatus {
   "NOT STARTED" = "Not Started",
