@@ -45,6 +45,7 @@ import {
   StudentCourseBigCard,
   CourseStatus,
   StudentCourseDetails,
+  StudentAppointments,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorsTasks } from "@/types/tasksOperations";
@@ -965,6 +966,38 @@ export async function getCoursesById(
     .innerJoin(coMonitorsUsers, eq(coMonitorsTable.userId, coMonitorsUsers.id))
     .innerJoin(attendancesTable, eq(coursesTable.id, attendancesTable.courseId))
     .where(eq(coursesTable.id, courseId));
+
+  return results.length > 0 ? results : null;
+}
+
+export async function getStudentAppointments(
+  studentId: number
+): Promise<StudentAppointments[] | null> {
+  const results = await db
+    .selectDistinct({
+      id: appointmentsTable.id,
+      // courseTitle: coursesTable.title,
+      // monitor: sql<string>`${monitorUsers.firstName} || ' ' || ${monitorUsers.lastName}`,
+      // coMonitor: sql<string>`${coMonitorsUsers.firstName} || ' ' || ${coMonitorsUsers.lastName}`,
+      // date: appointmentsTable.date,
+      // time: appointmentsTable.caption,
+      // status: appointmentsTable.status,
+    })
+    .from(appointmentsTable)
+    // .innerJoin(coursesTable, eq(coursesTable.id, appointmentsTable.))
+    .innerJoin(studentsTable, eq(studentsTable.id, appointmentsTable.studentId))
+    // .innerJoin(
+    //   coMonitorsTable,
+    //   eq(coMonitorsTable.id, appointmentsTable.coMonitorId)
+    // )
+    // .innerJoin(coMonitorsTable, eq(coMonitorsTable.userId, monitorUsers.id))
+    // .innerJoin(
+    //   coMonitorsTable,
+    //   eq(coursesTable.coMonitorId, coMonitorsTable.id)
+    // )
+    // .innerJoin(coMonitorsUsers, eq(coMonitorsTable.userId, coMonitorsUsers.id))
+    // .innerJoin(attendancesTable, eq(coursesTable.id, attendancesTable.courseId))
+    .where(eq(studentsTable.id, studentId));
 
   return results.length > 0 ? results : null;
 }

@@ -279,3 +279,19 @@ export type StudentCourseDetails = {
   // absence: number;
   coMonitors: string | null;
 };
+
+export enum StudentAppointmentStatus {
+  "PENDING" = "Pending",
+  "ACCEPTED" = "Accepted",
+  "REJECTED" = "Rejected",
+}
+
+export type StudentAppointments = {
+  id: number | null;
+  // courseTitle: string | null;
+  // monitor: string | null;
+  // coMonitor: string | null;
+  // date: Date | null;
+  // time: string | null;
+  // status: StudentAppointmentStatus | null;
+};
