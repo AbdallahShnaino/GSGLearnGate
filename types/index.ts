@@ -153,7 +153,6 @@ export type Attachment = {
   courseId: number;
   type: Attachments;
   path: string;
-  submissionId: number; // if its from student or not
 } & Timestamps;
 
 export type Attendance = {
@@ -218,7 +217,6 @@ export type MonitorsJoinUsers = {
   role: Role | null;
   city: string | null;
 };
-
 
 export type UsersNames = {
   id: number;
