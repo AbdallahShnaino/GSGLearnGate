@@ -1,8 +1,7 @@
 // "use client";
 
 import StudentAppointmentsTable from "@/components/StudentAppointmentsTable/StudentAppointmentsTable";
-import { getStudentAppointments } from "@/src/db/queries/select";
-import { Role } from "@/types";
+// import { Role } from "@/types";
 // import { CalendarCheck, CalendarX, Hourglass } from "@phosphor-icons/react";
 
 // const interviews = [
@@ -42,9 +41,6 @@ import { Role } from "@/types";
 // };
 
 const InterviewsPage = async () => {
-  const appointments = await getStudentAppointments(1);
-  console.log(appointments);
-
   return (
     <div className="min-h-screen bg-[#FFF5E8] p-6">
       {/* <h1 className="text-3xl font-bold text-[#FFA41F] mb-6 text-center">
@@ -75,7 +71,7 @@ const InterviewsPage = async () => {
           </div>
         ))}
       </div> */}
-      <StudentAppointmentsTable role={Role.MONITOR} />
+      <StudentAppointmentsTable />
     </div>
   );
 };

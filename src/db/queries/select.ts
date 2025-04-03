@@ -938,19 +938,19 @@ export async function getStudentAppointments(
       id: appointmentsTable.id,
       // courseTitle: coursesTable.title,
       // monitor: sql<string>`${monitorUsers.firstName} || ' ' || ${monitorUsers.lastName}`,
-      // coMonitor: sql<string>`${coMonitorsUsers.firstName} || ' ' || ${coMonitorsUsers.lastName}`,
-      // date: appointmentsTable.date,
+      coMonitor: sql<string>`${coMonitorsUsers.firstName} || ' ' || ${coMonitorsUsers.lastName}`,
+      date: appointmentsTable.date,
       // time: appointmentsTable.caption,
-      // status: appointmentsTable.status,
+      status: appointmentsTable.status,
     })
     .from(appointmentsTable)
     // .innerJoin(coursesTable, eq(coursesTable.id, appointmentsTable.))
     .innerJoin(studentsTable, eq(studentsTable.id, appointmentsTable.studentId))
-    // .innerJoin(
-    //   coMonitorsTable,
-    //   eq(coMonitorsTable.id, appointmentsTable.coMonitorId)
-    // )
-    // .innerJoin(coMonitorsTable, eq(coMonitorsTable.userId, monitorUsers.id))
+    .innerJoin(
+      coMonitorsTable,
+      eq(coMonitorsTable.id, appointmentsTable.coMonitorId)
+    )
+    .innerJoin(coMonitorsUsers, eq(coMonitorsTable.userId, coMonitorsUsers.id))
     // .innerJoin(
     //   coMonitorsTable,
     //   eq(coursesTable.coMonitorId, coMonitorsTable.id)
