@@ -219,7 +219,6 @@ export type MonitorsJoinUsers = {
   city: string | null;
 };
 
-
 export type UsersNames = {
   id: number;
   userId: number;
@@ -246,3 +245,14 @@ export type StudentCourseBigCard = {
   totalTasks: number;
   completedTasks: number;
 } & StudentCourseSmallCard;
+
+export type StudentCourseDetails = {
+  id: number | null;
+  title: string | null;
+  monitor: string | null;
+  absence: number | null;
+  description: string | null;
+  // tasks: string[] | null;
+  // absence: number;
+  coMonitors: string | null;
+};

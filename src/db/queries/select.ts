@@ -39,14 +39,18 @@ import {
   MonitorsJoinUsers,
   CourseJoinStudent,
   TaskStatus,
+  UsersNames,
+  StudentCourseBigCard,
+  CourseStatus,
+  StudentCourseDetails,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorsTasks } from "@/types/tasksOperations";
 import { MonitorTasksResponse } from "@/types/tasks";
-  UsersNames,
-  StudentCourseBigCard,
-  CourseStatus,
-} from "@/types/index";
+//   UsersNames,
+//   StudentCourseBigCard,
+//   CourseStatus,
+// } from "@/types/index";
 import { StudentCourseSmallCard } from "../../../types";
 
 export async function getAllUsers(): Promise<User[]> {
@@ -71,7 +75,6 @@ export async function getAllMonitors(): Promise<Monitor[]> {
   return await db.select().from(monitorsTable).all();
 }
 
-
 export async function getMonitorsNames(): Promise<UsersNames[]> {
   return await db
     .select({
@@ -90,7 +93,6 @@ export async function getMonitors(
   pageSize: number = 10
 ): Promise<{ users: MonitorsJoinUsers[]; totalCount: number } | null> {
   const offset = (page - 1) * pageSize;
-
 
   const result = await db
     .select({
@@ -682,7 +684,6 @@ export async function getStudentCountByCourse(courseId: number) {
   return result[0]?.count || 0;
 }
 
-
 export async function getAllSubmissions(): Promise<Submission[]> {
   return await db.select().from(submissionsTable).all();
 }
@@ -816,6 +817,7 @@ export async function getTaskById(taskId: number) {
     .limit(1);
 
   return task[0] || null;
+}
 export async function getLimitCoursesByStudent(
   studentId: number,
   limit?: number
@@ -875,6 +877,54 @@ export async function getCoursesDataByStudent(
       usersTable.firstName,
       usersTable.lastName
     );
+
+  return results.length > 0 ? results : null;
+}
+
+const monitorUsers = alias(usersTable, "monitor_users");
+const coMonitorsUsers = alias(usersTable, "co_monitor_users");
+export async function getCoursesById(
+  courseId: number
+): Promise<StudentCourseDetails[] | null> {
+  const results = await db
+    .selectDistinct({
+      id: coursesTable.id,
+      title: coursesTable.title,
+      monitor: sql<string>`${monitorUsers.firstName} || ' ' || ${monitorUsers.lastName}`,
+      description: coursesTable.description,
+      absence: attendancesTable.absence,
+      coMonitors: sql<string>`${coMonitorsUsers.firstName} || ' ' || ${coMonitorsUsers.lastName}`,
+
+      // tasks: sql<string[]>`
+      //   (
+      //     SELECT JSON_GROUP_ARRAY(
+      //       JSON_OBJECT(
+      //         'title', ${tasksTable.title},
+      //         'submissionStatus', ${submissionsTable.status},
+      //         'deadline', ${tasksTable.deadline}
+      //       )
+      //     )
+      //     FROM ${tasksTable}
+      //       JOIN ${submissionsTable} ON ${tasksTable.id} = ${submissionsTable.taskId}
+      //       )
+      //       // WHERE ${tasksTable.} = ${coursesTable.id}
+      //       `,
+
+      // coMonitors: sql<
+      //   string[]
+      // >`ARRAY_AGG(${usersTable.firstName} || ' ' || ${usersTable.lastName})`,
+    })
+    .from(studentsCoursesTable)
+    .innerJoin(coursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
+    .innerJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
+    .innerJoin(monitorUsers, eq(monitorsTable.userId, monitorUsers.id))
+    .innerJoin(
+      coMonitorsTable,
+      eq(coursesTable.coMonitorId, coMonitorsTable.id)
+    )
+    .innerJoin(coMonitorsUsers, eq(coMonitorsTable.userId, coMonitorsUsers.id))
+    .innerJoin(attendancesTable, eq(coursesTable.id, attendancesTable.courseId))
+    .where(eq(coursesTable.id, courseId));
 
   return results.length > 0 ? results : null;
 }
