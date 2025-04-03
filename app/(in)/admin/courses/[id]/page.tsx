@@ -5,7 +5,6 @@ import React from 'react';
 
 const Page = async() => {
     const monitors = await getMonitorsNames();
-    console.log(monitors)
     const coMonitors = await getCoMonitorsNames();
   return (
     <div className="flex flex-col">
