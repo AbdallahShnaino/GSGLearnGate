@@ -135,22 +135,20 @@ export type CourseJoinStudent = {
   coMonitorId: number | null;
   coMonitorName: string | null;
   studentCount: number;
-
-}
+};
 export type SubmissionsTask = {
   submissionId: number;
   studentId: number;
   studentName: string;
   email: string;
   submissionDate: string;
-  status: AssignmentStatus
+  status: AssignmentStatus;
   grade: number | null;
   profilePicture: string;
   taskName: string;
   courseName: string;
   taskId: number;
 } & Timestamps;
-
 
 export type Submission = {
   id: number;
@@ -235,7 +233,6 @@ export type MonitorsJoinUsers = {
   city: string | null;
 };
 
-
 export type UsersNames = {
   id: number;
   userId: number;
@@ -270,7 +267,6 @@ export type StudentCourseSmallCard = {
   absence: number | null;
 };
 
-
 export enum CourseStatus {
   "NOT STARTED" = "Not Started",
   "IN PROGRESS" = "In Progress",
@@ -290,8 +286,6 @@ export type StudentCourseDetails = {
   monitor: string | null;
   absence: number | null;
   description: string | null;
-  // tasks: string[] | null;
-  // absence: number;
   coMonitors: string | null;
 };
 
@@ -303,11 +297,19 @@ export enum StudentAppointmentStatus {
 
 export type StudentAppointments = {
   id: number | null;
-  // courseTitle: string | null;
-  // monitor: string | null;
   coMonitor: string | null;
   date: Date | null;
-  // time: string | null;
-  status: StudentAppointmentStatus | null;
+  status: StudentAppointmentStatus;
 };
 
+export enum StudentTaskStatus {
+  "PENDING" = "PENDING",
+  "SUBMITTED" = "SUBMITTED",
+  "GRADED" = "GRADED",
+}
+export type StudentCourseTasks = {
+  taskId: number;
+  taskTitle: string;
+  deadline: Date;
+  status: StudentTaskStatus;
+};
