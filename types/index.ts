@@ -326,3 +326,7 @@ export type StudentCourseTask = {
   description: string;
   deadline: Date;
 };
+
+export type coMonitorName = {
+  coMonitorName: string;
+};
