@@ -1,5 +1,5 @@
 import CourseTask from "@/components/CourseTask/CourseTask";
-import { getCoursesById } from "@/src/db/queries/select";
+import { getCoursesById, getTasksByCourseId } from "@/src/db/queries/select";
 import Link from "next/link";
 import React from "react";
 
@@ -11,6 +11,9 @@ const CourseDetails = async (props: IProps) => {
   const courseData = await getCoursesById(Number(courseId));
   const attendance = 25 - courseData![0].absence!;
   const attendancePercent = `${(attendance / 25) * 100}%`;
+
+  const courseTasks = await getTasksByCourseId(Number(courseId));
+  console.log(courseTasks);
 
   return (
     <div className="w-full flex flex-col min-h-screen bg-[#FFF5E8]">
@@ -39,9 +42,11 @@ const CourseDetails = async (props: IProps) => {
           <section id="assignments" className="mb-10">
             <h2 className="text-2xl font-bold text-[#FFA41F]">Assignments</h2>
             <div className="space-y-4">
-              <CourseTask />
-              <CourseTask />
-              <CourseTask />
+              {courseTasks?.map((task, index) => {
+                return (
+                  <CourseTask key={index} task={task} number={index + 1} />
+                );
+              })}
             </div>
             <div className="flex justify-center sm:justify-end  mt-4 mb-6">
               <Link
