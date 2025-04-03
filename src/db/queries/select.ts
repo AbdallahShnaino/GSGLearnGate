@@ -40,13 +40,15 @@ import {
   CourseJoinStudent,
   SubmissionsTask,
 
-  UsersNames,
+
   CourseWithNames,
   TaskStatus,
   UsersNames,
   CourseStatus,
   StudentCourseSmallCard,
   StudentCourseBigCard,
+  StudentCourseDetails,
+  StudentAppointments,
 
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
