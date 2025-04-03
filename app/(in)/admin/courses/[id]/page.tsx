@@ -5,7 +5,8 @@ import React from 'react';
 
 const Page = async() => {
     const monitors = await getMonitorsNames();
-      const coMonitors = await getCoMonitorsNames();
+    console.log(monitors)
+    const coMonitors = await getCoMonitorsNames();
   return (
     <div className="flex flex-col">
       <div className="flex flex-col items-center text-center p-4 sm:flex-row sm:justify-between sm:text-left">
