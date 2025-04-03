@@ -14,8 +14,12 @@ const CourseTask = (props: IProps) => {
           Assignment {props.number}: {props.task.taskTitle}
         </h3>
         <p className="text-sm text-gray-500">
-          Deadline: {props.task.deadline.toLocaleDateString("en-GB")} | Status:{" "}
-          {props.task.status}
+          Deadline: {props.task.deadline.toLocaleDateString("en-GB")}{" "}
+          {props.task.deadline.toLocaleTimeString("en-GB", {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}{" "}
+          | Status: {props.task.status}
         </p>
       </div>
     </Link>
