@@ -84,7 +84,9 @@ export type Course = {
   courseStartDate: Date;
   courseEndDate: Date;
   monitorId: number | null;
+  monitorName?: string;
   coMonitorId: number | null;
+  coMonitorName?: string;
   adminId: number | null;
   details: string;
   entryRequirements: string;
@@ -225,12 +227,33 @@ export type UsersNames = {
   lastName: string | null;
 };
 
+export type CourseWithNames = {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+  difficulty: Difficulty;
+  duration: number;
+  applyStartDate: Date;
+  applyEndDate: Date;
+  courseStartDate: Date;
+  courseEndDate: Date;
+  monitorId: number | null;
+  monitorName?: string | null;
+  coMonitorId: number | null;
+  coMonitorName?: string | null;
+  adminId: number | null;
+  details: string;
+  entryRequirements: string;
+} & Timestamps;
+
 export type StudentCourseSmallCard = {
   id: number | null;
   title: string | null;
   monitorName: string | null;
   absence: number | null;
 };
+
 
 export enum CourseStatus {
   "NOT STARTED" = "Not Started",
@@ -244,3 +267,30 @@ export type StudentCourseBigCard = {
   totalTasks: number;
   completedTasks: number;
 } & StudentCourseSmallCard;
+
+export type StudentCourseDetails = {
+  id: number | null;
+  title: string | null;
+  monitor: string | null;
+  absence: number | null;
+  description: string | null;
+  // tasks: string[] | null;
+  // absence: number;
+  coMonitors: string | null;
+};
+
+export enum StudentAppointmentStatus {
+  "PENDING" = "Pending",
+  "ACCEPTED" = "Accepted",
+  "REJECTED" = "Rejected",
+}
+
+export type StudentAppointments = {
+  id: number | null;
+  // courseTitle: string | null;
+  // monitor: string | null;
+  coMonitor: string | null;
+  date: Date | null;
+  // time: string | null;
+  status: StudentAppointmentStatus | null;
+};
