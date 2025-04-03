@@ -16,7 +16,7 @@ const Tasks = async (props: IProps) => {
 
       <div className="space-y-6 w-full">
         {courseTasks?.map((task, index) => {
-          return <TaskCard key={index} task={task} />;
+          return <TaskCard key={index} task={task} courseId={courseId} />;
         })}
       </div>
     </div>
