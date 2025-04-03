@@ -7,7 +7,6 @@ export async function addAttachmentForTask(
   courseId: number,
   creatorId: number,
   path: string,
-  submissionId: number,
   taskId: number,
   type: Attachments
 ) {
@@ -15,7 +14,6 @@ export async function addAttachmentForTask(
     courseId,
     creatorId,
     path,
-    submissionId,
     taskId,
     type,
   });

@@ -155,7 +155,6 @@ export type Attachment = {
   courseId: number;
   type: Attachments;
   path: string;
-  submissionId: number; // if its from student or not
 } & Timestamps;
 
 export type Attendance = {

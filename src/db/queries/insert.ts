@@ -99,9 +99,24 @@ export async function insertSubmission(
 }
 
 export async function insertTask(data: Omit<Task, "id">) {
-  const [inserted] = await db.insert(tasksTable).values(data).returning();
+  const normalizedData = {
+    ...data,
+    startedAt: new Date(data.startedAt).toISOString(),
+    deadline: new Date(data.deadline),
+  };
+
+  const [inserted] = await db
+    .insert(tasksTable)
+    .values(normalizedData)
+    .returning();
+
   if (!inserted) throw new Error("Failed to insert task");
-  return inserted;
+
+  return {
+    ...inserted,
+    startedAt: new Date(inserted.startedAt), // Convert back to Date
+    deadline: inserted.deadline, // Already a Date from returning()
+  } as Task;
 }
 export async function insertAttachment(
   data: Omit<Attachment, "id">
