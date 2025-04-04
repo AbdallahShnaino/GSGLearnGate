@@ -1101,3 +1101,14 @@ export async function getTasksByCourseId(
 
   return results.length > 0 ? results : null;
 }
+
+export async function getUserById(
+  id: number
+): Promise<Omit<User, "password"> | null> {
+  const result = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.id, Number(id)))
+    .get()
+  return result || null;
+}
