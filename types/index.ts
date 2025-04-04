@@ -254,7 +254,6 @@ export type StudentCourseSmallCard = {
   absence: number | null;
 };
 
-
 export enum CourseStatus {
   "NOT STARTED" = "Not Started",
   "IN PROGRESS" = "In Progress",
@@ -280,11 +279,10 @@ export type StudentCourseDetails = {
 };
 
 export enum StudentAppointmentStatus {
-  "PENDING" = "Pending",
+  "PENDING" = "PENDING",
   "ACCEPTED" = "Accepted",
   "REJECTED" = "Rejected",
 }
-
 export type StudentAppointments = {
   id: number | null;
   // courseTitle: string | null;
