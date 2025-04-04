@@ -290,9 +290,9 @@ export type StudentCourseDetails = {
 };
 
 export enum StudentAppointmentStatus {
-  "PENDING" = "Pending",
-  "ACCEPTED" = "Accepted",
-  "REJECTED" = "Rejected",
+  "PENDING" = "PENDING",
+  "ACCEPTED" = "ACCEPTED",
+  "REJECTED" = "REJECTED",
 }
 
 export type StudentAppointments = {
@@ -328,5 +328,16 @@ export type StudentCourseTask = {
 };
 
 export type coMonitorName = {
+  coMonitorId: number;
   coMonitorName: string;
 };
+
+export type StudentBookingDate = {
+  id: number;
+  // courseId: number;
+  coMonitorId: number;
+  studentId: number;
+  caption: string;
+  date: Date;
+  status: Status;
+} & Timestamps;

@@ -25,7 +25,7 @@ const BookingPage = async (props: IProps) => {
         />
       </div>
 
-      <SelectStudentAppointmentTime />
+      <SelectStudentAppointmentTime coMonitorId={coMonitor![0].coMonitorId} />
 
       <Link
         href="/student/appointments"

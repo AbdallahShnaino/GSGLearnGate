@@ -1132,6 +1132,7 @@ export async function getCoMonitorByCourseId(
 ): Promise<coMonitorName[] | null> {
   const results = await db
     .selectDistinct({
+      coMonitorId: coMonitorsTable.id,
       coMonitorName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
     })
     .from(appointmentsTable)

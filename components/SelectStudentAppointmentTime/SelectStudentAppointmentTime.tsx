@@ -1,14 +1,50 @@
 "use client";
-import { useState } from "react";
+import { insertStudentAppointmentBookingData } from "@/src/db/queries/insert";
+import { Status } from "@/types";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-const SelectStudentAppointmentTime = () => {
+interface IProps {
+  coMonitorId: number;
+}
+const SelectStudentAppointmentTime = (props: IProps) => {
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
+  const { courseId } = useParams();
 
-  const times = ["10:00 AM", "11:00 AM", "2:00 PM", "4:00 PM"];
+  const times = ["10:00", "11:00", "14:00", "16:00"];
 
-  const handleBooking = () => {
+  const handleBooking = async () => {
+    const dateObj = new Date(`${selectedDate}T${selectedTime}:00`);
+    console.log({
+      // courseId: courseId,
+      coMonitorId: props.coMonitorId,
+      studentId: 5,
+      caption: "string",
+      date: dateObj,
+      status: Status.PENDING,
+      // createdAt: new Date(),
+      // updatedAt: new Date(),
+    });
+
+    try {
+      await insertStudentAppointmentBookingData({
+        // courseId: courseId,
+        coMonitorId: props.coMonitorId,
+        studentId: 5,
+        caption: "string",
+        date: dateObj,
+        status: Status.PENDING,
+        // createdAt: new Date(),
+        // updatedAt: new Date(),
+      });
+    } catch (error) {
+      console.error("Booking failed:", error);
+      alert("Something went wrong!! Please try again...");
+    }
     alert(`Appointment booked on ${selectedDate} at ${selectedTime}`);
+    setSelectedDate("");
+    setSelectedTime("");
   };
   return (
     <>
