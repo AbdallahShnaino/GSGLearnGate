@@ -15,7 +15,7 @@ export default function useMonitorAnnouncements() {
   const [announcements, setAnnouncements] = useState<Announcement[] | null>(
     null
   );
-  const pageSize = 2;
+  const pageSize = 10;
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalPages, setTotalPages] = useState(1);

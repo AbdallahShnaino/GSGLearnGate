@@ -37,11 +37,6 @@ export default function SendAnnouncementForm({ courses }: IProps) {
     } else if (formState.success) {
       toast.success("Announcement Send successfully!");
     }
-    const timer = setTimeout(() => {
-      router.back();
-    }, 3000);
-
-    return () => clearTimeout(timer);
   }, [formState]);
 
   const getCourseOptions = () => {
