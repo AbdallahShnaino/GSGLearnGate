@@ -1,6 +1,8 @@
 "use server";
-
 import { authenticateUser } from "@/services/auth";
+import { Role } from "@/types";
+import { generateToken } from "@/utils/auth";
+import { cookies } from "next/headers";
 
 export type LoginUserStatus =
   | {
@@ -8,12 +10,14 @@ export type LoginUserStatus =
       message: string;
       error: string;
       userId: undefined;
+      role: undefined;
     }
   | {
       success: true;
       message: string;
       error?: string;
       userId: number | undefined;
+      role: Role | undefined;
     };
 
 export async function loginUser(
@@ -22,20 +26,15 @@ export async function loginUser(
 ): Promise<LoginUserStatus> {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
-
-  console.log(email);
-  console.log(password);
-
   if (!email || !password) {
     return {
       success: false,
       message: "Please fill all the fields",
       error: "Please fill all the fields",
       userId: undefined,
+      role: undefined,
     };
   }
-
-  // Validate email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return {
@@ -43,10 +42,9 @@ export async function loginUser(
       message: "Invalid email format",
       error: "Invalid email format",
       userId: undefined,
+      role: undefined,
     };
   }
-
-  // Authenticate user
   const authenticatedUser = await authenticateUser(email, password);
   if (!authenticatedUser) {
     return {
@@ -54,12 +52,24 @@ export async function loginUser(
       message: "Invalid email or password",
       error: "Invalid email or password",
       userId: undefined,
+      role: undefined,
     };
   } else {
+    const token = generateToken({ userId: authenticatedUser.userId, email });
+
+    const cookieStore = await cookies();
+    cookieStore.set("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60,
+    });
+    cookieStore.set("role", String(authenticatedUser.role));
     return {
       success: true,
       message: "Login Successfully",
       userId: authenticatedUser.userId,
+      role: authenticatedUser.role,
     };
   }
 }

@@ -4,21 +4,50 @@ import {
   LoginUserStatus,
 } from "@/controllers/actions/createUserAction";
 import Link from "next/link";
-import React from "react";
-import { useFormState } from "react-dom";
+import React, { useActionState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const initialState: LoginUserStatus = {
   success: false,
   message: "",
   error: "",
   userId: undefined,
+  role: undefined,
 };
 
 const LoginForm = () => {
-  const [formState, action] = useFormState(loginUser, initialState);
+  const [formState, action] = useActionState(loginUser, initialState);
+  const router = useRouter();
 
-  console.log(formState);
+  useEffect(() => {
+    if (formState.success) {
+      const getRoleFromCookie = () => {
+        const roleCookie = document.cookie
+          .split("; ")
+          .find((cookie) => cookie.startsWith("role="));
+        return roleCookie?.split("=")[1];
+      };
 
+      const role = getRoleFromCookie();
+
+      switch (role) {
+        case "ADMIN":
+          router.push("/admin");
+          break;
+        case "MONITOR":
+          router.push("/monitor");
+          break;
+        case "CO-MONITOR":
+          router.push("/co-mentor");
+          break;
+        case "STUDENT":
+          router.push("/student");
+          break;
+        default:
+          router.push("/");
+      }
+    }
+  }, [formState.success, router]);
   return (
     <form
       action={action}
@@ -30,7 +59,6 @@ const LoginForm = () => {
           type="email"
           name="email"
           id="email"
-          
           className="border-1 border-gray-300 px-1.5 py-1 rounded focus:outline-blue-500 bg-white "
         />
       </div>
@@ -49,13 +77,9 @@ const LoginForm = () => {
           type="password"
           name="password"
           id="password"
-          
           className="border-1 border-gray-300 px-1.5 py-1 rounded focus:outline-blue-500 bg-white"
         />
       </div>
-
-      <div className="text-red-600 mt-3 text-center">{formState.message}</div>
-
       <input
         type="submit"
         value="Sign in"

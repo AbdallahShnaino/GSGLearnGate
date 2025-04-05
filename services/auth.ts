@@ -1,12 +1,11 @@
 import { getUserByEmail } from "@/src/db/queries/select"; // استيراد دالة getUserByEmail
+import { Role } from "@/types";
 import { comparePassword } from "@/utils/crypt"; // استيراد دالة مقارنة كلمة المرور
 
 export async function authenticateUser(email: string, password: string) {
   try {
     // البحث عن المستخدم باستخدام البريد الإلكتروني
     const user = await getUserByEmail(email);
-
-    console.log(user);
 
     // التحقق من وجود المستخدم
     if (user === null) {
@@ -15,9 +14,10 @@ export async function authenticateUser(email: string, password: string) {
         message: "Invalid email or password",
         error: "User not found",
         userId: undefined,
+        role: undefined
       };
     }
-
+    console.log(user.password);
     // مقارنة كلمة المرور المدخلة مع كلمة المرور المخزنة
     const isPasswordValid = await comparePassword(password, user.password);
 
@@ -30,6 +30,7 @@ export async function authenticateUser(email: string, password: string) {
         message: "Invalid email or password",
         error: "Incorrect password",
         userId: undefined,
+        role: undefined
       };
     } else {
       // العودة بنتيجة ناجحة مع id المستخدم
@@ -38,6 +39,7 @@ export async function authenticateUser(email: string, password: string) {
         message: "Login successful",
         error: undefined,
         userId: user.id,
+        role: user.role as Role
       };
     }
   } catch (error) {
@@ -48,6 +50,7 @@ export async function authenticateUser(email: string, password: string) {
       message: "An error occurred during authentication",
       error: "Internal server error",
       userId: undefined,
+      role: undefined
     };
   }
 }
