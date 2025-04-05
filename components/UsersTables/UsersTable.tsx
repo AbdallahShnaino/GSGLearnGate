@@ -8,6 +8,7 @@ import DeleteUserModal from "../DeleteUserModal/DeleteUserModal";
 import { useUsersTable } from "@/hooks/useUsersTable";
 import Loader from "../Shared/Loader";
 import { Role } from "@/types";
+import TempPagination from "../Pagination/TempPagination";
 interface IProps{
   role: string;
 }
@@ -26,6 +27,7 @@ export default function UsersTable(props:IProps) {
     handlePreviousPage,
     currentPage,
     totalPages,
+    setCurrentPage
   } = useUsersTable(props.role);
   if(isLoading){
     return <Loader/>
@@ -91,24 +93,13 @@ export default function UsersTable(props:IProps) {
           selectedUser={selectedMonitor.toString()}
         />
       )}
-      {/** this pagination code will be replaced by pagination component in the next task(after merge)*/}
-      <div className="flex justify-between mt-4">
-        <button
-          onClick={handlePreviousPage}
-          disabled={currentPage === 1}
-          className={`px-3 py-2 rounded-lg ${currentPage === 1 ? "bg-gray-300 cursor-not-allowed" : "bg-[#FFA41F] text-white"}`}
-        >
-          Previous
-        </button>
-        <span>Page {currentPage} of {totalPages}</span>
-        <button
-          onClick={handleNextPage}
-          disabled={currentPage >= totalPages}
-          className={`px-3 py-2 rounded-lg ${currentPage >= totalPages ? "bg-gray-300 cursor-not-allowed" : "bg-[#FFA41F] text-white"}`}
-        >
-          Next
-        </button>
-      </div>
+      <TempPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        handleNextPage={handleNextPage}
+        handlePreviousPage={handlePreviousPage}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 }
