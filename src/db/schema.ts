@@ -210,19 +210,6 @@ export const attachmentsTable = sqliteTable("attachments", {
   ...timestamps,
 });
 
-export const attendancesTable = sqliteTable("attendances", {
-  id: int().primaryKey({ autoIncrement: true }),
-  studentId: int("student_id")
-    .notNull()
-    .references((): AnySQLiteColumn => studentsTable.id),
-  courseId: int("course_id")
-    .notNull()
-    .references((): AnySQLiteColumn => coursesTable.id, {
-      onDelete: "cascade",
-    }),
-  absence: int("absence"),
-  ...timestamps,
-});
 export const joiningRequestsTable = sqliteTable("joining_requests", {
   id: int().primaryKey({ autoIncrement: true }),
   studentId: int("student_id")
@@ -373,9 +360,6 @@ export type SelectTasks = typeof tasksTable.$inferSelect;
 
 export type InsertAttachment = typeof attachmentsTable.$inferInsert;
 export type SelectAttachments = typeof attachmentsTable.$inferSelect;
-
-export type InsertAttendance = typeof attendancesTable.$inferInsert;
-export type SelectAttendances = typeof attendancesTable.$inferSelect;
 
 export type InsertJoiningRequest = typeof joiningRequestsTable.$inferInsert;
 export type SelectJoiningRequests = typeof joiningRequestsTable.$inferSelect;
