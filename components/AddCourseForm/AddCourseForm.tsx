@@ -134,7 +134,7 @@ const AddCourseForm = ({ monitors, coMonitors }: IProps) => {
                 {monitors.map((monitor) => (
                   <option
                     key={monitor.id}
-                    value={monitor.userId}
+                    value={monitor.id}
                   >{`${monitor.firstName} ${monitor.lastName}`}</option>
                 ))}
               </select>
@@ -160,7 +160,7 @@ const AddCourseForm = ({ monitors, coMonitors }: IProps) => {
                 {coMonitors.map((coMonitor) => (
                   <option
                     key={coMonitor.id}
-                    value={coMonitor.userId}
+                    value={coMonitor.id}
                   >{`${coMonitor.firstName} ${coMonitor.lastName}`}</option>
                 ))}
               </select>

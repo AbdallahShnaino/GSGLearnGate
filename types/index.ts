@@ -26,6 +26,7 @@ export enum TaskStatus {
 export enum AssignmentStatus {
   PENDING = "PENDING",
   GRADED = "GRADED",
+  SUBMITTED = "SUBMITTED",
   NOTSUBMITTED = "NOT SUBMITTED",
 }
 
@@ -104,8 +105,9 @@ export type Appointment = {
   id: number;
   coMonitorId: number;
   studentId: number;
+  courseId: number;
   caption: string;
-  date: Date;
+  dateTime: Date;
   status: Status;
 } & Timestamps;
 
@@ -290,11 +292,10 @@ export type StudentCourseDetails = {
 };
 
 export enum StudentAppointmentStatus {
-  "PENDING" = "Pending",
-  "ACCEPTED" = "Accepted",
-  "REJECTED" = "Rejected",
+  "PENDING" = "PENDING",
+  "ACCEPTED" = "ACCEPTED",
+  "REJECTED" = "REJECTED",
 }
-
 export type StudentAppointments = {
   id: number | null;
   coMonitor: string | null;
@@ -306,10 +307,99 @@ export enum StudentTaskStatus {
   "PENDING" = "PENDING",
   "SUBMITTED" = "SUBMITTED",
   "GRADED" = "GRADED",
+  "LATE" = "LATE",
 }
 export type StudentCourseTasks = {
   taskId: number;
   taskTitle: string;
   deadline: Date;
   status: StudentTaskStatus;
+  grade: number;
+  gradedAt: Date;
+};
+
+export type StudentCourseTask = {
+  courseTitle: string;
+  taskTitle: string;
+  creator: string;
+  createdAt: Date;
+  updatedAt: Date;
+  description: string;
+  deadline: Date;
+};
+
+export type coMonitorName = {
+  coMonitorId: number;
+  coMonitorName: string;
+};
+
+export type StudentBookingDate = {
+  id: number;
+  // courseId: number;
+  coMonitorId: number;
+  studentId: number;
+  caption: string;
+  date: Date;
+  status: Status;
+} & Timestamps;
+
+export type Comment = {
+  content: string;
+  studentId: number;
+  submissionId: number;
+  courseId: number;
+  isPublic: boolean;
+  privateRecipientId: number;
+};
+export type CourseSchedule = {
+  id: number;
+  courseId: number;
+  creatorId: number;
+  dayOfWeek: string | null;
+  startTime: string;
+  endTime: string;
+  isRecurring: boolean;
+  specificDate: Date | null;
+  updatedAt: string;
+  createdAt: string;
+  deletedAt: string;
+};
+export type AvailabilitySlot = {
+  id: number;
+  coMonitorId: number;
+  courseId: number;
+  date: Date;
+  startTime: string;
+  endTime: string;
+  isBooked: boolean;
+  bookedByStudentId: number | null;
+  createdAt: string;
+  updatedAt: string;
+};
+// student book an appointemtn
+// co monitor add his own available times
+// admin add course info
+enum AttendanceRecordStatus {
+  PRESENT = "PRESENT",
+  ABSENT = "ABSENT",
+  LATE = "LATE",
+  EXCUSED = "EXCUSED",
+}
+export type AttendanceRecord = {
+  id: number;
+  sessionId: number;
+  status: AttendanceRecordStatus;
+  notes?: string;
+  recordedById: number;
+} & (
+  | { studentId: number; monitorId?: never; coMonitorId?: never }
+  | { monitorId: number; studentId?: never; coMonitorId?: never }
+  | { coMonitorId: number; studentId?: never; monitorId?: never }
+);
+export type AttendanceUpdate = {
+  sessionId: number;
+  userId: number;
+  userType: Role;
+  status: AttendanceRecordStatus;
+  notes?: string;
 };

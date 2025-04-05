@@ -1,7 +1,18 @@
 "use server";
 
 import { db } from "./../index";
-import { eq, sql, and, count, lte, gt, or, gte, lt } from "drizzle-orm";
+import {
+  eq,
+  sql,
+  and,
+  count,
+  lte,
+  gt,
+  or,
+  gte,
+  lt,
+  inArray,
+} from "drizzle-orm";
 
 import {
   usersTable,
@@ -41,13 +52,14 @@ import {
   SubmissionsTask,
   CourseWithNames,
   TaskStatus,
-  UsersNames,
   CourseStatus,
   StudentCourseSmallCard,
   StudentCourseBigCard,
   StudentCourseDetails,
   StudentAppointments,
   StudentCourseTasks,
+  StudentCourseTask,
+  coMonitorName,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorTasksResponse } from "@/types/tasks";
@@ -1083,6 +1095,40 @@ export async function getStudentAppointments(
   return results.length > 0 ? results : null;
 }
 
+export async function getMonitorAnnouncements(
+  courseId: number | undefined,
+  courseIds?: number[],
+  page: number = 1,
+  pageSize: number = 10
+): Promise<{ announcements: Announcement[] | null; total: number }> {
+  let allResults: Announcement[];
+
+  if (courseId !== undefined) {
+    allResults = await db
+      .select()
+      .from(announcementsTable)
+      .where(eq(announcementsTable.courseId, courseId))
+      .all();
+  } else if (courseIds && courseIds.length > 0) {
+    allResults = await db
+      .select()
+      .from(announcementsTable)
+      .where(inArray(announcementsTable.courseId, courseIds))
+      .all();
+  } else {
+    return { announcements: null, total: 0 };
+  }
+
+  const total = allResults.length;
+
+  const offset = (page - 1) * pageSize;
+  const paginatedResults = allResults.slice(offset, offset + pageSize);
+
+  return {
+    announcements: paginatedResults.length > 0 ? paginatedResults : null,
+    total,
+  };
+}
 export async function getTasksByCourseId(
   courseId: number
 ): Promise<StudentCourseTasks[] | null> {
@@ -1092,12 +1138,65 @@ export async function getTasksByCourseId(
       taskTitle: tasksTable.title,
       deadline: tasksTable.deadline,
       status: submissionsTable.status,
+      grade: submissionsTable.grade,
+      gradedAt: submissionsTable.gradedAt,
     })
     .from(tasksTable)
     .innerJoin(coursesTable, eq(coursesTable.id, tasksTable.courseId))
     .innerJoin(submissionsTable, eq(tasksTable.id, submissionsTable.taskId))
     .innerJoin(studentsTable, eq(studentsTable.id, submissionsTable.studentId))
     .where(eq(coursesTable.id, courseId));
+
+  return results.length > 0 ? results : null;
+}
+
+export async function getUserById(
+  id: number
+): Promise<Omit<User, "password"> | null> {
+  const result = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.id, Number(id)))
+    .get();
+  return result || null;
+}
+
+export async function getTaskByTaskId(
+  taskId: number
+): Promise<StudentCourseTask[] | null> {
+  const results = await db
+    .selectDistinct({
+      courseTitle: coursesTable.title,
+      taskTitle: tasksTable.title,
+      creator: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      createdAt: tasksTable.createdAt,
+      updatedAt: tasksTable.updatedAt,
+      description: tasksTable.description,
+      deadline: tasksTable.deadline,
+    })
+    .from(tasksTable)
+    .innerJoin(coursesTable, eq(coursesTable.id, tasksTable.courseId))
+    .innerJoin(usersTable, eq(usersTable.id, tasksTable.creatorId))
+    .where(eq(tasksTable.id, taskId));
+
+  return results.length > 0 ? results : null;
+}
+
+export async function getCoMonitorByCourseId(
+  courseId: number
+): Promise<coMonitorName[] | null> {
+  const results = await db
+    .selectDistinct({
+      coMonitorId: coMonitorsTable.id,
+      coMonitorName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+    })
+    .from(appointmentsTable)
+    .innerJoin(
+      coMonitorsTable,
+      eq(coMonitorsTable.id, appointmentsTable.coMonitorId)
+    )
+    .innerJoin(usersTable, eq(usersTable.id, coMonitorsTable.userId))
+    .where(eq(appointmentsTable.id, courseId));
 
   return results.length > 0 ? results : null;
 }
