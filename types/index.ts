@@ -291,7 +291,7 @@ export type StudentCourseDetails = {
   id: number | null;
   title: string | null;
   monitor: string | null;
-  status: AttendanceStatus;
+  // status: AttendanceStatus;
   description: string | null;
   coMonitors: string | null;
 };
