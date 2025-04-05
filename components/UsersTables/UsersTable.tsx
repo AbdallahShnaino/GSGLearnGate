@@ -8,6 +8,7 @@ import DeleteUserModal from "../DeleteUserModal/DeleteUserModal";
 import { useUsersTable } from "@/hooks/useUsersTable";
 import Loader from "../Shared/Loader";
 import { Role } from "@/types";
+import Link from "next/link";
 import TempPagination from "../Pagination/TempPagination";
 interface IProps{
   role: string;
@@ -78,7 +79,9 @@ export default function UsersTable(props:IProps) {
                       <button onClick={() => handleDeleteClick(user.userId)}>
                         <TrashSimple size={18} color="#ee1717" weight="fill" />
                       </button>
-                      <PencilSimple size={18} color="#1cc925" weight="fill" />
+                      <Link href={`/admin/users/${user.userId}`}>
+                        <PencilSimple size={18} color="#1cc925" weight="fill" />
+                      </Link>
                     </div>
                   </td>
                 </tr>
