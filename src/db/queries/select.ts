@@ -1128,6 +1128,7 @@ export async function getMonitorAnnouncements(
     announcements: paginatedResults.length > 0 ? paginatedResults : null,
     total,
   };
+}
 export async function getTasksByCourseId(
   courseId: number
 ): Promise<StudentCourseTasks[] | null> {
@@ -1156,7 +1157,7 @@ export async function getUserById(
     .select()
     .from(usersTable)
     .where(eq(usersTable.id, Number(id)))
-    .get()
+    .get();
   return result || null;
 }
 
