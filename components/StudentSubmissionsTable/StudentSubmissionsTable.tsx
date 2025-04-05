@@ -169,7 +169,9 @@ export default function StudentSubmissionsTable({ TaskId }: IdTaskIprops) {
                         {submission.status}
                       </td>
                       <td className="px-6 py-3">
-                        <Link href="#">
+                        <Link
+                          href={`/co-mentor/submission/${submission.submissionId}`}
+                        >
                           <button
                             className={`w-[100px] rounded-xl flex h-10 justify-center items-center transition duration-300 cursor-pointer ${
                               submission.status === "NOT SUBMITTED"
