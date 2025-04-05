@@ -27,7 +27,8 @@ import {
   submissionsTable,
   tasksTable,
   attachmentsTable,
-  attendancesTable,
+  // attendancesTable,
+  attendanceRecordsTable,
   joiningRequestsTable,
 } from "./../schema";
 import {
@@ -60,6 +61,7 @@ import {
   StudentCourseTasks,
   StudentCourseTask,
   coMonitorName,
+  UsersNames,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorTasksResponse } from "@/types/tasks";
@@ -780,7 +782,7 @@ export async function getAllAttachments(): Promise<Attachment[]> {
 }
 
 export async function getAllAttendances(): Promise<Attendance[]> {
-  return await db.select().from(attendancesTable).all();
+  return await db.select().from(attendanceRecordsTable).all();
 }
 
 export async function getAllJoiningRequests(): Promise<JoiningRequest[]> {
@@ -983,20 +985,23 @@ export async function getTaskById(taskId: number) {
 
 export async function getLimitCoursesByStudent(
   studentId: number,
-  limit: number = 10
+  limit?: number
 ): Promise<StudentCourseSmallCard[] | null> {
   const results = await db
     .selectDistinct({
       id: coursesTable.id,
       title: coursesTable.title,
       monitorName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
-      absence: attendancesTable.absence,
+      // attendance: attendanceRecordsTable.status,
     })
     .from(studentsCoursesTable)
     .innerJoin(coursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
     .innerJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
     .innerJoin(usersTable, eq(monitorsTable.userId, usersTable.id))
-    .innerJoin(attendancesTable, eq(coursesTable.id, attendancesTable.courseId))
+    // .innerJoin(
+    //   attendanceRecordsTable,
+    //   eq(coursesTable.id, attendanceRecordsTable.courseId)
+    // )
     .where(eq(studentsCoursesTable.studentId, studentId))
     .groupBy(
       coursesTable.id,
@@ -1017,7 +1022,7 @@ export async function getCoursesDataByStudent(
       id: coursesTable.id,
       title: coursesTable.title,
       monitorName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
-      absence: attendancesTable.absence,
+      attendance: attendanceRecordsTable.status,
       startDate: coursesTable.courseStartDate,
       endDate: coursesTable.courseEndDate,
       status: sql<CourseStatus>`CASE 
@@ -1032,7 +1037,10 @@ export async function getCoursesDataByStudent(
     .innerJoin(coursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
     .innerJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
     .innerJoin(usersTable, eq(monitorsTable.userId, usersTable.id))
-    .innerJoin(attendancesTable, eq(coursesTable.id, attendancesTable.courseId))
+    .innerJoin(
+      attendanceRecordsTable,
+      eq(coursesTable.id, attendanceRecordsTable.courseId)
+    )
     .where(eq(studentsCoursesTable.studentId, studentId))
     .groupBy(
       coursesTable.id,
@@ -1055,7 +1063,7 @@ export async function getCoursesById(
       title: coursesTable.title,
       monitor: sql<string>`${monitorUsers.firstName} || ' ' || ${monitorUsers.lastName}`,
       description: coursesTable.description,
-      absence: attendancesTable.absence,
+      attendance: attendanceRecordsTable.status,
       coMonitors: sql<string>`${coMonitorsUsers.firstName} || ' ' || ${coMonitorsUsers.lastName}`,
     })
     .from(studentsCoursesTable)
@@ -1067,7 +1075,10 @@ export async function getCoursesById(
       eq(coursesTable.coMonitorId, coMonitorsTable.id)
     )
     .innerJoin(coMonitorsUsers, eq(coMonitorsTable.userId, coMonitorsUsers.id))
-    .innerJoin(attendancesTable, eq(coursesTable.id, attendancesTable.courseId))
+    .innerJoin(
+      attendanceRecordsTable,
+      eq(coursesTable.id, attendanceRecordsTable.courseId)
+    )
     .where(eq(coursesTable.id, courseId));
 
   return results.length > 0 ? results : null;

@@ -308,6 +308,7 @@ export const attendanceRecordsTable = sqliteTable("attendance_records", {
   studentId: int("student_id").references(() => studentsTable.id),
   monitorId: int("monitor_id").references(() => monitorsTable.id),
   coMonitorId: int("co_monitor_id").references(() => coMonitorsTable.id),
+  courseId: int("course_id").references(() => coursesTable.id),
 
   status: text("status", {
     enum: ["PRESENT", "ABSENT", "LATE", "EXCUSED"],
