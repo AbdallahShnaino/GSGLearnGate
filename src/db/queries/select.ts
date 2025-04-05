@@ -1151,6 +1151,7 @@ export async function getTasksByCourseId(
       status: submissionsTable.status,
       grade: submissionsTable.grade,
       gradedAt: submissionsTable.gradedAt,
+      maxGrade: tasksTable.points,
     })
     .from(tasksTable)
     .innerJoin(coursesTable, eq(coursesTable.id, tasksTable.courseId))
