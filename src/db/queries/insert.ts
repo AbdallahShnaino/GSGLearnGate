@@ -28,6 +28,7 @@ import {
   Attachments,
   Role,
   JoiningRequest,
+  StudentBookingDate,
 } from "@/types/index";
 
 interface InsertUserInput {
@@ -145,4 +146,14 @@ export async function insertJoiningRequest(
     .values(data)
     .returning();
   return inserted as JoiningRequest;
+}
+
+export async function insertStudentAppointmentBookingData(
+  data: Omit<StudentBookingDate, "id">
+): Promise<StudentBookingDate> {
+  const [inserted] = await db
+    .insert(appointmentsTable)
+    .values(data)
+    .returning();
+  return inserted as StudentBookingDate;
 }

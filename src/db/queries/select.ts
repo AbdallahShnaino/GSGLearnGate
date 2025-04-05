@@ -49,6 +49,7 @@ import {
   StudentAppointments,
   StudentCourseTasks,
   StudentCourseTask,
+  coMonitorName,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorTasksResponse } from "@/types/tasks";
@@ -1122,6 +1123,25 @@ export async function getTaskByTaskId(
     .innerJoin(coursesTable, eq(coursesTable.id, tasksTable.courseId))
     .innerJoin(usersTable, eq(usersTable.id, tasksTable.creatorId))
     .where(eq(tasksTable.id, taskId));
+
+  return results.length > 0 ? results : null;
+}
+
+export async function getCoMonitorByCourseId(
+  courseId: number
+): Promise<coMonitorName[] | null> {
+  const results = await db
+    .selectDistinct({
+      coMonitorId: coMonitorsTable.id,
+      coMonitorName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+    })
+    .from(appointmentsTable)
+    .innerJoin(
+      coMonitorsTable,
+      eq(coMonitorsTable.id, appointmentsTable.coMonitorId)
+    )
+    .innerJoin(usersTable, eq(usersTable.id, coMonitorsTable.userId))
+    .where(eq(appointmentsTable.id, courseId));
 
   return results.length > 0 ? results : null;
 }
