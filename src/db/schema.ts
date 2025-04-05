@@ -154,6 +154,11 @@ export const submissionsTable = sqliteTable("submissions", {
     .references((): AnySQLiteColumn => coursesTable.id, {
       onDelete: "cascade",
     }),
+  attachmentId: int("attachment_id")
+    .notNull()
+    .references((): AnySQLiteColumn => attachmentsTable.id, {
+      onDelete: "cascade",
+    }),
   grade: int("grade"),
   feedback: text("feedback").notNull(),
   gradedAt: integer("graded_at", { mode: "timestamp" }).notNull(),
@@ -260,22 +265,6 @@ export const commentsTable = sqliteTable("comments", {
   ...timestamps,
 });
 
-export const courseSchedulesTable = sqliteTable("course_schedules", {
-  id: int().primaryKey({ autoIncrement: true }),
-  courseId: int("course_id")
-    .notNull()
-    .references(() => coursesTable.id, { onDelete: "cascade" }),
-  creatorId: int("creator_id")
-    .notNull()
-    .references(() => usersTable.id, { onDelete: "cascade" }),
-  dayOfWeek: text("day_of_week").notNull(),
-  startTime: text("start_time").notNull(),
-  endTime: text("end_time").notNull(),
-  isRecurring: int("is_recurring", { mode: "boolean" }).notNull().default(true),
-  specificDate: integer("specific_date", { mode: "timestamp" }),
-  ...timestamps,
-});
-
 export const coMonitorAvailabilityTable = sqliteTable(
   "co_monitor_availability",
   {
@@ -286,21 +275,36 @@ export const coMonitorAvailabilityTable = sqliteTable(
     courseId: int("course_id")
       .notNull()
       .references(() => coursesTable.id, { onDelete: "cascade" }),
-    date: integer("date", { mode: "timestamp" }).notNull(), // Date of availability
-    startTime: text("start_time").notNull(), // "14:00" (24-hour format)
-    endTime: text("end_time").notNull(), // "15:30"
-    isBooked: int("is_booked", { mode: "boolean" }).notNull().default(false), // If booked by a student
-    bookedByStudentId: int("booked_by_student_id") // Null if available
-      .references(() => studentsTable.id),
+    date: integer("date", { mode: "timestamp" }).notNull(),
+    startTime: text("start_time").notNull(),
+    endTime: text("end_time").notNull(),
+    isBooked: int("is_booked", { mode: "boolean" }).notNull().default(false),
+    bookedByStudentId: int("booked_by_student_id").references(
+      () => studentsTable.id
+    ),
     ...timestamps,
   }
 );
+
+export const courseSchedulesTable = sqliteTable("course_schedules", {
+  id: int().primaryKey({ autoIncrement: true }),
+  courseId: int("course_id")
+    .notNull()
+    .references(() => coursesTable.id, { onDelete: "cascade" }),
+  weekNumber: int("week_number").notNull(),
+  dayOfWeek: text("day_of_week").notNull(),
+  startTime: text("start_time").notNull(),
+  endTime: text("end_time").notNull(),
+  isRecurring: int("is_recurring", { mode: "boolean" }).notNull().default(true),
+  specificDate: integer("specific_date", { mode: "timestamp" }),
+  ...timestamps,
+});
+
 export const attendanceRecordsTable = sqliteTable("attendance_records", {
   id: int().primaryKey({ autoIncrement: true }),
   sessionId: int("session_id")
     .notNull()
     .references(() => courseSchedulesTable.id, { onDelete: "cascade" }),
-
   studentId: int("student_id").references(() => studentsTable.id),
   monitorId: int("monitor_id").references(() => monitorsTable.id),
   coMonitorId: int("co_monitor_id").references(() => coMonitorsTable.id),
