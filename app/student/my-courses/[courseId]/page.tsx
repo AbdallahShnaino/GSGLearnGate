@@ -9,6 +9,7 @@ interface IProps {
 const CourseDetails = async (props: IProps) => {
   const { courseId } = await props.params;
   const courseData = await getCoursesById(Number(courseId));
+
   const attendance = 25 - courseData![0].absence!;
   const attendancePercent = `${(attendance / 25) * 100}%`;
 
@@ -41,7 +42,12 @@ const CourseDetails = async (props: IProps) => {
             <div className="space-y-4">
               {courseTasks?.map((task, index) => {
                 return (
-                  <CourseTask key={index} task={task} number={index + 1} />
+                  <CourseTask
+                    key={index}
+                    task={task}
+                    number={index + 1}
+                    courseId={courseId}
+                  />
                 );
               })}
             </div>

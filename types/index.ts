@@ -316,3 +316,13 @@ export type StudentCourseTasks = {
   grade: number;
   gradedAt: Date;
 };
+
+export type StudentCourseTask = {
+  courseTitle: string;
+  taskTitle: string;
+  creator: string;
+  createdAt: Date;
+  updatedAt: Date;
+  description: string;
+  deadline: Date;
+};

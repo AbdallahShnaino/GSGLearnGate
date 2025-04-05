@@ -48,6 +48,7 @@ import {
   StudentCourseDetails,
   StudentAppointments,
   StudentCourseTasks,
+  StudentCourseTask,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorTasksResponse } from "@/types/tasks";
@@ -1100,6 +1101,27 @@ export async function getTasksByCourseId(
     .innerJoin(submissionsTable, eq(tasksTable.id, submissionsTable.taskId))
     .innerJoin(studentsTable, eq(studentsTable.id, submissionsTable.studentId))
     .where(eq(coursesTable.id, courseId));
+
+  return results.length > 0 ? results : null;
+}
+
+export async function getTaskByTaskId(
+  taskId: number
+): Promise<StudentCourseTask[] | null> {
+  const results = await db
+    .selectDistinct({
+      courseTitle: coursesTable.title,
+      taskTitle: tasksTable.title,
+      creator: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      createdAt: tasksTable.createdAt,
+      updatedAt: tasksTable.updatedAt,
+      description: tasksTable.description,
+      deadline: tasksTable.deadline,
+    })
+    .from(tasksTable)
+    .innerJoin(coursesTable, eq(coursesTable.id, tasksTable.courseId))
+    .innerJoin(usersTable, eq(usersTable.id, tasksTable.creatorId))
+    .where(eq(tasksTable.id, taskId));
 
   return results.length > 0 ? results : null;
 }
