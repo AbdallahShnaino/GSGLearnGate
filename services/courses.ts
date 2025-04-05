@@ -2,8 +2,8 @@
 
 import { deleteCourse } from "@/src/db/queries/delete";
 import { insertCourse, insertStudentCourse } from "@/src/db/queries/insert";
-import { Course } from "@/types";
-import { updateCourse } from "@/src/db/queries/update";
+import { Course, User } from "@/types";
+import { updateCourse, updateUser } from "@/src/db/queries/update";
 import {getStudentCountByCourse,getCoursesWithStudentCount, getAllCourses, getCoMonitorAppointments, getCoursesNamesByCoMonitor, getCoursesNamesByMonitor, getCourseById} from "@/src/db/queries/select";
 
 
@@ -62,4 +62,6 @@ export async function getCourse(id: number){
   return await getCourseById(id);
 }
 
-
+export async function editUser(id: number, data: Omit<User,"password" | "role">){
+  return await updateUser(id, data);
+} 

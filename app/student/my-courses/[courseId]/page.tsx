@@ -1,5 +1,5 @@
 import CourseTask from "@/components/CourseTask/CourseTask";
-import { getCoursesById } from "@/src/db/queries/select";
+import { getCoursesById, getTasksByCourseId } from "@/src/db/queries/select";
 import Link from "next/link";
 import React from "react";
 
@@ -9,24 +9,37 @@ interface IProps {
 const CourseDetails = async (props: IProps) => {
   const { courseId } = await props.params;
   const courseData = await getCoursesById(Number(courseId));
+
   const attendance = 25 - courseData![0].absence!;
   const attendancePercent = `${(attendance / 25) * 100}%`;
 
+  const courseTasks = await getTasksByCourseId(Number(courseId));
+
   return (
     <div className="w-full flex flex-col min-h-screen bg-[#FFF5E8]">
-      <header className="w-full bg-white shadow px-6 py-4">
-        <h1 className="text-2xl font-bold text-gray-800">
-          Course: {courseData![0].title}
-        </h1>
-        <p className="text-gray-600 mt-1">Monitor: {courseData![0].monitor}</p>
-        <p className="text-gray-600 mt-1">
-          Co-Monitors:{" "}
-          <span className="text-gray-600 mt-1">
-            {courseData![0].coMonitors}
-          </span>
-          {/* , */}
-          {/* <span className="text-gray-600 mt-1"> Hassan Malek</span> */}
-        </p>
+      <header className="w-full bg-white shadow px-6 py-4 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">
+            Course: {courseData![0].title}
+          </h1>
+          <p className="text-gray-600 mt-1">
+            Monitor: {courseData![0].monitor}
+          </p>
+          <p className="text-gray-600 mt-1">
+            Co-Monitors:{" "}
+            <span className="text-gray-600 mt-1">
+              {courseData![0].coMonitors}
+            </span>
+          </p>
+        </div>
+        <div>
+          <Link
+            href={`/student/my-courses/${courseId}/booking`}
+            className="px-4 py-2 text-sm sm:text-base text-white bg-[#E99375] hover:bg-[#FF8700] rounded-lg font-semibold shadow-md transition-all duration-300 focus:ring-2 focus:ring-[#FFA41F] focus:ring-offset-2"
+          >
+            Book an interview
+          </Link>
+        </div>
       </header>
 
       <div className="flex flex-1 flex-col lg:flex-row">
@@ -39,13 +52,20 @@ const CourseDetails = async (props: IProps) => {
           <section id="assignments" className="mb-10">
             <h2 className="text-2xl font-bold text-[#FFA41F]">Assignments</h2>
             <div className="space-y-4">
-              <CourseTask />
-              <CourseTask />
-              <CourseTask />
+              {courseTasks?.map((task, index) => {
+                return (
+                  <CourseTask
+                    key={index}
+                    task={task}
+                    number={index + 1}
+                    courseId={courseId}
+                  />
+                );
+              })}
             </div>
             <div className="flex justify-center sm:justify-end  mt-4 mb-6">
               <Link
-                href="/student/my-courses/course/tasks"
+                href={`/student/my-courses/${courseId}/tasks`}
                 className="px-4 py-2 text-sm sm:text-base text-white bg-[#FFA41F] hover:bg-[#FF8700] rounded-lg font-semibold shadow-md transition-all duration-300 focus:ring-2 focus:ring-[#FFA41F] focus:ring-offset-2"
               >
                 Show Details

@@ -25,8 +25,8 @@ export enum TaskStatus {
 
 export enum AssignmentStatus {
   PENDING = "PENDING",
-  SUBMITTED = "SUBMITTED",
   GRADED = "GRADED",
+  NOTSUBMITTED = "NOT SUBMITTED",
 }
 
 export enum Attachments {
@@ -136,6 +136,19 @@ export type CourseJoinStudent = {
   coMonitorName: string | null;
   studentCount: number;
 };
+export type SubmissionsTask = {
+  submissionId: number;
+  studentId: number;
+  studentName: string;
+  email: string;
+  submissionDate: string;
+  status: AssignmentStatus;
+  grade: number | null;
+  profilePicture: string;
+  taskName: string;
+  courseName: string;
+  taskId: number;
+} & Timestamps;
 
 export type Submission = {
   id: number;
@@ -273,22 +286,57 @@ export type StudentCourseDetails = {
   monitor: string | null;
   absence: number | null;
   description: string | null;
-  // tasks: string[] | null;
-  // absence: number;
   coMonitors: string | null;
 };
 
 export enum StudentAppointmentStatus {
   "PENDING" = "PENDING",
-  "ACCEPTED" = "Accepted",
-  "REJECTED" = "Rejected",
+  "ACCEPTED" = "ACCEPTED",
+  "REJECTED" = "REJECTED",
 }
 export type StudentAppointments = {
   id: number | null;
-  // courseTitle: string | null;
-  // monitor: string | null;
   coMonitor: string | null;
   date: Date | null;
-  // time: string | null;
-  status: StudentAppointmentStatus | null;
+  status: StudentAppointmentStatus;
 };
+
+export enum StudentTaskStatus {
+  "PENDING" = "PENDING",
+  "SUBMITTED" = "SUBMITTED",
+  "GRADED" = "GRADED",
+  "LATE" = "LATE",
+}
+export type StudentCourseTasks = {
+  taskId: number;
+  taskTitle: string;
+  deadline: Date;
+  status: StudentTaskStatus;
+  grade: number;
+  gradedAt: Date;
+};
+
+export type StudentCourseTask = {
+  courseTitle: string;
+  taskTitle: string;
+  creator: string;
+  createdAt: Date;
+  updatedAt: Date;
+  description: string;
+  deadline: Date;
+};
+
+export type coMonitorName = {
+  coMonitorId: number;
+  coMonitorName: string;
+};
+
+export type StudentBookingDate = {
+  id: number;
+  // courseId: number;
+  coMonitorId: number;
+  studentId: number;
+  caption: string;
+  date: Date;
+  status: Status;
+} & Timestamps;

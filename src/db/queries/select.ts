@@ -49,7 +49,7 @@ import {
   AppointmentWithStudent,
   MonitorsJoinUsers,
   CourseJoinStudent,
-  UsersNames,
+  SubmissionsTask,
   CourseWithNames,
   TaskStatus,
   CourseStatus,
@@ -57,6 +57,9 @@ import {
   StudentCourseBigCard,
   StudentCourseDetails,
   StudentAppointments,
+  StudentCourseTasks,
+  StudentCourseTask,
+  coMonitorName,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorTasksResponse } from "@/types/tasks";
@@ -857,6 +860,101 @@ export async function updateJoiningRequest(
     .returning();
 }
 
+export async function getSubmissionsAndNonSubmissionsForTask(
+  taskId: number,
+  courseId: number,
+  page: number = 1,
+  pageSize: number = 10
+): Promise<{ submissions: SubmissionsTask[]; totalCount: number }> {
+  const offset = (page - 1) * pageSize;
+
+  const taskAndCourse = await db
+    .select({
+      taskName: tasksTable.title,
+      courseName: coursesTable.title,
+    })
+    .from(tasksTable)
+    .innerJoin(coursesTable, eq(tasksTable.courseId, coursesTable.id))
+    .where(and(eq(tasksTable.id, taskId), eq(coursesTable.id, courseId)))
+    .all();
+
+  const taskName = taskAndCourse[0]?.taskName || "Unknown Task";
+  const courseName = taskAndCourse[0]?.courseName || "Unknown Course";
+
+  const submissions = await db
+    .select({
+      submissionId: submissionsTable.id,
+      studentId: studentsTable.id,
+      studentName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      email: usersTable.email,
+      submissionDate: submissionsTable.createdAt,
+      status: submissionsTable.status,
+      grade: submissionsTable.grade,
+      profilePicture: usersTable.image,
+      taskName: tasksTable.title,
+      courseName: coursesTable.title,
+      taskId: submissionsTable.taskId,
+    })
+    .from(submissionsTable)
+    .leftJoin(studentsTable, eq(submissionsTable.studentId, studentsTable.id))
+    .leftJoin(usersTable, eq(studentsTable.userId, usersTable.id))
+    .leftJoin(tasksTable, eq(submissionsTable.taskId, tasksTable.id))
+    .leftJoin(coursesTable, eq(tasksTable.courseId, coursesTable.id))
+    .where(eq(submissionsTable.taskId, taskId))
+    .groupBy(
+      submissionsTable.id,
+      studentsTable.id,
+      usersTable.id,
+      tasksTable.id,
+      coursesTable.id
+    )
+    .all();
+
+  const allStudentsInCourse = await db
+    .select({
+      studentId: studentsTable.id,
+      studentName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      email: usersTable.email,
+      profilePicture: usersTable.image,
+    })
+    .from(studentsCoursesTable)
+    .innerJoin(
+      studentsTable,
+      eq(studentsCoursesTable.studentId, studentsTable.id)
+    )
+    .innerJoin(usersTable, eq(studentsTable.userId, usersTable.id))
+    .where(eq(studentsCoursesTable.courseId, courseId))
+    .all();
+
+  const submittedStudentIds = submissions.map(
+    (submission) => submission.studentId
+  );
+  const nonSubmissions = allStudentsInCourse
+    .filter((student) => !submittedStudentIds.includes(student.studentId))
+    .map((student) => ({
+      submissionId: `non-${student.studentId}`,
+      studentId: student.studentId,
+      studentName: student.studentName,
+      email: student.email ?? "",
+      submissionDate: "__",
+      status: "NOT SUBMITTED",
+      grade: 0,
+      profilePicture: student.profilePicture ?? "",
+      taskName: taskName,
+      courseName: courseName,
+      taskId: taskId,
+    }));
+
+  const combinedResults = [...submissions, ...nonSubmissions];
+
+  const paginatedResults = combinedResults.slice(offset, offset + pageSize);
+
+  return {
+    submissions: paginatedResults as SubmissionsTask[], // Ensure type compatibility
+    totalCount: combinedResults.length,
+  };
+}
+
 export async function getLateSubmissionsCountByMonitor(monitorId: number) {
   const result = await db
     .select({ count: count() })
@@ -1030,4 +1128,74 @@ export async function getMonitorAnnouncements(
     announcements: paginatedResults.length > 0 ? paginatedResults : null,
     total,
   };
+export async function getTasksByCourseId(
+  courseId: number
+): Promise<StudentCourseTasks[] | null> {
+  const results = await db
+    .selectDistinct({
+      taskId: tasksTable.id,
+      taskTitle: tasksTable.title,
+      deadline: tasksTable.deadline,
+      status: submissionsTable.status,
+      grade: submissionsTable.grade,
+      gradedAt: submissionsTable.gradedAt,
+    })
+    .from(tasksTable)
+    .innerJoin(coursesTable, eq(coursesTable.id, tasksTable.courseId))
+    .innerJoin(submissionsTable, eq(tasksTable.id, submissionsTable.taskId))
+    .innerJoin(studentsTable, eq(studentsTable.id, submissionsTable.studentId))
+    .where(eq(coursesTable.id, courseId));
+
+  return results.length > 0 ? results : null;
+}
+
+export async function getUserById(
+  id: number
+): Promise<Omit<User, "password"> | null> {
+  const result = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.id, Number(id)))
+    .get()
+  return result || null;
+}
+
+export async function getTaskByTaskId(
+  taskId: number
+): Promise<StudentCourseTask[] | null> {
+  const results = await db
+    .selectDistinct({
+      courseTitle: coursesTable.title,
+      taskTitle: tasksTable.title,
+      creator: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      createdAt: tasksTable.createdAt,
+      updatedAt: tasksTable.updatedAt,
+      description: tasksTable.description,
+      deadline: tasksTable.deadline,
+    })
+    .from(tasksTable)
+    .innerJoin(coursesTable, eq(coursesTable.id, tasksTable.courseId))
+    .innerJoin(usersTable, eq(usersTable.id, tasksTable.creatorId))
+    .where(eq(tasksTable.id, taskId));
+
+  return results.length > 0 ? results : null;
+}
+
+export async function getCoMonitorByCourseId(
+  courseId: number
+): Promise<coMonitorName[] | null> {
+  const results = await db
+    .selectDistinct({
+      coMonitorId: coMonitorsTable.id,
+      coMonitorName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+    })
+    .from(appointmentsTable)
+    .innerJoin(
+      coMonitorsTable,
+      eq(coMonitorsTable.id, appointmentsTable.coMonitorId)
+    )
+    .innerJoin(usersTable, eq(usersTable.id, coMonitorsTable.userId))
+    .where(eq(appointmentsTable.id, courseId));
+
+  return results.length > 0 ? results : null;
 }
