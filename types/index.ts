@@ -294,7 +294,6 @@ export enum StudentAppointmentStatus {
   "ACCEPTED" = "ACCEPTED",
   "REJECTED" = "REJECTED",
 }
-
 export type StudentAppointments = {
   id: number | null;
   coMonitor: string | null;

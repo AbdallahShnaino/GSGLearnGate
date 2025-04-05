@@ -1,13 +1,11 @@
 import Sidebar from "@/components/SideBar/SideBar";
 import {
   House,
-  Book,
   Users,
   Student,
   UserGear,
   UserPlus,
   UserCirclePlus,
-  ReadCvLogo,
 } from "@phosphor-icons/react/dist/ssr";
 import { SidebarLink } from "@/types/user";
 
@@ -28,8 +26,8 @@ export const links: SidebarLink[] = [
     icon: <Student size={24} weight="bold" />,
   },
   {
-    href: "/monitor/create-announcement",
-    label: "Create Announcement",
+    href: "/monitor/announcements",
+    label: "Announcement",
     icon: <UserGear size={24} weight="bold" />,
   },
   {

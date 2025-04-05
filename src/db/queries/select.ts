@@ -1,7 +1,18 @@
 "use server";
 
 import { db } from "./../index";
-import { eq, sql, and, count, lte, gt, or, gte, lt } from "drizzle-orm";
+import {
+  eq,
+  sql,
+  and,
+  count,
+  lte,
+  gt,
+  or,
+  gte,
+  lt,
+  inArray,
+} from "drizzle-orm";
 
 import {
   usersTable,
@@ -41,7 +52,6 @@ import {
   SubmissionsTask,
   CourseWithNames,
   TaskStatus,
-  UsersNames,
   CourseStatus,
   StudentCourseSmallCard,
   StudentCourseBigCard,
@@ -1085,6 +1095,39 @@ export async function getStudentAppointments(
   return results.length > 0 ? results : null;
 }
 
+export async function getMonitorAnnouncements(
+  courseId: number | undefined,
+  courseIds?: number[],
+  page: number = 1,
+  pageSize: number = 10
+): Promise<{ announcements: Announcement[] | null; total: number }> {
+  let allResults: Announcement[];
+
+  if (courseId !== undefined) {
+    allResults = await db
+      .select()
+      .from(announcementsTable)
+      .where(eq(announcementsTable.courseId, courseId))
+      .all();
+  } else if (courseIds && courseIds.length > 0) {
+    allResults = await db
+      .select()
+      .from(announcementsTable)
+      .where(inArray(announcementsTable.courseId, courseIds))
+      .all();
+  } else {
+    return { announcements: null, total: 0 };
+  }
+
+  const total = allResults.length;
+
+  const offset = (page - 1) * pageSize;
+  const paginatedResults = allResults.slice(offset, offset + pageSize);
+
+  return {
+    announcements: paginatedResults.length > 0 ? paginatedResults : null,
+    total,
+  };
 export async function getTasksByCourseId(
   courseId: number
 ): Promise<StudentCourseTasks[] | null> {
