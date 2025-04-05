@@ -306,10 +306,13 @@ export enum StudentTaskStatus {
   "PENDING" = "PENDING",
   "SUBMITTED" = "SUBMITTED",
   "GRADED" = "GRADED",
+  "LATE" = "LATE",
 }
 export type StudentCourseTasks = {
   taskId: number;
   taskTitle: string;
   deadline: Date;
   status: StudentTaskStatus;
+  grade: number;
+  gradedAt: Date;
 };

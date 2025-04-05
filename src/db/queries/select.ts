@@ -1092,6 +1092,8 @@ export async function getTasksByCourseId(
       taskTitle: tasksTable.title,
       deadline: tasksTable.deadline,
       status: submissionsTable.status,
+      grade: submissionsTable.grade,
+      gradedAt: submissionsTable.gradedAt,
     })
     .from(tasksTable)
     .innerJoin(coursesTable, eq(coursesTable.id, tasksTable.courseId))
