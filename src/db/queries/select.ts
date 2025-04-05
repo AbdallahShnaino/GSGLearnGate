@@ -1091,8 +1091,9 @@ export async function getStudentAppointments(
     .selectDistinct({
       id: appointmentsTable.id,
       coMonitor: sql<string>`${coMonitorsUsers.firstName} || ' ' || ${coMonitorsUsers.lastName}`,
-      date: appointmentsTable.date,
+      date: appointmentsTable.dateTime,
       status: appointmentsTable.status,
+      courseTitle: coursesTable.title,
     })
     .from(appointmentsTable)
     .innerJoin(studentsTable, eq(studentsTable.id, appointmentsTable.studentId))
@@ -1101,6 +1102,7 @@ export async function getStudentAppointments(
       eq(coMonitorsTable.id, appointmentsTable.coMonitorId)
     )
     .innerJoin(coMonitorsUsers, eq(coMonitorsTable.userId, coMonitorsUsers.id))
+    .innerJoin(coursesTable, eq(coursesTable.id, appointmentsTable.courseId))
     .where(eq(studentsTable.id, studentId));
 
   return results.length > 0 ? results : null;
