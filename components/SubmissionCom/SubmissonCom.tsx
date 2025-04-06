@@ -3,11 +3,8 @@
 import TaskHeader from "./TaskHeader";
 import { Paperclip } from "@phosphor-icons/react";
 import { FolderPlus } from "@phosphor-icons/react";
-import {
-  fetchCommentsBySubmissionId,
-  saveSubmissionData,
-} from "@/services/co-mentor-func";
-import { insertCommentByCoMentor } from "@/services/action";
+
+import { insertCommentByCoMentor } from "@/controllers/actions/addPraivetCommrnt";
 import { useEffect, useState } from "react";
 import StudentInfoCard from "./StudentInfoCard";
 import Image from "next/image";
@@ -15,6 +12,10 @@ import { Attachments } from "@/types";
 import { useViewSubmission } from "@/hooks/useViewSubmission";
 import { usePrivateComments } from "@/hooks/usePrivateComments";
 import Loader from "../Shared/Loader";
+import {
+  fetchCommentsBySubmissionId,
+  saveSubmissionData,
+} from "@/services/co-mentor-func";
 
 interface SubmissionIdProps {
   id: number;

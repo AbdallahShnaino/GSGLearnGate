@@ -170,7 +170,7 @@ export default function StudentSubmissionsTable({ TaskId }: IdTaskIprops) {
                       </td>
                       <td className="px-6 py-3">
                         <Link
-                          href={`/co-mentor/submission/${submission.submissionId}`}
+                          href={`/co-monitor/submission/${submission.submissionId}`}
                         >
                           <button
                             className={`w-[100px] rounded-xl flex h-10 justify-center items-center transition duration-300 cursor-pointer ${

@@ -259,6 +259,7 @@ export type CourseWithNames = {
   details: string;
   entryRequirements: string;
 } & Timestamps;
+
 enum AttendanceStatus {
   PRESENT = "PRESENT", // حاضر
   ABSENT = "ABSENT", // غائب
@@ -318,7 +319,10 @@ export type StudentCourseTasks = {
   taskTitle: string;
   deadline: Date;
   status: StudentTaskStatus;
-<<<<<<< HEAD
+  grade: number;
+  gradedAt: Date;
+  maxGrade: number;
+
 };
 export interface SubmissionView {
   id: number;
@@ -351,7 +355,7 @@ export interface PrivateComment {
   createdBy: string;
   image: string | null;
 }
-=======
+export type StudentCourseTaskDetails = {
   grade: number;
   gradedAt: Date;
   maxGrade: number;
@@ -425,4 +429,4 @@ export type AttendanceRecord = {
   recordedById: number;
   studentId: number;
 };
->>>>>>> 70fba379c70b931ec01e6debfaafd49d6d2b5ca4
+

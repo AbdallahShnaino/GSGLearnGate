@@ -1,8 +1,10 @@
+'use server';
+
 import { getPrivateCommentsBySubmission, getPrivateCommentsReplyBySubmission, getSubmissionById, getSubmissionsAndNonSubmissionsForTask } from "@/src/db/queries/select";
 import { updateMeetingRequest } from "@/src/db/queries/update";
 import { Status } from "@/types";
 import { db } from "@/src/db";
-import { commentsTable, submissionsTable, tasksTable } from "@/src/db/schema";
+import {  submissionsTable, tasksTable } from "@/src/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function updateMeetingRequestStatus(id: number, status: Status) {
