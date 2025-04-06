@@ -282,7 +282,7 @@ export enum CourseStatus {
   "FINISHED" = "Finished",
 }
 export type StudentCourseBigCard = {
-  // status: CourseStatus;
+  status: CourseStatus;
   startDate: Date;
   endDate: Date;
   totalTasks: number;
