@@ -27,9 +27,9 @@ import {
   submissionsTable,
   tasksTable,
   attachmentsTable,
-  // attendancesTable,
-  attendanceRecordsTable,
   joiningRequestsTable,
+  courseSchedulesTable,
+  attendanceRecordsTable,
 } from "./../schema";
 import {
   Admin,
@@ -62,15 +62,42 @@ import {
   StudentCourseTask,
   coMonitorName,
   UsersNames,
+  CourseSchedule,
+  AttendanceRecordStatus,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorTasksResponse } from "@/types/tasks";
 import { MonitorsTasks } from "@/types/tasksOperations";
+import {
+  CourseScheduleList,
+  CourseStudentsList,
+} from "@/types/attendanceOperations";
 
 export async function getAllUsers(): Promise<User[]> {
   return await db.select().from(usersTable).all();
 }
+export async function getCourseSchedule(
+  courseId?: number
+): Promise<CourseScheduleList[]> {
+  let query = db
+    .select({
+      id: courseSchedulesTable.id,
+      courseId: courseSchedulesTable.courseId,
+      courseName: coursesTable.title,
+      dayOfWeek: courseSchedulesTable.dayOfWeek,
+      startTime: courseSchedulesTable.startTime,
+      endTime: courseSchedulesTable.endTime,
+    })
+    .from(courseSchedulesTable)
+    .leftJoin(coursesTable, eq(courseSchedulesTable.courseId, coursesTable.id));
 
+  if (courseId !== undefined) {
+    query = query.where(eq(courseSchedulesTable.courseId, courseId));
+  }
+
+  const result = await query.all();
+  return result;
+}
 export async function getUserByEmail(
   email: string
 ): Promise<Omit<User, "password"> | null> {
@@ -1210,4 +1237,86 @@ export async function getCoMonitorByCourseId(
     .where(eq(appointmentsTable.id, courseId));
 
   return results.length > 0 ? results : null;
+}
+export async function getStudentsByCourseId(
+  courseId: number
+): Promise<CourseStudentsList[]> {
+  const students = await db
+    .select({
+      id: studentsTable.id,
+      userId: studentsTable.userId,
+      firstName: usersTable.firstName,
+      lastName: usersTable.lastName,
+      email: usersTable.email,
+      image: usersTable.image,
+    })
+    .from(studentsCoursesTable)
+    .innerJoin(
+      studentsTable,
+      eq(studentsCoursesTable.studentId, studentsTable.id)
+    )
+    .innerJoin(usersTable, eq(studentsTable.userId, usersTable.id))
+    .where(eq(studentsCoursesTable.courseId, courseId))
+    .all();
+
+  return students;
+}
+
+export async function insertAttendanceRecord({
+  sessionId,
+  courseId,
+  studentId,
+  status,
+  recordedById,
+}: {
+  sessionId: number;
+  courseId: number;
+  studentId: number;
+  status: AttendanceRecordStatus;
+  recordedById: number;
+}) {
+  console.log(sessionId, courseId, studentId, status, recordedById);
+  const existing = await db
+    .select()
+    .from(attendanceRecordsTable)
+    .where(
+      and(
+        eq(attendanceRecordsTable.sessionId, sessionId),
+        eq(attendanceRecordsTable.studentId, studentId)
+      )
+    )
+    .get();
+
+  if (existing) {
+    return await db
+      .update(attendanceRecordsTable)
+      .set({
+        status,
+        recordedById,
+        updatedAt: sql`(current_timestamp)`, // Use SQL function for timestamp
+      })
+      .where(
+        and(
+          eq(attendanceRecordsTable.sessionId, sessionId),
+          eq(attendanceRecordsTable.studentId, studentId)
+        )
+      )
+      .returning()
+      .get();
+  }
+
+  return await db
+    .insert(attendanceRecordsTable)
+    .values({
+      sessionId,
+      courseId,
+      studentId,
+      status,
+      recordedById,
+      createdAt: sql`(current_timestamp)`,
+      updatedAt: sql`(current_timestamp)`,
+      deletedAt: sql`(current_timestamp)`,
+    })
+    .returning()
+    .get();
 }
