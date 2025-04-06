@@ -342,11 +342,11 @@ export type coMonitorName = {
 
 export type StudentBookingDate = {
   id: number;
-  // courseId: number;
   coMonitorId: number;
   studentId: number;
+  courseId: number;
   caption: string;
-  date: Date;
+  dateTime: Date;
   status: Status;
 } & Timestamps;
 

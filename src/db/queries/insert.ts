@@ -12,6 +12,7 @@ import {
   submissionsTable,
   tasksTable,
   attachmentsTable,
+  joiningRequestsTable,
   coMonitorAvailabilityTable,
 } from "./../schema";
 import {
