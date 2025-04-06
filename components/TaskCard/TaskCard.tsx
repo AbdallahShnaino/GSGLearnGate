@@ -4,6 +4,7 @@ import Link from "next/link";
 interface IProps {
   task: StudentCourseTasks;
   courseId: string;
+  studentId: string;
 }
 const TaskCard = (props: IProps) => {
   const statusBg = {
@@ -15,7 +16,7 @@ const TaskCard = (props: IProps) => {
 
   return (
     <Link
-      href={`/student/my-courses/${props.courseId}/tasks/${props.task.taskId}`}
+      href={`/${props.studentId}/my-courses/${props.courseId}/tasks/${props.task.taskId}`}
       className="block w-full"
     >
       <div className="w-full border rounded-2xl p-6 bg-white shadow-lg hover:shadow-xl transition-shadow duration-300">
@@ -43,14 +44,20 @@ const TaskCard = (props: IProps) => {
 
           <div className="flex flex-col sm:items-end text-sm">
             <p className="text-neutral-800 font-medium">
-              Grade: {props.task.grade} / {props.task.maxGrade}
+              Grade: {props.task.grade ? props.task.grade : "N/A"} /{" "}
+              {props.task.maxGrade}
             </p>
             <p className="text-neutral-600">
-              Graded At: {props.task.gradedAt.toLocaleDateString("en-GB")}{" "}
-              {props.task.gradedAt.toLocaleTimeString("en-GB", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}{" "}
+              Graded At:{" "}
+              {props.task.grade
+                ? props.task.gradedAt.toLocaleDateString("en-GB")
+                : "_"}{" "}
+              {props.task.grade
+                ? props.task.gradedAt.toLocaleTimeString("en-GB", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : ""}{" "}
             </p>
             <p className="text-neutral-600">Graded By: Ali Ahmad</p>
           </div>
