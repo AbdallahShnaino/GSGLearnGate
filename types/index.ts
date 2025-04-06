@@ -304,8 +304,9 @@ export enum StudentAppointmentStatus {
 export type StudentAppointments = {
   id: number | null;
   coMonitor: string | null;
-  date: Date | null;
+  date: Date;
   status: StudentAppointmentStatus;
+  courseTitle: string;
 };
 
 export enum StudentTaskStatus {
