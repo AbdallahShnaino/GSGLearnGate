@@ -8,6 +8,20 @@
       "when": 1743843224140,
       "tag": "0000_tan_natasha_romanoff",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1743845680809,
+      "tag": "0001_zippy_blink",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1743857434792,
+      "tag": "0002_dazzling_spot",
+      "breakpoints": true
     }
   ]
 }
