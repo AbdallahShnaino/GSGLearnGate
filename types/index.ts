@@ -383,9 +383,6 @@ export type AvailabilitySlot = {
   createdAt: string;
   updatedAt: string;
 };
-// student book an appointemtn
-// co monitor add his own available times
-// admin add course info
 export enum AttendanceRecordStatus {
   PRESENT = "PRESENT",
   ABSENT = "ABSENT",
