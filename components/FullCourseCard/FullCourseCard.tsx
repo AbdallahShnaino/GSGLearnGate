@@ -62,7 +62,9 @@ const FullCourseCard = (props: IProps) => {
         <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
           <span
             className="block h-full bg-[#FFA41F] rounded-full"
-            style={{ width: `${(completedHours / totalHours) * 100}%` }}
+            style={{
+              width: `${Math.round((completedHours / totalHours) * 100)}%`,
+            }}
           ></span>
         </div>
         <div className="flex justify-between items-center">
@@ -87,7 +89,7 @@ const FullCourseCard = (props: IProps) => {
         </div>
       </div>
       <Link
-        href={`/student/my-courses/${props.course.id}`}
+        href={`/${props.studentId}/my-courses/${props.course.id}`}
         className="mt-3 px-4 py-2 bg-[#FFA41F] text-white rounded-lg hover:bg-[#FFA41F] transition cursor-pointer flex justify-center"
       >
         More Details
