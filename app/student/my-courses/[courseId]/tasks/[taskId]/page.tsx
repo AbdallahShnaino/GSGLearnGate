@@ -8,13 +8,6 @@ const Task = async (props: IProps) => {
   const { taskId } = await props.params;
   const taskDetails = await getTaskByTaskId(Number(taskId));
   console.log(taskDetails);
-  // const timeDiff = taskDetails![0].deadline.getTime() - taskDetails![0].createdAt.getTime();
-
-  // حساب الأيام والساعات المتبقية
-  // const daysRemaining = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-  // const hoursRemaining = Math.floor(
-  //   (timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-  // );
 
   return (
     <div className="min-h-screen bg-[#FFF5E8] p-6">
@@ -30,33 +23,34 @@ const Task = async (props: IProps) => {
         <div className="mt-4 bg-[#FFF6E0] p-4 rounded-lg shadow">
           <h2 className="text-lg font-semibold text-[#FFA41F]">Details</h2>
           <p className="text-sm text-neutral-700">
-            Created by: {taskDetails![0].creator}
+            Created By: {taskDetails![0].creator}
           </p>
-          {/* <p className="text-sm text-neutral-700">
-            Created at: {taskDetails![0].createdAt.toLocaleDateString("en-GB")}{" "}
-            {taskDetails![0].createdAt.toLocaleTimeString("en-GB", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}{" "}
-            (last update:{" "}
-            {taskDetails![0].updatedAt.toLocaleDateString("en-GB")}{" "}
-            {taskDetails![0].updatedAt.toLocaleTimeString("en-GB", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}{" "}
-            )
-          </p> */}
+          <p className="text-sm text-neutral-700">
+            Created At: {taskDetails![0].createdAt.slice(0, 16)} (last update:{" "}
+            {taskDetails![0].updatedAt.slice(0, 16)})
+          </p>
           <p className="text-sm text-neutral-700">
             Deadline: {taskDetails![0].deadline.toLocaleDateString("en-GB")}{" "}
             {taskDetails![0].deadline.toLocaleTimeString("en-GB", {
               hour: "2-digit",
               minute: "2-digit",
             })}{" "}
-            {/* (Remaining Time: {
-              timeDiff > 0
-              ? `Days Remaining: ${daysRemaining} days, ${hoursRemaining} hours`
-              : "Deadline Passed!";
-            }) */}
+          </p>
+          <p className="text-sm text-neutral-700">
+            Time Left:{" "}
+            {(() => {
+              const deadline = new Date(taskDetails![0].deadline);
+              const now = new Date();
+              const diffMs = deadline.getTime() - now.getTime();
+
+              if (diffMs <= 0) return "Expired";
+
+              const diffHoursTotal = Math.floor(diffMs / 1000 / 60 / 60);
+              const days = Math.floor(diffHoursTotal / 24);
+              const hours = diffHoursTotal % 24;
+
+              return `${days}d ${hours}h`;
+            })()}
           </p>
         </div>
       </header>

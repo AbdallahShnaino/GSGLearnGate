@@ -13,9 +13,9 @@ const CourseCard = (props: IProps) => {
 
       <div className="mt-3 space-y-2">
         <div className="flex justify-between items-center">
-          <p className="text-gray-700">Attendance</p>
+          <p className="text-gray-700">Progress</p>
           <p className="text-gray-600">
-            {25 - props.course.absence}/25 lessons
+            {/* {25 - props.course.absence}/25 lessons */}
           </p>
         </div>
 

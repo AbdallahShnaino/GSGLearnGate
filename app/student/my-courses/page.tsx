@@ -3,6 +3,7 @@ import { getCoursesDataByStudent } from "@/src/db/queries/select";
 
 const MyCourses = async () => {
   const courses = await getCoursesDataByStudent(1);
+  console.log(courses);
 
   return (
     <div className="px-6 py-3 w-full min-h-screen">

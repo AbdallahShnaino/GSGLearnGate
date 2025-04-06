@@ -261,12 +261,17 @@ export type CourseWithNames = {
   details: string;
   entryRequirements: string;
 } & Timestamps;
-
+enum AttendanceStatus {
+  PRESENT = "PRESENT", // حاضر
+  ABSENT = "ABSENT", // غائب
+  EXCUSED = "EXCUSED", // غياب بعذر
+  LATE = "LATE", // متأخر
+}
 export type StudentCourseSmallCard = {
   id: number | null;
   title: string | null;
   monitorName: string | null;
-  absence: number | null;
+  // attendance: number;
 };
 
 export enum CourseStatus {
@@ -275,7 +280,7 @@ export enum CourseStatus {
   "FINISHED" = "Finished",
 }
 export type StudentCourseBigCard = {
-  status: CourseStatus;
+  // status: CourseStatus;
   startDate: Date;
   endDate: Date;
   totalTasks: number;
@@ -286,7 +291,7 @@ export type StudentCourseDetails = {
   id: number | null;
   title: string | null;
   monitor: string | null;
-  absence: number | null;
+  // status: AttendanceStatus;
   description: string | null;
   coMonitors: string | null;
 };
@@ -299,8 +304,9 @@ export enum StudentAppointmentStatus {
 export type StudentAppointments = {
   id: number | null;
   coMonitor: string | null;
-  date: Date | null;
+  date: Date;
   status: StudentAppointmentStatus;
+  courseTitle: string;
 };
 
 export enum StudentTaskStatus {
@@ -316,14 +322,15 @@ export type StudentCourseTasks = {
   status: StudentTaskStatus;
   grade: number;
   gradedAt: Date;
+  maxGrade: number;
 };
 
 export type StudentCourseTask = {
   courseTitle: string;
   taskTitle: string;
   creator: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
   description: string;
   deadline: Date;
 };
@@ -335,11 +342,11 @@ export type coMonitorName = {
 
 export type StudentBookingDate = {
   id: number;
-  // courseId: number;
   coMonitorId: number;
   studentId: number;
+  courseId: number;
   caption: string;
-  date: Date;
+  dateTime: Date;
   status: Status;
 } & Timestamps;
 
@@ -372,9 +379,6 @@ export type AvailabilitySlot = {
   createdAt: string;
   updatedAt: string;
 };
-// student book an appointemtn
-// co monitor add his own available times
-// admin add course info
 export enum AttendanceRecordStatus {
   PRESENT = "PRESENT",
   ABSENT = "ABSENT",

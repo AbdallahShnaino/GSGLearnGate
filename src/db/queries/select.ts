@@ -30,6 +30,7 @@ import {
   joiningRequestsTable,
   courseSchedulesTable,
   attendanceRecordsTable,
+  coMonitorAvailabilityTable,
 } from "./../schema";
 import {
   Admin,
@@ -61,6 +62,7 @@ import {
   StudentCourseTasks,
   StudentCourseTask,
   coMonitorName,
+  UsersNames,
   CourseSchedule,
   AttendanceRecordStatus,
 } from "@/types/index";
@@ -71,6 +73,7 @@ import {
   CourseScheduleList,
   CourseStudentsList,
 } from "@/types/attendanceOperations";
+import { CoMonitorAppointment } from "@/types/appointments";
 
 export async function getAllUsers(): Promise<User[]> {
   return await db.select().from(usersTable).all();
@@ -808,7 +811,7 @@ export async function getAllAttachments(): Promise<Attachment[]> {
 }
 
 export async function getAllAttendances(): Promise<Attendance[]> {
-  return await db.select().from(attendancesTable).all();
+  return await db.select().from(attendanceRecordsTable).all();
 }
 
 export async function getAllJoiningRequests(): Promise<JoiningRequest[]> {
@@ -1011,20 +1014,23 @@ export async function getTaskById(taskId: number) {
 
 export async function getLimitCoursesByStudent(
   studentId: number,
-  limit: number = 10
+  limit?: number
 ): Promise<StudentCourseSmallCard[] | null> {
   const results = await db
     .selectDistinct({
       id: coursesTable.id,
       title: coursesTable.title,
       monitorName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
-      absence: attendancesTable.absence,
+      // attendance: attendanceRecordsTable.status,
     })
     .from(studentsCoursesTable)
     .innerJoin(coursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
     .innerJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
     .innerJoin(usersTable, eq(monitorsTable.userId, usersTable.id))
-    .innerJoin(attendancesTable, eq(coursesTable.id, attendancesTable.courseId))
+    // .innerJoin(
+    //   attendanceRecordsTable,
+    //   eq(coursesTable.id, attendanceRecordsTable.courseId)
+    // )
     .where(eq(studentsCoursesTable.studentId, studentId))
     .groupBy(
       coursesTable.id,
@@ -1045,7 +1051,7 @@ export async function getCoursesDataByStudent(
       id: coursesTable.id,
       title: coursesTable.title,
       monitorName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
-      absence: attendancesTable.absence,
+      // attendance: attendanceRecordsTable.status,
       startDate: coursesTable.courseStartDate,
       endDate: coursesTable.courseEndDate,
       status: sql<CourseStatus>`CASE 
@@ -1060,7 +1066,10 @@ export async function getCoursesDataByStudent(
     .innerJoin(coursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
     .innerJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
     .innerJoin(usersTable, eq(monitorsTable.userId, usersTable.id))
-    .innerJoin(attendancesTable, eq(coursesTable.id, attendancesTable.courseId))
+    // .innerJoin(
+    //   attendanceRecordsTable,
+    //   eq(coursesTable.id, attendanceRecordsTable.courseId)
+    // )
     .where(eq(studentsCoursesTable.studentId, studentId))
     .groupBy(
       coursesTable.id,
@@ -1083,7 +1092,7 @@ export async function getCoursesById(
       title: coursesTable.title,
       monitor: sql<string>`${monitorUsers.firstName} || ' ' || ${monitorUsers.lastName}`,
       description: coursesTable.description,
-      absence: attendancesTable.absence,
+      // attendance: attendanceRecordsTable.status,
       coMonitors: sql<string>`${coMonitorsUsers.firstName} || ' ' || ${coMonitorsUsers.lastName}`,
     })
     .from(studentsCoursesTable)
@@ -1095,7 +1104,10 @@ export async function getCoursesById(
       eq(coursesTable.coMonitorId, coMonitorsTable.id)
     )
     .innerJoin(coMonitorsUsers, eq(coMonitorsTable.userId, coMonitorsUsers.id))
-    .innerJoin(attendancesTable, eq(coursesTable.id, attendancesTable.courseId))
+    // .innerJoin(
+    //   attendanceRecordsTable,
+    //   eq(coursesTable.id, attendanceRecordsTable.courseId)
+    // )
     .where(eq(coursesTable.id, courseId));
 
   return results.length > 0 ? results : null;
@@ -1108,8 +1120,9 @@ export async function getStudentAppointments(
     .selectDistinct({
       id: appointmentsTable.id,
       coMonitor: sql<string>`${coMonitorsUsers.firstName} || ' ' || ${coMonitorsUsers.lastName}`,
-      date: appointmentsTable.date,
+      date: appointmentsTable.dateTime,
       status: appointmentsTable.status,
+      courseTitle: coursesTable.title,
     })
     .from(appointmentsTable)
     .innerJoin(studentsTable, eq(studentsTable.id, appointmentsTable.studentId))
@@ -1118,6 +1131,7 @@ export async function getStudentAppointments(
       eq(coMonitorsTable.id, appointmentsTable.coMonitorId)
     )
     .innerJoin(coMonitorsUsers, eq(coMonitorsTable.userId, coMonitorsUsers.id))
+    .innerJoin(coursesTable, eq(coursesTable.id, appointmentsTable.courseId))
     .where(eq(studentsTable.id, studentId));
 
   return results.length > 0 ? results : null;
@@ -1168,6 +1182,7 @@ export async function getTasksByCourseId(
       status: submissionsTable.status,
       grade: submissionsTable.grade,
       gradedAt: submissionsTable.gradedAt,
+      maxGrade: tasksTable.points,
     })
     .from(tasksTable)
     .innerJoin(coursesTable, eq(coursesTable.id, tasksTable.courseId))
@@ -1309,4 +1324,42 @@ export async function insertAttendanceRecord({
     })
     .returning()
     .get();
+}
+
+export async function getAllCoMonitorAppointments(
+  coMonitorId: number
+): Promise<CoMonitorAppointment[]> {
+  return await db
+    .select({
+      id: coMonitorAvailabilityTable.id,
+      date: coMonitorAvailabilityTable.date,
+      startTime: coMonitorAvailabilityTable.startTime,
+      endTime: coMonitorAvailabilityTable.endTime,
+      isBooked: coMonitorAvailabilityTable.isBooked,
+      course: {
+        id: coursesTable.id,
+        title: coursesTable.title,
+      },
+      student: {
+        id: studentsTable.id,
+        userId: studentsTable.userId,
+        firstName: usersTable.firstName,
+        lastName: usersTable.lastName,
+      },
+    })
+    .from(coMonitorAvailabilityTable)
+    .leftJoin(
+      coursesTable,
+      eq(coMonitorAvailabilityTable.courseId, coursesTable.id)
+    )
+    .leftJoin(
+      studentsTable,
+      eq(coMonitorAvailabilityTable.bookedByStudentId, studentsTable.id)
+    )
+    .leftJoin(
+      usersTable,
+      eq(studentsTable.userId, usersTable.id) // Join users table
+    )
+    .where(eq(coMonitorAvailabilityTable.coMonitorId, coMonitorId))
+    .all();
 }

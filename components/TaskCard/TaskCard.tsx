@@ -43,7 +43,7 @@ const TaskCard = (props: IProps) => {
 
           <div className="flex flex-col sm:items-end text-sm">
             <p className="text-neutral-800 font-medium">
-              Grade: {props.task.grade} / 1000
+              Grade: {props.task.grade} / {props.task.maxGrade}
             </p>
             <p className="text-neutral-600">
               Graded At: {props.task.gradedAt.toLocaleDateString("en-GB")}{" "}
