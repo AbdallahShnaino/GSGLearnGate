@@ -1090,7 +1090,7 @@ export async function getCoursesById(
       title: coursesTable.title,
       monitor: sql<string>`${monitorUsers.firstName} || ' ' || ${monitorUsers.lastName}`,
       description: coursesTable.description,
-      attendance: attendanceRecordsTable.status,
+      // attendance: attendanceRecordsTable.status,
       coMonitors: sql<string>`${coMonitorsUsers.firstName} || ' ' || ${coMonitorsUsers.lastName}`,
     })
     .from(studentsCoursesTable)
@@ -1102,10 +1102,10 @@ export async function getCoursesById(
       eq(coursesTable.coMonitorId, coMonitorsTable.id)
     )
     .innerJoin(coMonitorsUsers, eq(coMonitorsTable.userId, coMonitorsUsers.id))
-    .innerJoin(
-      attendanceRecordsTable,
-      eq(coursesTable.id, attendanceRecordsTable.courseId)
-    )
+    // .innerJoin(
+    //   attendanceRecordsTable,
+    //   eq(coursesTable.id, attendanceRecordsTable.courseId)
+    // )
     .where(eq(coursesTable.id, courseId));
 
   return results.length > 0 ? results : null;
