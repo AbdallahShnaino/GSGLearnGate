@@ -13,11 +13,14 @@ import {
   submissionsTable,
   tasksTable,
   attachmentsTable,
-  attendancesTable,
+  courseSchedulesTable,
   joiningRequestsTable,
+
   commentsTable,
   InsertCommentsTable,
   SelectCommentsTable,
+  coMonitorAvailabilityTable,
+
 } from "./../schema";
 import {
   User,
@@ -28,12 +31,11 @@ import {
   Submission,
   Task,
   Attachment,
-  Attendance,
   Attachments,
   Role,
-  Comment,
-  JoiningRequest,
   StudentBookingDate,
+  CourseSchedule,
+  AvailabilitySlot,
 } from "@/types/index";
 
 interface InsertUserInput {
@@ -137,22 +139,6 @@ export async function insertAttachment(
   return inserted as Attachment;
 }
 
-export async function insertAttendance(
-  data: Omit<Attendance, "id">
-): Promise<Attendance> {
-  const [inserted] = await db.insert(attendancesTable).values(data).returning();
-  return inserted as Attendance;
-}
-export async function insertJoiningRequest(
-  data: Omit<JoiningRequest, "id">
-): Promise<JoiningRequest> {
-  const [inserted] = await db
-    .insert(joiningRequestsTable)
-    .values(data)
-    .returning();
-  return inserted as JoiningRequest;
-}
-
 export async function insertStudentAppointmentBookingData(
   data: Omit<StudentBookingDate, "id">
 ): Promise<StudentBookingDate> {
@@ -162,6 +148,7 @@ export async function insertStudentAppointmentBookingData(
     .returning();
   return inserted as StudentBookingDate;
 }
+
 export async function insertComment(
   data: Omit<InsertCommentsTable, "id">
 ): Promise<SelectCommentsTable> {
@@ -179,5 +166,32 @@ export async function insertComment(
   } catch (error) {
     console.error("Error inserting comment:", error);
     throw new Error("Failed to insert comment.");
+  }
+}
+
+
+export async function insertCourseSchedule(data: Omit<CourseSchedule, "id">): Promise<CourseSchedule> {
+  const [inserted] = await db.insert(
+courseSchedulesTable).values(data).returning();
+  return inserted as CourseSchedule;
+}
+
+
+export async function insertCoMonitorAvailability(
+  availability: Omit<AvailabilitySlot, "id" | "createdAt" | "updatedAt">
+) {
+  try {
+    const [newAvailability] = await db
+      .insert(coMonitorAvailabilityTable)
+      .values({
+        ...availability,
+        isBooked: availability.isBooked ?? false, // Default to false if not provided
+      })
+      .returning();
+
+    return newAvailability;
+  } catch (error) {
+    console.error("Error inserting co-monitor availability:", error);
+    throw new Error("Failed to create availability slot");
   }
 }

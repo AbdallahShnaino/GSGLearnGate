@@ -31,6 +31,7 @@ export default function SelectCourse({
       </label>
       <select
         id="course"
+        name="courseId"
         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#FFA41F] focus:border-[#FFA41F]"
         value={value}
         onChange={(e) => {

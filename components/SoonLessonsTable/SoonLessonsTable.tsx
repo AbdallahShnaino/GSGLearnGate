@@ -11,11 +11,17 @@ const Table = async () => {
               <th className="px-8 py-8 text-left font-medium text-gray-500">
                 Course
               </th>
-              <th className="px-8 py-8 text-left font-medium text-gray-500">
+              {/* <th className="px-8 py-8 text-left font-medium text-gray-500">
                 Date
+              </th> */}
+              <th className="px-8 py-8 text-left font-medium text-gray-500">
+                Day
               </th>
               <th className="px-8 py-8 text-left font-medium text-gray-500">
-                Time
+                Start Time
+              </th>
+              <th className="px-8 py-8 text-left font-medium text-gray-500">
+                End Time
               </th>
             </tr>
           </thead>
@@ -26,6 +32,7 @@ const Table = async () => {
                   {course.title}
                 </td>
                 <td className="px-8 py-8 text-gray-700">Date</td>
+                <td className="px-8 py-8 text-gray-700">Time</td>
                 <td className="px-8 py-8 text-gray-700">Time</td>
               </tr>
             ))}

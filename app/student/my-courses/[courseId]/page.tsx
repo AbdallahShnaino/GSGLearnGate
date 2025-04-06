@@ -10,8 +10,8 @@ const CourseDetails = async (props: IProps) => {
   const { courseId } = await props.params;
   const courseData = await getCoursesById(Number(courseId));
 
-  const attendance = 25 - courseData![0].absence!;
-  const attendancePercent = `${(attendance / 25) * 100}%`;
+  // const attendance = 25 - courseData![0].absence!;
+  // const attendancePercent = `${(attendance / 25) * 100}%`;
 
   const courseTasks = await getTasksByCourseId(Number(courseId));
 
@@ -94,12 +94,12 @@ const CourseDetails = async (props: IProps) => {
             <div className="mt-4">
               <div className="flex justify-between items-center">
                 <p className="text-gray-700">Attendance Rate</p>
-                <p className="text-gray-600">{attendancePercent}</p>
+                {/* <p className="text-gray-600">{attendancePercent}</p> */}
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3 mt-2">
                 <div
                   className="h-full bg-[#E99375] rounded-full"
-                  style={{ width: attendancePercent }}
+                  // style={{ width: attendancePercent }}
                 ></div>
               </div>
             </div>

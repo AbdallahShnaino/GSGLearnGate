@@ -6,6 +6,8 @@ import { getLimitCoursesByStudent } from "@/src/db/queries/select";
 
 const Dashboard = async () => {
   const courses = await getLimitCoursesByStudent(1, 2);
+  console.log(courses);
+
   const totalCourses = await getLimitCoursesByStudent(1);
 
   return (
