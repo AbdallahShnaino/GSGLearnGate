@@ -12,6 +12,7 @@ import {
   submissionsTable,
   tasksTable,
   attachmentsTable,
+  courseSchedulesTable,
   joiningRequestsTable,
   coMonitorAvailabilityTable,
 } from "./../schema";
@@ -27,6 +28,7 @@ import {
   Attachments,
   Role,
   StudentBookingDate,
+  CourseSchedule,
   AvailabilitySlot,
 } from "@/types/index";
 
@@ -140,6 +142,13 @@ export async function insertStudentAppointmentBookingData(
     .returning();
   return inserted as StudentBookingDate;
 }
+
+export async function insertCourseSchedule(data: Omit<CourseSchedule, "id">): Promise<CourseSchedule> {
+  const [inserted] = await db.insert(courseSchedulesTable).values(data).returning();
+  return inserted as CourseSchedule;
+}
+
+
 export async function insertCoMonitorAvailability(
   availability: Omit<AvailabilitySlot, "id" | "createdAt" | "updatedAt">
 ) {
