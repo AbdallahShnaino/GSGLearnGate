@@ -328,8 +328,8 @@ export type StudentCourseTask = {
   courseTitle: string;
   taskTitle: string;
   creator: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
   description: string;
   deadline: Date;
 };
