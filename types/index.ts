@@ -379,7 +379,7 @@ export type AvailabilitySlot = {
 // student book an appointemtn
 // co monitor add his own available times
 // admin add course info
-enum AttendanceRecordStatus {
+export enum AttendanceRecordStatus {
   PRESENT = "PRESENT",
   ABSENT = "ABSENT",
   LATE = "LATE",
@@ -387,19 +387,9 @@ enum AttendanceRecordStatus {
 }
 export type AttendanceRecord = {
   id: number;
+  courseId: number;
   sessionId: number;
   status: AttendanceRecordStatus;
-  notes?: string;
   recordedById: number;
-} & (
-  | { studentId: number; monitorId?: never; coMonitorId?: never }
-  | { monitorId: number; studentId?: never; coMonitorId?: never }
-  | { coMonitorId: number; studentId?: never; monitorId?: never }
-);
-export type AttendanceUpdate = {
-  sessionId: number;
-  userId: number;
-  userType: Role;
-  status: AttendanceRecordStatus;
-  notes?: string;
+  studentId: number;
 };
