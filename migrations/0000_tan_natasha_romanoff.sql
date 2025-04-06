@@ -53,7 +53,6 @@ CREATE TABLE `attendance_records` (
 	`session_id` integer NOT NULL,
 	`student_id` integer,
 	`monitor_id` integer,
-	`co_monitor_id` integer,
 	`status` text NOT NULL,
 	`notes` text,
 	`recorded_by` integer,
@@ -62,8 +61,6 @@ CREATE TABLE `attendance_records` (
 	`deleted_at` text DEFAULT (current_timestamp) NOT NULL,
 	FOREIGN KEY (`session_id`) REFERENCES `course_schedules`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`student_id`) REFERENCES `students`(`id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`monitor_id`) REFERENCES `monitors`(`id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`co_monitor_id`) REFERENCES `co_monitors`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`recorded_by`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint

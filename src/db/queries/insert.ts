@@ -12,7 +12,6 @@ import {
   submissionsTable,
   tasksTable,
   attachmentsTable,
-  // attendancesTable,
   joiningRequestsTable,
 } from "./../schema";
 import {
@@ -24,10 +23,8 @@ import {
   Submission,
   Task,
   Attachment,
-  Attendance,
   Attachments,
   Role,
-  JoiningRequest,
   StudentBookingDate,
 } from "@/types/index";
 
@@ -130,22 +127,6 @@ export async function insertAttachment(
     })
     .returning();
   return inserted as Attachment;
-}
-
-export async function insertAttendance(
-  data: Omit<Attendance, "id">
-): Promise<Attendance> {
-  const [inserted] = await db.insert(attendancesTable).values(data).returning();
-  return inserted as Attendance;
-}
-export async function insertJoiningRequest(
-  data: Omit<JoiningRequest, "id">
-): Promise<JoiningRequest> {
-  const [inserted] = await db
-    .insert(joiningRequestsTable)
-    .values(data)
-    .returning();
-  return inserted as JoiningRequest;
 }
 
 export async function insertStudentAppointmentBookingData(

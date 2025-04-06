@@ -305,15 +305,16 @@ export const attendanceRecordsTable = sqliteTable("attendance_records", {
   sessionId: int("session_id")
     .notNull()
     .references(() => courseSchedulesTable.id, { onDelete: "cascade" }),
+  courseId: int("course_id")
+    .notNull()
+    .references(() => coursesTable.id, { onDelete: "cascade" }),
   studentId: int("student_id").references(() => studentsTable.id),
   monitorId: int("monitor_id").references(() => monitorsTable.id),
   coMonitorId: int("co_monitor_id").references(() => coMonitorsTable.id),
-  courseId: int("course_id").references(() => coursesTable.id),
 
   status: text("status", {
     enum: ["PRESENT", "ABSENT", "LATE", "EXCUSED"],
   }).notNull(),
-  notes: text("notes"),
   recordedById: int("recorded_by").references(() => usersTable.id),
   ...timestamps,
 });
