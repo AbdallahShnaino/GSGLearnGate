@@ -354,16 +354,12 @@ export type Comment = {
 export type CourseSchedule = {
   id: number;
   courseId: number;
-  creatorId: number;
   dayOfWeek: string | null;
   startTime: string;
   endTime: string;
   isRecurring: boolean;
   specificDate: Date | null;
-  updatedAt: string;
-  createdAt: string;
-  deletedAt: string;
-};
+} & Timestamps;
 export type AvailabilitySlot = {
   id: number;
   coMonitorId: number;

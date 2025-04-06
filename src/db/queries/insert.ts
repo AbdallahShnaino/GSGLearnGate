@@ -12,6 +12,7 @@ import {
   submissionsTable,
   tasksTable,
   attachmentsTable,
+  courseSchedulesTable,
 } from "./../schema";
 import {
   User,
@@ -25,6 +26,7 @@ import {
   Attachments,
   Role,
   StudentBookingDate,
+  CourseSchedule,
 } from "@/types/index";
 
 interface InsertUserInput {
@@ -137,3 +139,9 @@ export async function insertStudentAppointmentBookingData(
     .returning();
   return inserted as StudentBookingDate;
 }
+
+export async function insertCourseSchedule(data: Omit<CourseSchedule, "id">): Promise<CourseSchedule> {
+  const [inserted] = await db.insert(courseSchedulesTable).values(data).returning();
+  return inserted as CourseSchedule;
+}
+
