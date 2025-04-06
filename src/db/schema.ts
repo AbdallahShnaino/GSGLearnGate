@@ -309,6 +309,9 @@ export const attendanceRecordsTable = sqliteTable("attendance_records", {
     .notNull()
     .references(() => coursesTable.id, { onDelete: "cascade" }),
   studentId: int("student_id").references(() => studentsTable.id),
+  monitorId: int("monitor_id").references(() => monitorsTable.id),
+  coMonitorId: int("co_monitor_id").references(() => coMonitorsTable.id),
+
 
   status: text("status", {
     enum: ["PRESENT", "ABSENT", "LATE", "EXCUSED"],
