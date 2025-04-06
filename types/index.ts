@@ -321,6 +321,7 @@ export type StudentCourseTasks = {
   status: StudentTaskStatus;
   grade: number;
   gradedAt: Date;
+  maxGrade: number;
 };
 
 export type StudentCourseTask = {
