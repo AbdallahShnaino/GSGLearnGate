@@ -4,7 +4,16 @@ import React from "react";
 interface IProps {
   course: StudentCourseSmallCard;
 }
+
+// const oneWeekInSeconds = 7 * 24 * 60 * 60;
+// const differenceInSeconds = Math.abs(
+//   props.course.endDate / 1000 - props.course.startDate / 1000
+// );
+// const differenceInWeeks = Math.floor(differenceInSeconds / oneWeekInSeconds);
+// const hoursNumber = differenceInWeeks * 6;
+
 const CourseCard = (props: IProps) => {
+  const progressPercentage = (4 / (props.course.duration * 6)) * 100;
   return (
     <div className="w-full min-w-0 sm:max-w-md p-4 bg-white shadow-lg rounded-2xl border border-gray-200 flex-grow">
       <h3 className="text-xl font-semibold text-gray-800">
@@ -14,13 +23,14 @@ const CourseCard = (props: IProps) => {
       <div className="mt-3 space-y-2">
         <div className="flex justify-between items-center">
           <p className="text-gray-700">Progress</p>
-          <p className="text-gray-600">
-            {/* {25 - props.course.absence}/25 lessons */}
-          </p>
+          <p className="text-gray-600">4/{props.course.duration * 6} hours</p>
         </div>
 
         <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
-          <span className="block h-full bg-[#FFA41F] rounded-full w-[60%]"></span>
+          <span
+            className={`block h-full bg-[#FFA41F] rounded-full`}
+            style={{ width: `${progressPercentage}%` }}
+          ></span>
         </div>
       </div>
 
