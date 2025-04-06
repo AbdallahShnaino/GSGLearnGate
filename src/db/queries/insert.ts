@@ -13,6 +13,7 @@ import {
   tasksTable,
   attachmentsTable,
   joiningRequestsTable,
+  coMonitorAvailabilityTable,
 } from "./../schema";
 import {
   User,
@@ -26,6 +27,7 @@ import {
   Attachments,
   Role,
   StudentBookingDate,
+  AvailabilitySlot,
 } from "@/types/index";
 
 interface InsertUserInput {
@@ -137,4 +139,22 @@ export async function insertStudentAppointmentBookingData(
     .values(data)
     .returning();
   return inserted as StudentBookingDate;
+}
+export async function insertCoMonitorAvailability(
+  availability: Omit<AvailabilitySlot, "id" | "createdAt" | "updatedAt">
+) {
+  try {
+    const [newAvailability] = await db
+      .insert(coMonitorAvailabilityTable)
+      .values({
+        ...availability,
+        isBooked: availability.isBooked ?? false, // Default to false if not provided
+      })
+      .returning();
+
+    return newAvailability;
+  } catch (error) {
+    console.error("Error inserting co-monitor availability:", error);
+    throw new Error("Failed to create availability slot");
+  }
 }
