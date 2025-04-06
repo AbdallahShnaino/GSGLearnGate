@@ -1,73 +1,114 @@
 "use client";
-import React, { useState } from "react";
-import StudentInfoCard from "./StudentInfoCard";
+
 import TaskHeader from "./TaskHeader";
-import { Paperclip } from "@phosphor-icons/react/dist/icons/Paperclip";
-import { FloppyDisk } from "@phosphor-icons/react/dist/icons/FloppyDisk";
-import { FolderPlus } from "@phosphor-icons/react/dist/icons/FolderPlus";
+import { Paperclip } from "@phosphor-icons/react";
+import { FolderPlus } from "@phosphor-icons/react";
+import {
+  fetchCommentsBySubmissionId,
+  saveSubmissionData,
+} from "@/services/co-mentor-func";
+import { insertCommentByCoMentor } from "@/services/action";
+import { useEffect, useState } from "react";
+import StudentInfoCard from "./StudentInfoCard";
+import Image from "next/image";
+import { Attachments } from "@/types";
+import { useViewSubmission } from "@/hooks/useViewSubmission";
+import { usePrivateComments } from "@/hooks/usePrivateComments";
+import Loader from "../Shared/Loader";
+
 interface SubmissionIdProps {
-  id: string;
+  id: number;
+  CoMentorId: number;
 }
-const SubmissonCom = ({ id }: SubmissionIdProps) => {
-  const [grade, setGrade] = useState("");
-  const [feedback, setFeedback] = useState("");
-  const [newComment, setNewComment] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
 
-  const student = {
-    id: "STD12345",
-    name: "John Smith",
-    task: {
-      id: "TASK987",
-      title: "UI Development Project",
-      status: "Submitted",
-      submittedAt: "2023-04-01T14:30:00",
-      content:
-        "I developed the user interface using React and Tailwind CSS as required in the task. I also added some additional features such as dark mode and mobile compatibility.",
-      attachments: [
-        { name: "screenshot1.png", url: "#" },
-        { name: "source-code.zip", url: "#" },
-      ],
-      comments: [
-        {
-          id: 1,
-          text: "Can I get more time to improve the design?",
-          timestamp: "2023-04-01T15:45:00",
-        },
-        {
-          id: 2,
-          text: "I added an extra feature for page navigation",
-          timestamp: "2023-04-02T10:20:00",
-        },
-      ],
-    },
-  };
+const SubmissonCom = ({ id, CoMentorId }: SubmissionIdProps) => {
+  const { submission, attachments, loading, error } = useViewSubmission(id);
+  const {
+    privateComments,
+    loading: commentsLoading,
+    error: commentsError,
+    setPrivateComments,
+  } = usePrivateComments(id, CoMentorId);
 
-  const handleSaveAllChanges = () => {
-    if (grade) {
+  const [grade, setGrade] = useState<string>("");
+  const [feedback, setFeedback] = useState<string>("");
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [replyText, setReplyText] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (submission) {
+      setGrade(submission.grade?.toString() || "");
+      setFeedback(submission.feedback || "");
+    }
+  }, [submission]);
+
+  const handleSaveAllChanges = async () => {
+    if (grade && feedback) {
       setIsSaving(true);
 
-      setTimeout(() => {
+      try {
+        const result = await saveSubmissionData({
+          submissionId: id,
+          grade: Number(grade),
+          feedback,
+        });
+
+        if (result.success) {
+          alert("All changes have been saved successfully!");
+        } else {
+          alert(result.message || "Failed to save changes. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error saving submission data:", error);
+        alert("Failed to save changes. Please try again.");
+      } finally {
         setIsSaving(false);
-        alert("All changes have been saved successfully!");
-      }, 1500);
+      }
     } else {
-      alert("Please enter a grade before saving");
+      alert("Please fill in all required fields before saving.");
     }
   };
-  const handleAddComment = () => {
-    if (newComment.trim()) {
-      setNewComment("");
+
+  const handleAddComment = async () => {
+    if (!replyText.trim()) {
+      alert("Please enter a comment before submitting.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      await insertCommentByCoMentor({
+        submissionId: id,
+        coMentorId: CoMentorId,
+        text: replyText,
+      });
+
+      const updatedComments = await fetchCommentsBySubmissionId(id, CoMentorId);
+
+      setPrivateComments(updatedComments);
+
+      setReplyText("");
+    } catch (error) {
+      console.error("Error adding comment:", error);
+      alert("Failed to add comment. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  if (loading || commentsLoading) return <Loader message="Loading data..." />;
+  if (error || commentsError) return <p>{error || commentsError}</p>;
 
   return (
     <div className="min-h-screen py-4">
       <div className="container mx-auto px-4 max-w-7xl">
         <StudentInfoCard
-          id={student.id}
-          name={student.name}
-          status={student.task.status}
+          id={submission?.studentId || 0}
+          name={submission?.StudentName || "Unknown"}
+          avatar={submission?.StudentImage || "/profile(6).png"}
+          status={submission?.status || "Submitted"}
         />
 
         <form
@@ -78,9 +119,9 @@ const SubmissonCom = ({ id }: SubmissionIdProps) => {
         >
           <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
             <TaskHeader
-              title={student.task.title}
-              id={student.id}
-              submittedAt={student.task.submittedAt}
+              title={submission?.TaskTitle || "No Title"}
+              id={submission?.studentId || 0}
+              submittedAt={submission?.createdAt}
             />
 
             <div className="p-5 space-y-6">
@@ -95,15 +136,32 @@ const SubmissonCom = ({ id }: SubmissionIdProps) => {
                     Attachments:
                   </h4>
                   <div className="flex flex-wrap gap-2">
-                    {student.task.attachments.map((attachment, index) => (
+                    {attachments && (
                       <a
-                        key={index}
-                        href={attachment.url}
+                        href={attachments.attachmentPath}
+                        target={
+                          attachments.attachmentType === Attachments.LINK
+                            ? "_blank"
+                            : "_self"
+                        }
+                        rel={
+                          attachments.attachmentType === Attachments.LINK
+                            ? "noopener noreferrer"
+                            : undefined
+                        }
+                        download={
+                          attachments.attachmentType === Attachments.FILE
+                            ? true
+                            : undefined
+                        }
                         className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded text-sm"
                       >
-                        {attachment.name}
+                        {attachments.attachmentType === Attachments.LINK
+                          ? "Open Link"
+                          : attachments.attachmentPath.split("/").pop() ||
+                            "Download File"}
                       </a>
-                    ))}
+                    )}
                   </div>
                 </div>
               </section>
@@ -152,23 +210,33 @@ const SubmissonCom = ({ id }: SubmissionIdProps) => {
 
               <section className="pt-2">
                 <h3 className="text-lg font-medium mb-3 pb-2 border-b flex items-center gap-2">
-                  {/* <MessageSquare className="h-5 w-5 text-[#FFA41F]" /> */}
                   Comments
                   <span className="ml-1 bg-[#FFA41F] text-white rounded-full px-2 py-0.5 text-xs">
-                    {student.task.comments.length}
+                    {privateComments.length}
                   </span>
                 </h3>
 
                 <div className="space-y-3 mb-4">
-                  {student.task.comments.map((comment) => (
-                    <div key={comment.id} className="border p-3 rounded-md">
+                  {privateComments.map((comment) => (
+                    <div
+                      key={comment.commentId}
+                      className="border p-2 rounded-md"
+                    >
                       <div className="flex justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          {/* <Image src="" /> */}
-                          <span className="font-medium">{student.name}</span>
+                          <Image
+                            src={comment.image || "/default-avatar.png"}
+                            alt={comment.createdBy || "User"}
+                            width={28}
+                            height={28}
+                            className="rounded-full"
+                          />
+                          <span className="font-medium">
+                            {comment.createdBy || "Unknown User"}
+                          </span>
                         </div>
                         <span className="text-xs text-gray-500">
-                          {new Date(comment.timestamp).toLocaleString("en-US", {
+                          {new Date(comment.createdAt).toLocaleString("en-US", {
                             month: "short",
                             day: "numeric",
                             hour: "2-digit",
@@ -176,38 +244,29 @@ const SubmissonCom = ({ id }: SubmissionIdProps) => {
                           })}
                         </span>
                       </div>
-                      <p>{comment.text}</p>
+                      <p>{comment.commentText}</p>
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-4">
-                  <label
-                    htmlFor="newComment"
-                    className="block mb-2 font-medium"
-                  >
-                    Add Comment
-                  </label>
+                <div className="mt-2">
                   <textarea
-                    id="newComment"
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    placeholder="Add a comment..."
-                    rows={2}
-                    className="w-full p-3 border rounded-md mb-2 focus:outline-none focus:ring-1 focus:ring-[#FFA41F] focus:border-[#FFA41F]"
+                    placeholder="Add a reply..."
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    className="w-full p-2 border rounded-md text-sm"
                   ></textarea>
                   <button
                     type="button"
                     onClick={handleAddComment}
-                    disabled={!newComment.trim()}
-                    className={`py-2 px-4 rounded-md font-medium text-white
-                                                    ${
-                                                      !newComment.trim()
-                                                        ? "bg-gray-300 cursor-not-allowed"
-                                                        : "bg-[#FFA41F] hover:bg-[#FF9800]"
-                                                    }`}
+                    disabled={isLoading}
+                    className={`mt-1 px-3 py-1 rounded-md text-sm text-white ${
+                      isLoading
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-[#FFA41F] hover:bg-[#FF9800]"
+                    }`}
                   >
-                    Add Comment
+                    {isLoading ? "Loading..." : "Reply"}
                   </button>
                 </div>
               </section>
@@ -223,12 +282,9 @@ const SubmissonCom = ({ id }: SubmissionIdProps) => {
               <button
                 type="submit"
                 disabled={isSaving}
-                className={`px-4 py-2 rounded-md text-white flex items-center gap-2
-                                                ${
-                                                  isSaving
-                                                    ? "bg-gray-400"
-                                                    : "bg-[#FFA41F] hover:bg-[#FF9800]"
-                                                }`}
+                className={`px-4 py-2 rounded-md text-white flex items-center gap-2 ${
+                  isSaving ? "bg-gray-400" : "bg-[#FFA41F] hover:bg-[#FF9800]"
+                }`}
               >
                 {isSaving ? (
                   "Saving..."

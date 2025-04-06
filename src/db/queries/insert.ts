@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm/sql/expressions/conditions";
 import { db } from "./../index";
 import {
   usersTable,
@@ -14,6 +15,9 @@ import {
   attachmentsTable,
   attendancesTable,
   joiningRequestsTable,
+  commentsTable,
+  InsertCommentsTable,
+  SelectCommentsTable,
 } from "./../schema";
 import {
   User,
@@ -27,6 +31,7 @@ import {
   Attendance,
   Attachments,
   Role,
+  Comment,
   JoiningRequest,
   StudentBookingDate,
 } from "@/types/index";
@@ -156,4 +161,23 @@ export async function insertStudentAppointmentBookingData(
     .values(data)
     .returning();
   return inserted as StudentBookingDate;
+}
+export async function insertComment(
+  data: Omit<InsertCommentsTable, "id">
+): Promise<SelectCommentsTable> {
+  if (!data.submissionId || !data.content || !data.privateRecipientId) {
+    throw new Error("Missing required fields for inserting a comment.");
+  }
+
+  try {
+    const [inserted] = await db
+      .insert(commentsTable)
+      .values(data)
+      .returning();
+
+    return inserted as SelectCommentsTable;
+  } catch (error) {
+    console.error("Error inserting comment:", error);
+    throw new Error("Failed to insert comment.");
+  }
 }

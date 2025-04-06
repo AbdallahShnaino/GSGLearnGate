@@ -3,8 +3,8 @@ import React from "react";
 
 interface Props {
   title: string;
-  id: string;
-  submittedAt: string;
+  id: number;
+  submittedAt: Date;
 }
 
 const TaskHeader = ({ title, id, submittedAt }: Props) => {

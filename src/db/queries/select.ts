@@ -27,8 +27,9 @@ import {
   submissionsTable,
   tasksTable,
   attachmentsTable,
-  attendancesTable,
+  // attendancesTable,
   joiningRequestsTable,
+  commentsTable,
 } from "./../schema";
 import {
   Admin,
@@ -60,10 +61,16 @@ import {
   StudentCourseTasks,
   StudentCourseTask,
   coMonitorName,
+  SubmissionView,
+  SubmissionAttachment,
+  PrivateComment,
+  PrivateCommentReply,
+  
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorTasksResponse } from "@/types/tasks";
 import { MonitorsTasks } from "@/types/tasksOperations";
+import { Student } from "phosphor-react";
 
 export async function getAllUsers(): Promise<User[]> {
   return await db.select().from(usersTable).all();
@@ -435,7 +442,7 @@ export async function getAppointmentsByStudent(
     .select({
       id: appointmentsTable.id,
       studentId: appointmentsTable.studentId,
-      date: appointmentsTable.date,
+      // date: appointmentsTable.date,
       caption: appointmentsTable.caption,
       coMonitorId: appointmentsTable.coMonitorId,
       status: appointmentsTable.status,
@@ -488,7 +495,7 @@ export async function getCoMonitorAppointments(
     .select({
       id: appointmentsTable.id,
       studentId: appointmentsTable.studentId,
-      date: appointmentsTable.date,
+      // date: appointmentsTable.date,
       caption: appointmentsTable.caption,
       coMonitorId: appointmentsTable.coMonitorId,
       status: appointmentsTable.status,
@@ -779,9 +786,9 @@ export async function getAllAttachments(): Promise<Attachment[]> {
   return await db.select().from(attachmentsTable).all();
 }
 
-export async function getAllAttendances(): Promise<Attendance[]> {
-  return await db.select().from(attendancesTable).all();
-}
+// export async function getAllAttendances(): Promise<Attendance[]> {
+//   return await db.select().from(attendancesTable).all();
+// }
 
 export async function getAllJoiningRequests(): Promise<JoiningRequest[]> {
   return await db.select().from(joiningRequestsTable).all();
@@ -996,7 +1003,7 @@ export async function getLimitCoursesByStudent(
     .innerJoin(coursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
     .innerJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
     .innerJoin(usersTable, eq(monitorsTable.userId, usersTable.id))
-    .innerJoin(attendancesTable, eq(coursesTable.id, attendancesTable.courseId))
+    // .innerJoin(attendancesTable, eq(coursesTable.id, attendancesTable.courseId))
     .where(eq(studentsCoursesTable.studentId, studentId))
     .groupBy(
       coursesTable.id,
@@ -1017,7 +1024,7 @@ export async function getCoursesDataByStudent(
       id: coursesTable.id,
       title: coursesTable.title,
       monitorName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
-      absence: attendancesTable.absence,
+      // absence: attendancesTable.absence,
       startDate: coursesTable.courseStartDate,
       endDate: coursesTable.courseEndDate,
       status: sql<CourseStatus>`CASE 
@@ -1055,7 +1062,7 @@ export async function getCoursesById(
       title: coursesTable.title,
       monitor: sql<string>`${monitorUsers.firstName} || ' ' || ${monitorUsers.lastName}`,
       description: coursesTable.description,
-      absence: attendancesTable.absence,
+      // absence: attendancesTable.absence,
       coMonitors: sql<string>`${coMonitorsUsers.firstName} || ' ' || ${coMonitorsUsers.lastName}`,
     })
     .from(studentsCoursesTable)
@@ -1080,7 +1087,7 @@ export async function getStudentAppointments(
     .selectDistinct({
       id: appointmentsTable.id,
       coMonitor: sql<string>`${coMonitorsUsers.firstName} || ' ' || ${coMonitorsUsers.lastName}`,
-      date: appointmentsTable.date,
+      // date: appointmentsTable.date,
       status: appointmentsTable.status,
     })
     .from(appointmentsTable)
@@ -1199,4 +1206,135 @@ export async function getCoMonitorByCourseId(
     .where(eq(appointmentsTable.id, courseId));
 
   return results.length > 0 ? results : null;
+}
+export async function getSubmissionById(
+  submissionId: number
+): Promise<{
+  submission: SubmissionView | null;
+  attachments: SubmissionAttachment;
+}> {
+  const result = await db
+    .select({
+      id: submissionsTable.id,
+      taskId: submissionsTable.taskId,
+      studentId: submissionsTable.studentId,
+      courseId: submissionsTable.courseId,
+      grade: submissionsTable.grade,
+      feedback: submissionsTable.feedback,
+      gradedAt: submissionsTable.gradedAt,
+      status: submissionsTable.status,
+      createdAt: submissionsTable.createdAt,
+      updatedAt: submissionsTable.updatedAt,
+      deletedAt: submissionsTable.deletedAt,
+      StudentName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      StudentEmail: usersTable.email,
+      StudentImage: usersTable.image,
+      TaskTitle: tasksTable.title,
+    })
+    .from(submissionsTable)
+    .leftJoin(usersTable, eq(submissionsTable.studentId, usersTable.id))
+    .leftJoin(tasksTable, eq(submissionsTable.taskId, tasksTable.id))
+    .where(eq(submissionsTable.id, submissionId))
+    .get();
+
+  if (!result) {
+    return {
+      submission: null,
+      attachments: { attachmentId: 0, attachmentPath: '', attachmentType: undefined },
+    };
+  }
+
+  const submission: SubmissionView = {
+    ...result,
+    createdAt: new Date(result.createdAt),
+    updatedAt: new Date(result.updatedAt),
+    deletedAt: result.deletedAt ? new Date(result.deletedAt) : null,
+    gradedAt: result.gradedAt ? new Date(result.gradedAt) : null,
+  };
+
+  const attachmentsResult = await db
+    .select({
+      attachmentId: attachmentsTable.id,
+      attachmentPath: attachmentsTable.path,
+      attachmentType: attachmentsTable.type,
+    })
+    .from(attachmentsTable)
+    .innerJoin(submissionsTable, eq(attachmentsTable.id, submissionsTable.attachmentId))
+    .where(eq(submissionsTable.id, submissionId))
+    .all();
+
+  return {
+    submission,
+    attachments: attachmentsResult[0] || { attachmentId: 0, attachmentPath: '', attachmentType: undefined },
+  };
+}
+export async function getPrivateCommentsBySubmission(
+  submissionId: number
+): Promise<PrivateComment[]> {
+  const submission = await db
+    .select({
+      studentId: submissionsTable.studentId,
+    })
+    .from(submissionsTable)
+    .where(eq(submissionsTable.id, submissionId))
+    .get();
+
+  if (!submission) {
+    throw new Error("Submission not found.");
+  }
+
+  const comments = await db
+    .select({
+      commentId: commentsTable.id,
+      commentText: commentsTable.content,
+      createdAt: commentsTable.createdAt,
+      createdBy: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      image: usersTable.image,
+    })
+    .from(commentsTable)
+    .innerJoin(usersTable, eq(commentsTable.studentId, usersTable.id))
+    .where(
+      and(
+        eq(commentsTable.submissionId, submissionId),
+        eq(commentsTable.studentId, submission.studentId),
+        eq(commentsTable.isPublic, false)
+      )
+    )
+    .orderBy(commentsTable.createdAt);
+
+  console.log("Comments: ", comments);
+  return comments.map((comment) => ({
+    ...comment,
+    createdAt: new Date(comment.createdAt),
+  }));
+}
+export async function getPrivateCommentsReplyBySubmission(
+  submissionId: number,
+  ComentorId: number
+): Promise<PrivateComment[]> {
+ 
+  const comments = await db
+    .select({
+      commentId: commentsTable.id,
+      commentText: commentsTable.content,
+      createdAt: commentsTable.createdAt,
+      createdBy: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      image: usersTable.image,
+    })
+    .from(commentsTable)
+    .innerJoin(usersTable, eq(commentsTable.coMonitorId, usersTable.id))
+    .where(
+      and(
+        eq(commentsTable.submissionId, submissionId),
+        eq(commentsTable.coMonitorId,ComentorId),
+        eq(commentsTable.isPublic, false)
+      )
+    )
+    .orderBy(commentsTable.createdAt);
+
+  console.log("Comments: ", comments);
+  return comments.map((comment) => ({
+    ...comment,
+    createdAt: new Date(comment.createdAt),
+  }));
 }

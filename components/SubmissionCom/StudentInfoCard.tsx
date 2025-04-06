@@ -1,16 +1,23 @@
 import React from "react";
-
+import Image from "next/image";
 interface Props {
   name: string;
-  id: string;
+  id: number;
   status: string;
+  avatar: string;
 }
 
-const StudentInfoCard = ({ name, id, status }: Props) => {
+const StudentInfoCard = ({ name, id, status, avatar }: Props) => {
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm mb-6 flex justify-between items-center">
       <div className="flex items-center gap-3">
-        {/* <Image src={} />  */}
+        <Image
+          src={avatar || "/profile (1).png"}
+          alt={name}
+          width={44}
+          height={44}
+          className=" rounded-full"
+        />
         <div>
           <h1 className="text-xl font-bold">{name}</h1>
           <p className="text-sm text-gray-500">Student ID: {id}</p>
