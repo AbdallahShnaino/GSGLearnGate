@@ -30,6 +30,7 @@ import {
   joiningRequestsTable,
   courseSchedulesTable,
   attendanceRecordsTable,
+  coMonitorAvailabilityTable,
 } from "./../schema";
 import {
   Admin,
@@ -71,6 +72,7 @@ import {
   CourseScheduleList,
   CourseStudentsList,
 } from "@/types/attendanceOperations";
+import { CoMonitorAppointment } from "@/types/appointments";
 
 export async function getAllUsers(): Promise<User[]> {
   return await db.select().from(usersTable).all();
@@ -1309,4 +1311,42 @@ export async function insertAttendanceRecord({
     })
     .returning()
     .get();
+}
+
+export async function getAllCoMonitorAppointments(
+  coMonitorId: number
+): Promise<CoMonitorAppointment[]> {
+  return await db
+    .select({
+      id: coMonitorAvailabilityTable.id,
+      date: coMonitorAvailabilityTable.date,
+      startTime: coMonitorAvailabilityTable.startTime,
+      endTime: coMonitorAvailabilityTable.endTime,
+      isBooked: coMonitorAvailabilityTable.isBooked,
+      course: {
+        id: coursesTable.id,
+        title: coursesTable.title,
+      },
+      student: {
+        id: studentsTable.id,
+        userId: studentsTable.userId,
+        firstName: usersTable.firstName,
+        lastName: usersTable.lastName,
+      },
+    })
+    .from(coMonitorAvailabilityTable)
+    .leftJoin(
+      coursesTable,
+      eq(coMonitorAvailabilityTable.courseId, coursesTable.id)
+    )
+    .leftJoin(
+      studentsTable,
+      eq(coMonitorAvailabilityTable.bookedByStudentId, studentsTable.id)
+    )
+    .leftJoin(
+      usersTable,
+      eq(studentsTable.userId, usersTable.id) // Join users table
+    )
+    .where(eq(coMonitorAvailabilityTable.coMonitorId, coMonitorId))
+    .all();
 }
