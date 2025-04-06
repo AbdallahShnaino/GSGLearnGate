@@ -1049,7 +1049,7 @@ export async function getCoursesDataByStudent(
       id: coursesTable.id,
       title: coursesTable.title,
       monitorName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
-      attendance: attendanceRecordsTable.status,
+      // attendance: attendanceRecordsTable.status,
       startDate: coursesTable.courseStartDate,
       endDate: coursesTable.courseEndDate,
       status: sql<CourseStatus>`CASE 
@@ -1064,10 +1064,10 @@ export async function getCoursesDataByStudent(
     .innerJoin(coursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
     .innerJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
     .innerJoin(usersTable, eq(monitorsTable.userId, usersTable.id))
-    .innerJoin(
-      attendanceRecordsTable,
-      eq(coursesTable.id, attendanceRecordsTable.courseId)
-    )
+    // .innerJoin(
+    //   attendanceRecordsTable,
+    //   eq(coursesTable.id, attendanceRecordsTable.courseId)
+    // )
     .where(eq(studentsCoursesTable.studentId, studentId))
     .groupBy(
       coursesTable.id,

@@ -312,7 +312,6 @@ export const attendanceRecordsTable = sqliteTable("attendance_records", {
   monitorId: int("monitor_id").references(() => monitorsTable.id),
   coMonitorId: int("co_monitor_id").references(() => coMonitorsTable.id),
 
-
   status: text("status", {
     enum: ["PRESENT", "ABSENT", "LATE", "EXCUSED"],
   }).notNull(),
