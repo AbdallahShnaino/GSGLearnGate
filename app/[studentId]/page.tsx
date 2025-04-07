@@ -28,9 +28,11 @@ const Dashboard = async (props: IProps) => {
         </Link>
       </div>
       <hr className="border-t border-gray-300 my-4" />
-      <h1 className="text-4xl font-bold text-gray-800 my-4">Soon lessons</h1>
+      <h1 className="text-4xl font-bold text-gray-800 my-4">
+        Soon Lesson For Each Course
+      </h1>
       <div className="flex flex-col lg:flex-row gap-10 items-center">
-        <SoonLessonsTable />
+        <SoonLessonsTable studentId={studentId} />
         <div className="w-full max-w-sm min-w-[250px] px-4 py-20 bg-white shadow-lg rounded-2xl border border-gray-200 flex flex-col justify-center items-center gap-5">
           <h3 className="text-lg font-semibold">
             You are registered for {totalCourses?.length} courses
