@@ -12,6 +12,7 @@ import {
   gte,
   lt,
   inArray,
+  asc,
 } from "drizzle-orm";
 
 import {
@@ -77,7 +78,12 @@ import {
   Comments,
   SubmissionId,
   newAnnouncements,
+
+  PublicComment,
+
+
   Attachments,
+
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorTasksResponse } from "@/types/tasks";
@@ -1681,6 +1687,51 @@ export async function getStudentAnnouncementsById(
     .where(eq(studentsCoursesTable.studentId, studentId));
 
   return results.length > 0 ? results : null;
+}
+
+
+export async function getPublicCommentsByTaskId(
+  taskId: number
+): Promise<PublicComment[]> {
+  const publicComments = await db
+    .select({
+      commentId: commentsTable.id,
+      commentText: commentsTable.content,
+      createdAt: commentsTable.createdAt,
+      isPublic: commentsTable.isPublic,
+      userName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      userEmail: usersTable.email,
+      userImage: usersTable.image,
+      userType: sql<string>`CASE
+        WHEN ${commentsTable.studentId} IS NOT NULL THEN 'Student'
+        WHEN ${commentsTable.coMonitorId} IS NOT NULL THEN 'Co-Mentor'
+        WHEN ${commentsTable.monitorId} IS NOT NULL THEN 'Mentor'
+        ELSE 'Unknown'
+      END`,
+      userId: sql<number>`CASE
+        WHEN ${commentsTable.studentId} IS NOT NULL THEN ${studentsTable.userId}
+        WHEN ${commentsTable.coMonitorId} IS NOT NULL THEN ${coMonitorsTable.userId}
+        WHEN ${commentsTable.monitorId} IS NOT NULL THEN ${monitorsTable.userId}
+        ELSE NULL
+      END`,
+    })
+    .from(commentsTable)
+    .leftJoin(studentsTable, eq(commentsTable.studentId, studentsTable.id))
+    .leftJoin(coMonitorsTable, eq(commentsTable.coMonitorId, coMonitorsTable.id))
+    .leftJoin(monitorsTable, eq(commentsTable.monitorId, monitorsTable.id))
+    .innerJoin(usersTable, sql`
+      ${usersTable.id} = COALESCE(
+        ${studentsTable.userId},
+        ${coMonitorsTable.userId},
+        ${monitorsTable.userId}
+      )
+    `)
+    .where(
+      and(eq(commentsTable.taskId, taskId) , eq(commentsTable.isPublic, true))
+    )
+    .orderBy(asc(commentsTable.createdAt));
+
+  return publicComments;
 }
 
 export async function getAttachmentPathsByTaskId(

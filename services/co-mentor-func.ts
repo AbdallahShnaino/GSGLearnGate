@@ -1,6 +1,6 @@
 "use server";
 
-import { getPrivateCommentsBySubmission, getPrivateCommentsReplyBySubmission, getSubmissionById, getSubmissionsAndNonSubmissionsForTask } from "@/src/db/queries/select";
+import { getPrivateCommentsBySubmission, getPrivateCommentsReplyBySubmission, getPublicCommentsByTaskId, getSubmissionById, getSubmissionsAndNonSubmissionsForTask } from "@/src/db/queries/select";
 import { updateMeetingRequest } from "@/src/db/queries/update";
 import { Status } from "@/types";
 import { db } from "@/src/db";
@@ -123,5 +123,20 @@ export async function saveSubmissionData({
   } catch (error) {
     console.error("Error saving submission data:", error);
     return { success: false, message: "Failed to save submission data.", error: error.message };
+  }
+}
+export async function fetchPublicCommentsByTaskId(taskId: number) {
+  try {
+    
+    const publicComments = await getPublicCommentsByTaskId(taskId);
+
+    if (!publicComments || publicComments.length === 0) {
+      throw new Error("No public comments found for the given task.");
+    }
+
+    return publicComments;
+  } catch (error) {
+    console.error("Error fetching public comments:", error);
+    throw new Error("Failed to fetch public comments.");
   }
 }
