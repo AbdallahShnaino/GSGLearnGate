@@ -18,7 +18,7 @@ const page = () => {
         <h1 className="text-2xl font-bold text-[#FFA41F]">
           Tasks & Assignments
         </h1>
-        <CreateTaskB uttom />
+        <CreateTaskButtom />
       </div>
       <StatusTaskCard />
       <div className="bg-white border border-[#FFA41F]/30 rounded-lg p-3  mb-6 shadow-sm">

@@ -474,3 +474,13 @@ export type newAnnouncements = {
 } & Announcement;
 
 
+export interface PublicComment {
+   commentId: number;
+    commentText: string;
+    createdAt: string;
+    isPublic: boolean;
+    userName: string;
+    userEmail: string | null;
+    userImage: string | null;
+    userType: string;
+}
