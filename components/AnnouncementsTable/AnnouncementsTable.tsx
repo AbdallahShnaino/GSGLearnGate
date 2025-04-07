@@ -4,7 +4,6 @@ import AnnouncementCard from "../AnnouncementCard/AnnouncementCard";
 import Loader from "../Shared/Loader";
 import SelectCourse from "../Dropdowns/SelectCourse";
 import TempPagination from "../Pagination/TempPagination";
-import { useState } from "react";
 
 interface IProps {
   monitorCoursesList: { courseId: number; courseName: string }[] | null;

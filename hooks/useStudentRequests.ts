@@ -6,6 +6,7 @@ import {
   updateJoiningRequestStatus,
 } from "@/services/joiningRequest";
 import { addStudentToCourse, getMonitorCoursesNames } from "@/services/courses";
+import { STATIC_MONITOR_ID } from "@/context/keys";
 
 export default function useStudentRequests() {
   const searchParams = useSearchParams();
@@ -20,8 +21,6 @@ export default function useStudentRequests() {
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<JoiningOrder | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  const STATIC_MONITOR_ID = 13;
 
   const fetchRequests = async () => {
     const requests = await getJoiningRequests(
@@ -80,7 +79,6 @@ export default function useStudentRequests() {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
   };
 
-
   const handleNextPage = () => {
     setCurrentPage((prev) => prev + 1);
   };
@@ -102,6 +100,5 @@ export default function useStudentRequests() {
     handleReject,
     handlePreviousPage,
     handleNextPage,
-
   };
 }

@@ -1,8 +1,9 @@
+import { STATIC_MONITOR_ID } from "@/context/keys";
 import { getLateSubmissionsCount } from "@/services/submission";
 import { Warning } from "@phosphor-icons/react/dist/ssr";
 
 export default async function LateSubmissionsCard() {
-  const count = await getLateSubmissionsCount(13);
+  const count = await getLateSubmissionsCount(STATIC_MONITOR_ID);
   return (
     <div className="bg-white border border-[#FFA41F]/30 rounded-lg p-4 shadow-sm">
       <div className="flex items-center justify-between">
