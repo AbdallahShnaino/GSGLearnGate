@@ -1,8 +1,10 @@
 import { StudentCourseSmallCard } from "@/types";
+import Link from "next/link";
 import React from "react";
 
 interface IProps {
   course: StudentCourseSmallCard;
+  studentId: string;
 }
 
 // const oneWeekInSeconds = 7 * 24 * 60 * 60;
@@ -12,7 +14,7 @@ interface IProps {
 // const differenceInWeeks = Math.floor(differenceInSeconds / oneWeekInSeconds);
 // const hoursNumber = differenceInWeeks * 6;
 
-const CourseCard = (props: IProps) => {
+const CourseCard = async (props: IProps) => {
   const progressPercentage = (4 / (props.course.duration * 6)) * 100;
   return (
     <div className="w-full min-w-0 sm:max-w-md p-4 bg-white shadow-lg rounded-2xl border border-gray-200 flex-grow">
@@ -39,9 +41,12 @@ const CourseCard = (props: IProps) => {
           Monitor:{" "}
           <span className="font-medium">{props.course.monitorName}</span>
         </p>
-        <button className="mt-3 px-4 py-2 bg-[#FFA41F] text-white rounded-lg hover:bg-[#FF8C00] transition cursor-pointer">
+        <Link
+          href={`/${props.studentId}/my-courses/${props.course.id}`}
+          className="mt-3 px-4 py-2 bg-[#FFA41F] text-white rounded-lg hover:bg-[#FF8C00] transition cursor-pointer"
+        >
           More Details
-        </button>
+        </Link>
       </div>
     </div>
   );

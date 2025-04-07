@@ -1052,12 +1052,12 @@ export async function getCoursesDataByStudent(
       id: coursesTable.id,
       title: coursesTable.title,
       monitorName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
-      // attendance: attendanceRecordsTable.status,
       startDate: coursesTable.courseStartDate,
       endDate: coursesTable.courseEndDate,
-      status: sql<CourseStatus>`CASE 
-      WHEN ${coursesTable.courseStartDate} > CURRENT_DATE THEN 'Not Started'
-      WHEN ${coursesTable.courseEndDate} < CURRENT_DATE THEN 'Finished'
+      duration: coursesTable.duration,
+      status: sql<CourseStatus>`CASE
+      WHEN ${coursesTable.courseStartDate} > CAST(strftime('%s','now') AS INTEGER) THEN 'Not Started'
+      WHEN ${coursesTable.courseEndDate} < CAST(strftime('%s','now') AS INTEGER) THEN 'Finished'
       ELSE 'In Progress'
       END`,
       totalTasks: sql<number>`(SELECT COUNT(*) FROM ${tasksTable} WHERE course_id = ${coursesTable.id})`,
@@ -1067,10 +1067,6 @@ export async function getCoursesDataByStudent(
     .innerJoin(coursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
     .innerJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
     .innerJoin(usersTable, eq(monitorsTable.userId, usersTable.id))
-    // .innerJoin(
-    //   attendanceRecordsTable,
-    //   eq(coursesTable.id, attendanceRecordsTable.courseId)
-    // )
     .where(eq(studentsCoursesTable.studentId, studentId))
     .groupBy(
       coursesTable.id,
