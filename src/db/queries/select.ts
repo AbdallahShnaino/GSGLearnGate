@@ -67,23 +67,17 @@ import {
   UsersNames,
   CourseSchedule,
   AttendanceRecordStatus,
-
   PrivateComment,
   SubmissionView,
   SubmissionAttachment,
-
   CourseWithPresenter,
   SoonLectures,
   AttendanceRecordOne,
   Comments,
   SubmissionId,
   newAnnouncements,
-
   PublicComment,
-
-
   Attachments,
-
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorTasksResponse } from "@/types/tasks";
@@ -1136,20 +1130,26 @@ export async function getStudentAppointments(
 ): Promise<StudentAppointments[] | null> {
   const results = await db
     .selectDistinct({
-      id: appointmentsTable.id,
-      coMonitor: sql<string>`${coMonitorsUsers.firstName} || ' ' || ${coMonitorsUsers.lastName}`,
-      date: appointmentsTable.dateTime,
-      status: appointmentsTable.status,
+      id: coMonitorAvailabilityTable.id,
+      coMonitor: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      date: coMonitorAvailabilityTable.date,
+      startTime: coMonitorAvailabilityTable.startTime,
       courseTitle: coursesTable.title,
     })
-    .from(appointmentsTable)
-    .innerJoin(studentsTable, eq(studentsTable.id, appointmentsTable.studentId))
+    .from(coMonitorAvailabilityTable)
+    .innerJoin(
+      studentsTable,
+      eq(studentsTable.id, coMonitorAvailabilityTable.bookedByStudentId)
+    )
     .innerJoin(
       coMonitorsTable,
-      eq(coMonitorsTable.id, appointmentsTable.coMonitorId)
+      eq(coMonitorsTable.id, coMonitorAvailabilityTable.coMonitorId)
     )
-    .innerJoin(coMonitorsUsers, eq(coMonitorsTable.userId, coMonitorsUsers.id))
-    .innerJoin(coursesTable, eq(coursesTable.id, appointmentsTable.courseId))
+    .innerJoin(usersTable, eq(coMonitorsTable.userId, usersTable.id))
+    .innerJoin(
+      coursesTable,
+      eq(coursesTable.id, coMonitorAvailabilityTable.courseId)
+    )
     .where(eq(studentsTable.id, studentId));
 
   return results.length > 0 ? results : null;
@@ -1382,10 +1382,7 @@ export async function getAllCoMonitorAppointments(
     .all();
 }
 
-
-export async function getSubmissionById(
-  submissionId: number
-): Promise<{
+export async function getSubmissionById(submissionId: number): Promise<{
   submission: SubmissionView | null;
   attachments: SubmissionAttachment;
 }> {
@@ -1416,7 +1413,11 @@ export async function getSubmissionById(
   if (!result) {
     return {
       submission: null,
-      attachments: { attachmentId: 0, attachmentPath: '', attachmentType: undefined },
+      attachments: {
+        attachmentId: 0,
+        attachmentPath: "",
+        attachmentType: undefined,
+      },
     };
   }
 
@@ -1435,13 +1436,20 @@ export async function getSubmissionById(
       attachmentType: attachmentsTable.type,
     })
     .from(attachmentsTable)
-    .innerJoin(submissionsTable, eq(attachmentsTable.id, submissionsTable.attachmentId))
+    .innerJoin(
+      submissionsTable,
+      eq(attachmentsTable.id, submissionsTable.attachmentId)
+    )
     .where(eq(submissionsTable.id, submissionId))
     .all();
 
   return {
     submission,
-    attachments: attachmentsResult[0] || { attachmentId: 0, attachmentPath: '', attachmentType: undefined },
+    attachments: attachmentsResult[0] || {
+      attachmentId: 0,
+      attachmentPath: "",
+      attachmentType: undefined,
+    },
   };
 }
 export async function getPrivateCommentsBySubmission(
@@ -1488,7 +1496,6 @@ export async function getPrivateCommentsReplyBySubmission(
   submissionId: number,
   ComentorId: number
 ): Promise<PrivateComment[]> {
- 
   const comments = await db
     .select({
       commentId: commentsTable.id,
@@ -1502,7 +1509,7 @@ export async function getPrivateCommentsReplyBySubmission(
     .where(
       and(
         eq(commentsTable.submissionId, submissionId),
-        eq(commentsTable.coMonitorId,ComentorId),
+        eq(commentsTable.coMonitorId, ComentorId),
         eq(commentsTable.isPublic, false)
       )
     )
@@ -1554,7 +1561,9 @@ export async function getAllCoursesWithMonitors(): Promise<Course[]> {
   }));
 }
 
-export async function getCourseWithMonitor(id:number): Promise<CourseWithPresenter> {
+export async function getCourseWithMonitor(
+  id: number
+): Promise<CourseWithPresenter> {
   const results = await db
     .select({
       id: coursesTable.id,
@@ -1583,15 +1592,17 @@ export async function getCourseWithMonitor(id:number): Promise<CourseWithPresent
     })
     .from(coursesTable)
     .leftJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
-    .leftJoin(usersTable, eq(monitorsTable.userId, usersTable.id)).where(eq(coursesTable.id, id)).get();
+    .leftJoin(usersTable, eq(monitorsTable.userId, usersTable.id))
+    .where(eq(coursesTable.id, id))
+    .get();
 
-    return {
-      ...results,
-      presenterName: results.monitorFirstName 
-        ? `${results.monitorFirstName} ${results.monitorLastName}`
-        : 'Unknown',
-      presenterImage: results.monitorImage || null
-    };
+  return {
+    ...results,
+    presenterName: results.monitorFirstName
+      ? `${results.monitorFirstName} ${results.monitorLastName}`
+      : "Unknown",
+    presenterImage: results.monitorImage || null,
+  };
 }
 
 export async function getStudentAttendanceById(
@@ -1689,7 +1700,6 @@ export async function getStudentAnnouncementsById(
   return results.length > 0 ? results : null;
 }
 
-
 export async function getPublicCommentsByTaskId(
   taskId: number
 ): Promise<PublicComment[]> {
@@ -1717,17 +1727,23 @@ export async function getPublicCommentsByTaskId(
     })
     .from(commentsTable)
     .leftJoin(studentsTable, eq(commentsTable.studentId, studentsTable.id))
-    .leftJoin(coMonitorsTable, eq(commentsTable.coMonitorId, coMonitorsTable.id))
+    .leftJoin(
+      coMonitorsTable,
+      eq(commentsTable.coMonitorId, coMonitorsTable.id)
+    )
     .leftJoin(monitorsTable, eq(commentsTable.monitorId, monitorsTable.id))
-    .innerJoin(usersTable, sql`
+    .innerJoin(
+      usersTable,
+      sql`
       ${usersTable.id} = COALESCE(
         ${studentsTable.userId},
         ${coMonitorsTable.userId},
         ${monitorsTable.userId}
       )
-    `)
+    `
+    )
     .where(
-      and(eq(commentsTable.taskId, taskId) , eq(commentsTable.isPublic, true))
+      and(eq(commentsTable.taskId, taskId), eq(commentsTable.isPublic, true))
     )
     .orderBy(asc(commentsTable.createdAt));
 
@@ -1745,4 +1761,3 @@ export async function getAttachmentPathsByTaskId(
 
   return attachments.map((attachment: Attachment) => attachment.path);
 }
-
