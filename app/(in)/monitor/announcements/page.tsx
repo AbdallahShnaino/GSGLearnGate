@@ -1,9 +1,9 @@
 import AnnouncementsTable from "@/components/AnnouncementsTable/AnnouncementsTable";
 import { getMonitorCoursesNames } from "@/services/courses";
 import CreateTaskButton from "@/components/CreateTaskButtom/CreateTaskButtom";
+import { STATIC_MONITOR_ID } from "@/context/keys";
 
 export default async function Page() {
-  const STATIC_MONITOR_ID = 13;
   const coursesList = await getMonitorCoursesNames(STATIC_MONITOR_ID);
 
   return (

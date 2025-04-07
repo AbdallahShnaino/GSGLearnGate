@@ -4,6 +4,7 @@ import { getMonitorTasks } from "@/services/task";
 import { TaskStatus } from "@/types";
 import { MonitorsTasks } from "@/types/tasksOperations";
 import { getStudentsCountPerCourse } from "@/services/courses";
+import { STATIC_MONITOR_ID } from "@/context/keys";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -28,7 +29,7 @@ export function useMonitorTasks() {
       setLoading(true);
       try {
         const { tasks, total } = await getMonitorTasks(
-          13,
+          STATIC_MONITOR_ID,
           taskStatus,
           page,
           ITEMS_PER_PAGE

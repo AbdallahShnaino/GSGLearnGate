@@ -1,86 +1,83 @@
-import { Announcement } from "@/types";
-import { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { getMonitorCoursesNames } from "@/services/courses";
+import { STATIC_MONITOR_ID } from "@/context/keys";
 import { getAnnouncements } from "@/services/announcement";
+import { getMonitorCoursesNames } from "@/services/courses";
+import { Announcement } from "@/types";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 
 export default function useMonitorAnnouncements() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const initialCourseId = Number(searchParams.get("courseId")) || undefined;
-  const initialPage = Number(searchParams.get("page")) || 1;
+  const courseId = Number(searchParams.get("courseId")) || undefined;
+  const currentPage = Number(searchParams.get("page")) || 1;
 
-  const [courseId, setCourseId] = useState<number | undefined>(initialCourseId);
   const [announcements, setAnnouncements] = useState<Announcement[] | null>(
     null
   );
   const pageSize = 10;
   const [isLoading, setIsLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalPages, setTotalPages] = useState(1);
 
-  const MONITOR_ID: number = 13;
+  const fetchRequests = useCallback(
+    async (courseId?: number, page: number = 1) => {
+      setIsLoading(true);
+      try {
+        const courseData = await getMonitorCoursesNames(STATIC_MONITOR_ID);
+        const courseIds = courseData
+          ? courseData.map((course) => course.courseId)
+          : undefined;
+        const requests = await getAnnouncements(
+          courseId,
+          courseIds,
+          page,
+          pageSize
+        );
 
-  const fetchRequests = async (newCourseId?: number) => {
-    setIsLoading(true);
-    try {
-      const courseData = await getMonitorCoursesNames(MONITOR_ID);
-      const courseIds = courseData
-        ? courseData.map((course) => course.courseId)
-        : undefined;
-      const requests = await getAnnouncements(
-        newCourseId ?? courseId,
-        courseIds,
-        currentPage,
-        pageSize
-      );
-
-      requests && setTotalPages(Math.ceil(requests.total / pageSize));
-      setAnnouncements(requests.announcements);
-    } catch (error) {
-      console.error("Failed to fetch announcements:", error);
-      setAnnouncements(null);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("page", currentPage.toString());
-    if (courseId !== undefined) {
-      params.set("courseId", courseId.toString());
-    } else {
-      params.delete("courseId");
-    }
-    router.push(`?${params.toString()}`, { scroll: false }); // Update URL without scrolling
-  }, [currentPage, courseId, router, searchParams]);
+        requests && setTotalPages(Math.ceil(requests.total / pageSize));
+        setAnnouncements(requests.announcements);
+      } catch (error) {
+        console.error("Failed to fetch announcements:", error);
+        setAnnouncements(null);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
 
   useEffect(() => {
-    const newCourseId = Number(searchParams.get("courseId")) || undefined;
-    const newPage = Number(searchParams.get("page")) || 1;
+    fetchRequests(courseId, currentPage);
+  }, [courseId, currentPage, fetchRequests]);
 
-    if (newCourseId !== courseId) {
-      setCourseId(newCourseId);
-    }
-    if (newPage !== currentPage) {
-      setCurrentPage(newPage);
-    }
+  const updateUrl = useCallback(
+    (newPage: number, newCourseId?: number) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("page", newPage.toString());
 
-    fetchRequests(newCourseId);
-  }, [searchParams]);
+      if (newCourseId !== undefined) {
+        params.set("courseId", newCourseId.toString());
+      } else {
+        params.delete("courseId");
+      }
+
+      router.push(`?${params.toString()}`, { scroll: false });
+    },
+    [router, searchParams]
+  );
 
   const handlePreviousPage = () => {
-    setCurrentPage((prev) => Math.max(prev - 1, 1));
+    const newPage = Math.max(currentPage - 1, 1);
+    updateUrl(newPage, courseId);
   };
 
   const handleNextPage = () => {
-    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+    const newPage = Math.min(currentPage + 1, totalPages);
+    updateUrl(newPage, courseId);
   };
 
   const onPageChange = (page: number) => {
-    setCurrentPage(page);
+    updateUrl(page, courseId);
   };
 
   return {

@@ -35,3 +35,97 @@ async function main() {
 }
 
 main().catch(console.error);
+
+/*
+
+
+src/
+├── components/
+│   ├── common/               # Reusable UI components
+│   │   ├── buttons/
+│   │   │   ├── CreateTaskButton.tsx
+│   │   │   ├── DayButton.tsx
+│   │   ├── cards/
+│   │   │   ├── AnnouncementCard.tsx
+│   │   │   ├── CourseCard.tsx
+│   │   │   ├── PersonCard.tsx
+│   │   │   ├── StatisticCard.tsx
+│   │   │   ├── TaskCard.tsx
+│   │   │   ├── TaskCardCo.tsx
+│   │   │   └── TaskCardDetails.tsx
+│   │   ├── charts/
+│   │   │   └── BarChart.tsx
+│   │   ├── forms/
+│   │   │   ├── Filter.tsx
+│   │   │   ├── Forms.tsx
+│   │   │   ├── Pagination.tsx
+│   │   │   ├── SearchBar.tsx
+│   │   │   ├── SelectOption.tsx
+│   │   │   ├── TimePicker.tsx
+│   │   │   └── Dropdowns/
+│   │   ├── modals/
+│   │   │   ├── ApproveModal.tsx
+│   │   │   ├── DeleteUserModal.tsx
+│   │   │   └── RejectModal.tsx
+│   │   ├── tables/
+│   │   │   ├── AttendenTabel.tsx
+│   │   │   ├── CoursesTable.tsx
+│   │   │   └── UsersTables.tsx
+│   │   ├── Footer.tsx
+│   │   ├── Header.tsx
+│   │   ├── HeroSection.tsx
+│   │   ├── NavLinks.tsx
+│   │   ├── SideBar.tsx
+│   │   └── Shared.tsx
+│   │
+│   ├── course/               # Course-related components
+│   │   ├── AddCourseForm.tsx
+│   │   ├── AddCourseScheduleForm.tsx
+│   │   ├── CollectionCourses.tsx
+│   │   ├── Course.tsx
+│   │   ├── FullCourseCard.tsx
+│   │   ├── UpdateCourseForm.tsx
+│   │   └── CourseTask/
+│   │
+│   ├── tasks/                # Task-related components
+│   │   ├── Task.tsx
+│   │   ├── TaskForm.tsx
+│   │   ├── TasksList.tsx
+│   │   ├── TaskSubmit.tsx
+│   │   └── StatusTaskCards.tsx
+│   │
+│   ├── announcements/        # Announcement components
+│   │   ├── AnnouncementsTable.tsx
+│   │   ├── SendAnnouncementForm.tsx
+│   │   └── Attachments/
+│   │
+│   ├── profile/              # User profile components
+│   │   ├── EditEmailAddress.tsx
+│   │   ├── EditPassword.tsx
+│   │   ├── EditPersonalInformation.tsx
+│   │   ├── EditProfileImage.tsx
+│   │   └── ResetPassword.tsx
+│   │
+│   ├── auth/                 # Authentication components
+│   │   ├── ForgetPassword.tsx
+│   │   └── ResetPassword.tsx
+│   │
+│   ├── calendar/             # Scheduling components
+│   │   ├── Calendar.tsx
+│   │   ├── SoonLessonsTable.tsx
+│   │   ├── SelectStudentAppointmentTime.tsx
+│   │   └── StudentAppointmentsTable.tsx
+│   │
+│   ├── students/             # Student-related components
+│   │   ├── StudentRequestsTable.tsx
+│   │   ├── StudentSubmissionsTable.tsx
+│   │   └── MeetingRequestsTable.tsx
+│   │
+│   └── monitoring/           # Monitoring components
+│       ├── AddMonitorForm.tsx
+│       └── TotalCom.tsx
+│
+├── ...
+
+
+*/
