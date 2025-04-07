@@ -5,6 +5,7 @@ import {
   getMonitorTasksDeadlines,
   getMonitorSubmissionsNotGradedCount,
   getTasksByMonitor,
+  getTaskById,
 } from "@/src/db/queries/select";
 import { TaskStatus } from "@/types";
 
@@ -49,4 +50,7 @@ export async function getActiveTasksCount(monitorId: number) {
 
 export async function getNotGradedSubmissionsCount(monitorId: number) {
   return await getMonitorSubmissionsNotGradedCount(monitorId);
+}
+export async function getTask(taskId: number) {
+  return await getTaskById(taskId);
 }

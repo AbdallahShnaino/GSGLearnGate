@@ -71,6 +71,7 @@ import {
   Comments,
   SubmissionId,
   newAnnouncements,
+  Attachments,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorTasksResponse } from "@/types/tasks";
@@ -1010,7 +1011,7 @@ export async function getLateSubmissionsCountByMonitor(monitorId: number) {
   return result[0]?.count ?? 0;
 }
 
-export async function getTaskById(taskId: number) {
+export async function getTaskById(taskId: number): Promise<Task> {
   const task = await db
     .select()
     .from(tasksTable)
@@ -1462,4 +1463,16 @@ export async function getStudentAnnouncementsById(
     .where(eq(studentsCoursesTable.studentId, studentId));
 
   return results.length > 0 ? results : null;
+}
+
+export async function getAttachmentPathsByTaskId(
+  taskId: number
+): Promise<string[]> {
+  const attachments = await db
+    .select({ path: attachmentsTable.path })
+    .from(attachmentsTable)
+    .where(eq(attachmentsTable.taskId, taskId))
+    .execute();
+
+  return attachments.map((attachment: Attachment) => attachment.path);
 }
