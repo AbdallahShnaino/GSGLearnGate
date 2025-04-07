@@ -1233,13 +1233,13 @@ export async function getCoMonitorByCourseId(
       coMonitorId: coMonitorsTable.id,
       coMonitorName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
     })
-    .from(appointmentsTable)
+    .from(coursesTable)
     .innerJoin(
       coMonitorsTable,
-      eq(coMonitorsTable.id, appointmentsTable.coMonitorId)
+      eq(coMonitorsTable.id, coursesTable.coMonitorId)
     )
     .innerJoin(usersTable, eq(usersTable.id, coMonitorsTable.userId))
-    .where(eq(appointmentsTable.id, courseId));
+    .where(eq(coursesTable.id, courseId));
 
   return results.length > 0 ? results : null;
 }
