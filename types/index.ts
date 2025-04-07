@@ -410,3 +410,18 @@ export type SoonLectures = {
 export type AttendanceRecordOne = {
   attendanceStatus: AttendanceRecordStatus;
 };
+
+export type Comments = {
+  id: number;
+  content: string;
+  userName: string;
+  isPublic: boolean;
+};
+
+export type SubmissionId = {
+  SubmissionId: number;
+};
+
+export type newComment = {
+  taskId: number;
+} & Comment;

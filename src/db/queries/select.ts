@@ -31,6 +31,7 @@ import {
   courseSchedulesTable,
   attendanceRecordsTable,
   coMonitorAvailabilityTable,
+  commentsTable,
 } from "./../schema";
 import {
   Admin,
@@ -67,6 +68,8 @@ import {
   AttendanceRecordStatus,
   SoonLectures,
   AttendanceRecordOne,
+  Comments,
+  SubmissionId,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorTasksResponse } from "@/types/tasks";
@@ -77,6 +80,7 @@ import {
 } from "@/types/attendanceOperations";
 import { CoMonitorAppointment } from "@/types/appointments";
 import { addDays, getDay, isAfter, setHours, setMinutes } from "date-fns";
+import { boolean } from "drizzle-orm/gel-core";
 
 export async function getAllUsers(): Promise<User[]> {
   return await db.select().from(usersTable).all();
@@ -1394,4 +1398,41 @@ export async function getStudentAttendanceById(
   ).length;
 
   return presentCount;
+}
+
+export async function getPublicCommentsByTaskId(
+  courseId: number,
+  TaskId: number
+): Promise<Comments[]> {
+  const students = await db
+    .select({
+      id: commentsTable.id,
+      content: commentsTable.content,
+      userName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      isPublic: commentsTable.isPublic,
+    })
+    .from(commentsTable)
+    .innerJoin(usersTable, eq(usersTable.id, commentsTable.privateRecipientId))
+    .innerJoin(coursesTable, eq(coursesTable.id, commentsTable.courseId))
+    .innerJoin(tasksTable, eq(tasksTable.id, commentsTable.taskId))
+    .where(and(eq(coursesTable.id, courseId), eq(tasksTable.id, TaskId)))
+    .all();
+
+  return students;
+}
+
+export async function getSubmissionIdByTaskId(
+  courseId: number,
+  TaskId: number
+): Promise<{ submissionId: number }[]> {
+  const SubmissionId = await db
+    .select({
+      submissionId: submissionsTable.id,
+    })
+    .from(submissionsTable)
+    .innerJoin(tasksTable, eq(tasksTable.id, submissionsTable.taskId))
+    .innerJoin(coursesTable, eq(coursesTable.id, tasksTable.courseId))
+    .where(and(eq(coursesTable.id, courseId), eq(tasksTable.id, TaskId)));
+
+  return SubmissionId;
 }
