@@ -393,3 +393,8 @@ export type AttendanceRecord = {
   recordedById: number;
   studentId: number;
 };
+
+export type CourseWithPresenter = Course & {
+  presenterName?: string;
+  presenterImage?: string;
+};
