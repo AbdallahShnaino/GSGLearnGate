@@ -4,8 +4,9 @@ import {
   LoginUserStatus,
 } from "@/controllers/actions/createUserAction";
 import Link from "next/link";
-import React, { useActionState, useEffect } from "react";
+import React, { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Role } from "@/types";
 
 const initialState: LoginUserStatus = {
   success: false,
@@ -17,37 +18,31 @@ const initialState: LoginUserStatus = {
 
 const LoginForm = () => {
   const [formState, action] = useActionState(loginUser, initialState);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     if (formState.success) {
-      const getRoleFromCookie = () => {
-        const roleCookie = document.cookie
-          .split("; ")
-          .find((cookie) => cookie.startsWith("role="));
-        return roleCookie?.split("=")[1];
-      };
-
-      const role = getRoleFromCookie();
-
-      switch (role) {
-        case "ADMIN":
+      setLoading(true)
+      switch (formState.role) {
+        case Role.ADMIN:
           router.push("/admin");
           break;
-        case "MONITOR":
+        case Role.MONITOR:
           router.push("/monitor");
           break;
-        case "CO-MONITOR":
+        case Role.CO_MONITOR:
           router.push("/co-mentor");
           break;
-        case "STUDENT":
+        case Role.STUDENT:
           router.push("/student");
           break;
         default:
-          router.push("/");
+          router.push("");
       }
     }
-  }, [formState.success, router]);
+  }, [formState.success, formState.role, router]);
+
   return (
     <form
       action={action}
@@ -59,7 +54,8 @@ const LoginForm = () => {
           type="email"
           name="email"
           id="email"
-          className="border-1 border-gray-300 px-1.5 py-1 rounded focus:outline-blue-500 bg-white "
+          className="border-1 border-gray-300 px-1.5 py-1 rounded focus:outline-blue-500 bg-white"
+          required
         />
       </div>
 
@@ -78,11 +74,17 @@ const LoginForm = () => {
           name="password"
           id="password"
           className="border-1 border-gray-300 px-1.5 py-1 rounded focus:outline-blue-500 bg-white"
+          required
         />
       </div>
+      
+      {formState.error && (
+        <p className="text-red-500 text-sm">{formState.error}</p>
+      )}
       <input
+        disabled={loading}
         type="submit"
-        value="Sign in"
+        value={loading ? "Loading..." : "Sign in"}
         className="mt-1.5 bg-[#222831] hover:bg-[#393E46] rounded p-2 text-white cursor-pointer"
       />
     </form>

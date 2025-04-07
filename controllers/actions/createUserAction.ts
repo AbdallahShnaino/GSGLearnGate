@@ -65,6 +65,7 @@ export async function loginUser(
       maxAge: 7 * 24 * 60 * 60,
     });
     cookieStore.set("role", String(authenticatedUser.role));
+    cookieStore.set("userId", String(authenticatedUser.userId));
     return {
       success: true,
       message: "Login Successfully",
