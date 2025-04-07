@@ -4,6 +4,7 @@ import { AppointmentWithStudent, Status } from '@/types';
 import { updateMeetingRequestStatus } from "@/services/co-mentor-func";
 import { useSearchParams } from "next/navigation";
 import { getCoMonitorAppointments } from "@/src/db/queries/select";
+import { STATIC_COMONITOR_ID } from "@/context/keys";
 
 export const useMeetingRequests = () => {
     const searchParams = useSearchParams();
@@ -18,16 +19,17 @@ export const useMeetingRequests = () => {
     const [totalPages, setTotalPages] = useState(1);
     const [isLoading, setIsLoading] = useState(true);
     const pageSize = 10;
-    const CO_MONITOR_ID = 4;
+    const CO_MONITOR_ID = STATIC_COMONITOR_ID;
 
     const fetchRequestsMeeting = async () => {
         try {
             setIsLoading(true);
             const response = await getCoMonitorAppointments(CO_MONITOR_ID, courseId, currentPage, pageSize);
-            if (response && response.appointments) {
+            console.log("Meeting Requests:", response);
+           
                 setMeetingRequests(response.appointments);
                 setTotalPages(Math.ceil(response.totalCount / 10));
-            }
+           
         } catch (error) {
             console.error("Failed to fetch data:", error);
         } finally {
@@ -37,9 +39,10 @@ export const useMeetingRequests = () => {
 
 
     useEffect(() => {
-        setCourseId(Number(searchParams.get("courseId")) || undefined);
+        
         fetchRequestsMeeting();
-    }, [currentPage, courseId]);
+        setCourseId(Number(searchParams.get("courseId")) || undefined);
+    }, [currentPage, courseId,searchParams]);
 
     useEffect(() => {
         if (currentPage > totalPages) {
@@ -47,11 +50,7 @@ export const useMeetingRequests = () => {
         }
     }, [totalPages]);
 
-    const filterRequests = (query: string) => {
-        return meetingRequests.filter((appointment) =>
-            appointment.studentName.toLowerCase().includes(query.toLowerCase())
-        );
-    };
+
 
     const handleOpenRejectModal = (request: AppointmentWithStudent) => {
         setSelectedRequest(request);
@@ -109,7 +108,6 @@ export const useMeetingRequests = () => {
     return {
         courseId,
         meetingRequests,
-        filterRequests,
         selectedRequest,
         isApproveModalOpen,
         isRejectModalOpen,
