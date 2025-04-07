@@ -66,11 +66,13 @@ import {
   UsersNames,
   CourseSchedule,
   AttendanceRecordStatus,
+  CourseWithPresenter,
   SoonLectures,
   AttendanceRecordOne,
   Comments,
   SubmissionId,
   newAnnouncements,
+
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorTasksResponse } from "@/types/tasks";
@@ -1369,6 +1371,86 @@ export async function getAllCoMonitorAppointments(
     .all();
 }
 
+export async function getAllCoursesWithMonitors(): Promise<Course[]> {
+  const results = await db
+    .select({
+      id: coursesTable.id,
+      title: coursesTable.title,
+      description: coursesTable.description,
+      image: coursesTable.image,
+      difficulty: coursesTable.difficulty,
+      duration: coursesTable.duration,
+      applyStartDate: coursesTable.applyStartDate,
+      applyEndDate: coursesTable.applyEndDate,
+      courseStartDate: coursesTable.courseStartDate,
+      courseEndDate: coursesTable.courseEndDate,
+      monitorId: coursesTable.monitorId,
+      coMonitorId: coursesTable.coMonitorId,
+      adminId: coursesTable.adminId,
+      details: coursesTable.details,
+      entryRequirements: coursesTable.entryRequirements,
+      createdAt: coursesTable.createdAt,
+      updatedAt: coursesTable.updatedAt,
+      deletedAt: coursesTable.deletedAt,
+
+      monitorUserId: monitorsTable.userId,
+      monitorFirstName: usersTable.firstName,
+      monitorLastName: usersTable.lastName,
+      monitorImage: usersTable.image,
+    })
+    .from(coursesTable)
+    .leftJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
+    .leftJoin(usersTable, eq(monitorsTable.userId, usersTable.id));
+
+  return results.map((course) => ({
+    ...course,
+    presenterName: course.monitorFirstName
+      ? `${course.monitorFirstName} ${course.monitorLastName}`
+      : "Unknown",
+    presenterImage: course.monitorImage || null,
+  }));
+}
+
+export async function getCourseWithMonitor(id:number): Promise<CourseWithPresenter> {
+  const results = await db
+    .select({
+      id: coursesTable.id,
+      title: coursesTable.title,
+      description: coursesTable.description,
+      image: coursesTable.image,
+      difficulty: coursesTable.difficulty,
+      duration: coursesTable.duration,
+      applyStartDate: coursesTable.applyStartDate,
+      applyEndDate: coursesTable.applyEndDate,
+      courseStartDate: coursesTable.courseStartDate,
+      courseEndDate: coursesTable.courseEndDate,
+      monitorId: coursesTable.monitorId,
+      coMonitorId: coursesTable.coMonitorId,
+      adminId: coursesTable.adminId,
+      details: coursesTable.details,
+      entryRequirements: coursesTable.entryRequirements,
+      createdAt: coursesTable.createdAt,
+      updatedAt: coursesTable.updatedAt,
+      deletedAt: coursesTable.deletedAt,
+
+      monitorUserId: monitorsTable.userId,
+      monitorFirstName: usersTable.firstName,
+      monitorLastName: usersTable.lastName,
+      monitorImage: usersTable.image,
+    })
+    .from(coursesTable)
+    .leftJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
+    .leftJoin(usersTable, eq(monitorsTable.userId, usersTable.id)).where(eq(coursesTable.id, id)).get();
+
+    return {
+      ...results,
+      presenterName: results.monitorFirstName 
+        ? `${results.monitorFirstName} ${results.monitorLastName}`
+        : 'Unknown',
+      presenterImage: results.monitorImage || null
+    };
+}
+
 export async function getStudentAttendanceById(
   studentId: number,
   courseId: number
@@ -1463,3 +1545,4 @@ export async function getStudentAnnouncementsById(
 
   return results.length > 0 ? results : null;
 }
+

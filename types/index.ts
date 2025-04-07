@@ -398,6 +398,10 @@ export type AttendanceRecord = {
   studentId: number;
 };
 
+export type CourseWithPresenter = Course & {
+  presenterName?: string;
+  presenterImage?: string;
+};
 export type SoonLectures = {
   courseTitle: string;
   lectureDate: Date;
@@ -430,3 +434,4 @@ export type newComment = {
 export type newAnnouncements = {
   courseTitle: string;
 } & Announcement;
+
