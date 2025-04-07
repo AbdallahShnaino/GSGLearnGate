@@ -26,7 +26,6 @@ export enum TaskStatus {
 export enum AssignmentStatus {
   PENDING = "PENDING",
   GRADED = "GRADED",
-  SUBMITTED = "SUBMITTED",
   NOTSUBMITTED = "NOT SUBMITTED",
 }
 
@@ -105,9 +104,8 @@ export type Appointment = {
   id: number;
   coMonitorId: number;
   studentId: number;
-  courseId: number;
   caption: string;
-  dateTime: Date;
+  date: Date;
   status: Status;
 } & Timestamps;
 
@@ -261,6 +259,7 @@ export type CourseWithNames = {
   details: string;
   entryRequirements: string;
 } & Timestamps;
+
 enum AttendanceStatus {
   PRESENT = "PRESENT", // حاضر
   ABSENT = "ABSENT", // غائب
@@ -301,10 +300,11 @@ export type StudentCourseDetails = {
 };
 
 export enum StudentAppointmentStatus {
-  "PENDING" = "PENDING",
-  "ACCEPTED" = "ACCEPTED",
-  "REJECTED" = "REJECTED",
+  "PENDING" = "Pending",
+  "ACCEPTED" = "Accepted",
+  "REJECTED" = "Rejected",
 }
+
 export type StudentAppointments = {
   id: number | null;
   coMonitor: string | null;
@@ -317,13 +317,49 @@ export enum StudentTaskStatus {
   "PENDING" = "PENDING",
   "SUBMITTED" = "SUBMITTED",
   "GRADED" = "GRADED",
-  "LATE" = "LATE",
 }
 export type StudentCourseTasks = {
   taskId: number;
   taskTitle: string;
   deadline: Date;
   status: StudentTaskStatus;
+  grade: number;
+  gradedAt: Date;
+  maxGrade: number;
+
+};
+export interface SubmissionView {
+  id: number;
+  taskId: number;
+  studentId: number;
+  courseId: number;
+  grade: number | null;
+  feedback: string | null;
+  gradedAt: Date | null;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+  StudentName: string;
+  StudentEmail: string | null;
+  StudentImage: string | null;
+  TaskTitle: string | null;
+}
+
+export interface SubmissionAttachment {
+  attachmentId: number;
+  attachmentPath: string;
+  attachmentType?: Attachments;
+}
+
+export interface PrivateComment {
+  commentId: number;
+  commentText: string;
+  createdAt: Date;
+  createdBy: string;
+  image: string | null;
+}
+export type StudentCourseTaskDetails = {
   grade: number;
   gradedAt: Date;
   maxGrade: number;
@@ -398,6 +434,12 @@ export type AttendanceRecord = {
   studentId: number;
 };
 
+
+
+export type CourseWithPresenter = Course & {
+  presenterName?: string;
+  presenterImage?: string;
+};
 export type SoonLectures = {
   courseTitle: string;
   lectureDate: Date;
@@ -430,3 +472,5 @@ export type newComment = {
 export type newAnnouncements = {
   courseTitle: string;
 } & Announcement;
+
+
