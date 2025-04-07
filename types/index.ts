@@ -270,7 +270,9 @@ export type StudentCourseSmallCard = {
   id: number | null;
   title: string | null;
   monitorName: string | null;
-  // attendance: number;
+  duration: number;
+  startDate: number;
+  endDate: number;
 };
 
 export enum CourseStatus {
@@ -279,7 +281,7 @@ export enum CourseStatus {
   "FINISHED" = "Finished",
 }
 export type StudentCourseBigCard = {
-  // status: CourseStatus;
+  status: CourseStatus;
   startDate: Date;
   endDate: Date;
   totalTasks: number;
@@ -293,6 +295,8 @@ export type StudentCourseDetails = {
   // status: AttendanceStatus;
   description: string | null;
   coMonitors: string | null;
+  startDate: Date;
+  endDate: Date;
 };
 
 export enum StudentAppointmentStatus {
@@ -429,4 +433,44 @@ export type AttendanceRecord = {
   recordedById: number;
   studentId: number;
 };
+
+
+
+export type CourseWithPresenter = Course & {
+  presenterName?: string;
+  presenterImage?: string;
+};
+export type SoonLectures = {
+  courseTitle: string;
+  lectureDate: Date;
+  // courseStartTime: Date;
+  // weekDay: string;
+  // startTime: string;
+  // endTime: string;
+};
+
+export type AttendanceRecordOne = {
+  attendanceStatus: AttendanceRecordStatus;
+};
+
+export type Comments = {
+  id: number;
+  content: string;
+  userName: string;
+  isPublic: boolean;
+  createdAt: string;
+};
+
+export type SubmissionId = {
+  SubmissionId: number;
+};
+
+export type newComment = {
+  taskId: number;
+} & Comment;
+
+export type newAnnouncements = {
+  courseTitle: string;
+} & Announcement;
+
 

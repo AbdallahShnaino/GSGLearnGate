@@ -4,20 +4,24 @@ import SoonLessonsTable from "@/components/SoonLessonsTable/SoonLessonsTable";
 import Link from "next/link";
 import { getLimitCoursesByStudent } from "@/src/db/queries/select";
 
-const Dashboard = async () => {
-  const courses = await getLimitCoursesByStudent(1, 2);
-  console.log(courses);
+interface IProps {
+  params: Promise<{ studentId: string }>;
+}
 
-  const totalCourses = await getLimitCoursesByStudent(1);
+const Dashboard = async (props: IProps) => {
+  const { studentId } = await props.params;
+  const courses = await getLimitCoursesByStudent(Number(studentId), 2);
+
+  const totalCourses = await getLimitCoursesByStudent(Number(studentId));
 
   return (
     <div className="px-6 py-3 w-full min-h-screen">
       <h1 className="text-4xl font-bold text-gray-800 my-4">My Courses</h1>
       <div className="flex flex-wrap gap-4 justify-center sm:justify-between items-center w-full">
         {courses?.map((course) => (
-          <CourseCard key={course.id} course={course} />
+          <CourseCard key={course.id} course={course} studentId={studentId} />
         ))}
-        <Link href="/student/my-courses">
+        <Link href={`/${studentId}/my-courses`}>
           <button className="px-10 py-2 bg-[#FFA41F] text-white rounded-lg hover:bg-[#FF8C00] transition cursor-pointer">
             Show All
           </button>
@@ -31,7 +35,7 @@ const Dashboard = async () => {
           <h3 className="text-lg font-semibold">
             You are registered for {totalCourses?.length} courses
           </h3>
-          <Link href="/student/my-courses">
+          <Link href={`/${studentId}/my-courses`}>
             <button className="mt-3 px-4 py-2 bg-[#FFA41F] text-white rounded-lg hover:bg-[#FF8C00] transition cursor-pointer w-full sm:w-auto">
               Show All Courses
             </button>

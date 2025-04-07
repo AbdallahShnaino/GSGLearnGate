@@ -1,89 +1,93 @@
 "use client";
-import { insertStudentAppointmentBookingData } from "@/src/db/queries/insert";
-import { Status } from "@/types";
-import { useParams } from "next/navigation";
-import { useState } from "react";
+import { getCoMonitorAppointmentsList } from "@/services/availability";
+import { bookAppointment } from "@/src/db/queries/update";
+import { CoMonitorAppointment } from "@/types/appointments";
+import { useEffect, useState } from "react";
 
 interface IProps {
   coMonitorId: number;
 }
 const SelectStudentAppointmentTime = (props: IProps) => {
   const [selectedDate, setSelectedDate] = useState("");
-  const [selectedTime, setSelectedTime] = useState("");
-  const [caption, setCaption] = useState("");
-  const { courseId } = useParams();
+  const [selectedRecord, setSelectedRecord] = useState<CoMonitorAppointment>();
+  const [availability, setAvailability] = useState<CoMonitorAppointment[]>();
+  const [time, setTime] = useState("");
 
-  const times = ["10:00", "11:00", "14:00", "16:00"];
+  const fetchData = async () => {
+    try {
+      const appointments = await getCoMonitorAppointmentsList(
+        props.coMonitorId
+      );
+      setAvailability(appointments);
+    } catch (error) {
+      console.error("Error loading data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const handleBooking = async () => {
-    const dateStr = `${selectedDate}T${selectedTime}:00`;
-    const dateObj = new Date(dateStr);
-
     try {
-      await insertStudentAppointmentBookingData({
-        courseId: Number(courseId),
-        coMonitorId: props.coMonitorId,
-        studentId: 1,
-        caption: caption,
-        dateTime: dateObj,
-        status: Status.PENDING,
-        createdAt: new Date().toLocaleDateString(),
-        updatedAt: new Date().toLocaleDateString(),
-      });
-      alert(`Appointment booked on ${selectedDate} at ${selectedTime}`);
+      await bookAppointment(selectedRecord!.id);
+      alert(`Appointment booked on ${selectedDate} at ${time}`);
     } catch (error) {
       console.error("Booking failed:", error);
       alert("Something went wrong!! Please try again...");
     }
     setSelectedDate("");
-    setSelectedTime("");
-    setCaption("");
+    setTime("");
+  };
+  const handleDateSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = e.target.value;
+    const newSelectedRecord = availability?.find((appointment) => {
+      return appointment.date.toLocaleDateString("en-GB") === selectedValue;
+    });
+    setSelectedDate(selectedValue);
+    setSelectedRecord(newSelectedRecord);
+    setTime(newSelectedRecord!.startTime);
   };
   return (
     <>
       <div className="flex flex-col gap-3">
         <label className="text-gray-700">Select Date</label>
-        <input
-          type="date"
-          className="p-2 border rounded-lg text-gray-700"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-        />
-      </div>
-
-      <div className="flex flex-col gap-3">
-        <label className="text-gray-700">Select Time</label>
         <select
           className="p-2 border rounded-lg text-gray-700"
-          value={selectedTime}
-          onChange={(e) => setSelectedTime(e.target.value)}
+          value={selectedDate}
+          onChange={handleDateSelect}
         >
           <option value="" disabled>
             Select a time
           </option>
-          {times.map((time) => (
-            <option key={time} value={time}>
-              {time}
-            </option>
-          ))}
+          {availability &&
+            availability
+              ?.filter((appointment) => {
+                return appointment.isBooked === false;
+              })
+              .map((appointment) => (
+                <option
+                  key={appointment.id}
+                  value={appointment.date.toLocaleDateString("en-GB")}
+                >
+                  {appointment.date.toLocaleDateString("en-GB")}
+                </option>
+              ))}
         </select>
       </div>
       <div className="flex flex-col gap-3">
-        <label className="text-gray-700">Write Caption</label>
-        <textarea
+        <label className="text-gray-700">Time</label>
+        <input
+          type="text"
           className="p-2 border rounded-lg text-gray-700"
-          rows={3}
-          cols={30}
-          placeholder="Enter your caption here"
-          value={caption}
-          onChange={(e) => setCaption(e.target.value)}
-        ></textarea>
+          value={time ? time : "No Time"}
+          disabled
+        />
       </div>
-
       <button
         onClick={handleBooking}
         className="mt-3 px-4 py-2 bg-[#FFA41F] text-white rounded-lg hover:bg-[#FF8C00] transition cursor-pointer flex justify-center"
-        disabled={!selectedDate || !selectedTime}
+        disabled={!selectedDate}
       >
         Confirm Booking
       </button>
