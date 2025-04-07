@@ -2,10 +2,10 @@ import TaskCard from "@/components/TaskCard/TaskCard";
 import { getTasksByCourseId } from "@/src/db/queries/select";
 
 interface IProps {
-  params: Promise<{ courseId: string }>;
+  params: Promise<{ studentId: string; courseId: string }>;
 }
 const Tasks = async (props: IProps) => {
-  const { courseId } = await props.params;
+  const { studentId, courseId } = await props.params;
   const courseTasks = await getTasksByCourseId(Number(courseId));
 
   return (
@@ -16,7 +16,14 @@ const Tasks = async (props: IProps) => {
 
       <div className="space-y-6 w-full">
         {courseTasks?.map((task, index) => {
-          return <TaskCard key={index} task={task} courseId={courseId} />;
+          return (
+            <TaskCard
+              key={index}
+              task={task}
+              courseId={courseId}
+              studentId={studentId}
+            />
+          );
         })}
       </div>
     </div>
