@@ -6,10 +6,10 @@ import { PublicComment } from "@/types";
 import Loader from "../Shared/Loader";
 
 interface Props {
-  TaskId: number;
+  taskId: number;
 }
 
-const PublicComments = ({ TaskId }: Props) => {
+const PublicComments = ({ taskId }: Props) => {
   const [publicComments, setPublicComments] = useState<PublicComment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -18,7 +18,7 @@ const PublicComments = ({ TaskId }: Props) => {
     const fetchComments = async () => {
       try {
         setLoading(true);
-        const comments = await fetchPublicCommentsByTaskId(TaskId);
+        const comments = await fetchPublicCommentsByTaskId(taskId);
         setPublicComments(comments);
       } catch (err) {
         console.error("Error fetching public comments:", err);
@@ -29,7 +29,7 @@ const PublicComments = ({ TaskId }: Props) => {
     };
 
     fetchComments();
-  }, [TaskId]);
+  }, [taskId]);
 
   if (loading) return <Loader />;
 

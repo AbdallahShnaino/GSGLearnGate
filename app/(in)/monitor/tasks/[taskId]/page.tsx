@@ -4,6 +4,7 @@ import TaskCardDetails from "@/components/TaskCardDetails/TaskCardDetails";
 import { getTask } from "@/services/task";
 import { Task } from "@/types";
 import { getAttachmentForTask } from "@/services/attachment";
+import PublicComments from "@/components/Comments/PublicComments";
 interface IProps {
   params: Promise<{ taskId: string }>;
 }
@@ -28,6 +29,8 @@ const page = async ({ params }: IProps) => {
           paths={paths}
         />
       </div>
+      <PublicComments taskId={Number(taskId)} />
+
       <CardFooter taskId={Number(taskId)} />
     </div>
   );

@@ -3,7 +3,7 @@ import CardFooter from "@/components/CardFooter/CardFooter";
 import CardTskHeader from "@/components/CardTskHeader/CardTskHeader";
 import TaskCardDetails from "@/components/TaskCardDetails/TaskCardDetails";
 
-import PuplicCommments from "@/components/Comments/PuplicCommments";
+import PuplicCommments from "@/components/Comments/PublicComments";
 
 const page = () => {
   return (
