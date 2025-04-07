@@ -19,10 +19,6 @@ const CourseDetails = async (props: IProps) => {
     Number(courseId)
   );
 
-  // console.log(attendancesNumber);
-
-  // const attendancePercent = `${(attendance / 25) * 100}%`;
-
   const today = new Date();
   const courseStartDate = new Date(courseData![0].startDate);
   const courseEndDate = new Date(courseData![0].endDate);
@@ -110,6 +106,7 @@ const CourseDetails = async (props: IProps) => {
                       task={task}
                       number={index + 1}
                       courseId={courseId}
+                      studentId={studentId}
                     />
                   );
                 })
@@ -122,7 +119,7 @@ const CourseDetails = async (props: IProps) => {
             {courseTasks && (
               <div className="flex justify-center sm:justify-end  mt-4 mb-6">
                 <Link
-                  href={`/student/my-courses/${courseId}/tasks`}
+                  href={`/${studentId}/my-courses/${courseId}/tasks`}
                   className="px-4 py-2 text-sm sm:text-base text-white bg-[#FFA41F] hover:bg-[#FF8700] rounded-lg font-semibold shadow-md transition-all duration-300 focus:ring-2 focus:ring-[#FFA41F] focus:ring-offset-2"
                 >
                   Show Details
