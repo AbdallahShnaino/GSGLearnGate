@@ -7,7 +7,7 @@ export default async function page({ params }: Props) {
   const { Id } = await params;
   return (
     <div>
-      <SubmissonCom id={Id} CoMentorId={5} />
+      <SubmissonCom id={12} CoMentorId={5} />
     </div>
   );
 }
