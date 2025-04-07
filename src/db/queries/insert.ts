@@ -15,6 +15,7 @@ import {
   courseSchedulesTable,
   joiningRequestsTable,
   coMonitorAvailabilityTable,
+  commentsTable,
 } from "./../schema";
 import {
   User,
@@ -30,6 +31,7 @@ import {
   StudentBookingDate,
   CourseSchedule,
   AvailabilitySlot,
+  newComment,
 } from "@/types/index";
 
 interface InsertUserInput {
@@ -143,11 +145,15 @@ export async function insertStudentAppointmentBookingData(
   return inserted as StudentBookingDate;
 }
 
-export async function insertCourseSchedule(data: Omit<CourseSchedule, "id">): Promise<CourseSchedule> {
-  const [inserted] = await db.insert(courseSchedulesTable).values(data).returning();
+export async function insertCourseSchedule(
+  data: Omit<CourseSchedule, "id">
+): Promise<CourseSchedule> {
+  const [inserted] = await db
+    .insert(courseSchedulesTable)
+    .values(data)
+    .returning();
   return inserted as CourseSchedule;
 }
-
 
 export async function insertCoMonitorAvailability(
   availability: Omit<AvailabilitySlot, "id" | "createdAt" | "updatedAt">
@@ -166,4 +172,11 @@ export async function insertCoMonitorAvailability(
     console.error("Error inserting co-monitor availability:", error);
     throw new Error("Failed to create availability slot");
   }
+}
+
+export async function insertComment(
+  data: Omit<newComment, "id">
+): Promise<newComment> {
+  const [inserted] = await db.insert(commentsTable).values(data).returning();
+  return inserted as newComment;
 }
