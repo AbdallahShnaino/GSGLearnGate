@@ -4,7 +4,7 @@ import { deleteCourse } from "@/src/db/queries/delete";
 import { insertCourse, insertCourseSchedule, insertStudentCourse } from "@/src/db/queries/insert";
 import { Course, CourseSchedule, User } from "@/types";
 import { updateCourse, updateUser } from "@/src/db/queries/update";
-import {getStudentCountByCourse,getCoursesWithStudentCount, getAllCourses, getCoMonitorAppointments, getCoursesNamesByCoMonitor, getCoursesNamesByMonitor, getCourseById} from "@/src/db/queries/select";
+import {getStudentCountByCourse,getCoursesWithStudentCount, getAllCourses, getCoMonitorAppointments, getCoursesNamesByCoMonitor, getCoursesNamesByMonitor, getCourseById, getAllCoursesWithMonitors, getCourseWithMonitor} from "@/src/db/queries/select";
 
 
 export async function addStudentToCourse(studentId: number, courseId: number) {
@@ -68,4 +68,12 @@ export async function editUser(id: number, data: Omit<User,"password" | "role">)
 
 export async function insertSchedule(data: Omit<CourseSchedule,"id">){
   return await insertCourseSchedule(data);
+}
+
+export async function getCoursesWithMonitor(){
+  return await getAllCoursesWithMonitors();
+}
+
+export async function getCourseWithMonitorById(id:number){
+  return await getCourseWithMonitor(id);
 }

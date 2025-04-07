@@ -13,10 +13,11 @@ import {
   tasksTable,
   attachmentsTable,
   courseSchedulesTable,
+  joiningRequestsTable,
+  commentsTable,
   InsertCommentsTable,
   SelectCommentsTable,
   coMonitorAvailabilityTable,
-  commentsTable,
 } from "./../schema";
 import {
   User,
@@ -158,6 +159,7 @@ export async function insertComment(
 
   try {
     const [inserted] = await db.insert(commentsTable).values(data).returning();
+
     return inserted as SelectCommentsTable;
   } catch (error) {
     console.error("Error inserting comment:", error);
@@ -172,6 +174,7 @@ export async function insertCourseSchedule(
     .insert(courseSchedulesTable)
     .values(data)
     .returning();
+
   return inserted as CourseSchedule;
 }
 
