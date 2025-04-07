@@ -2,6 +2,7 @@ import Sidebar from "@/components/SideBar/SideBar";
 import { Gauge } from "@phosphor-icons/react/dist/ssr";
 import { Laptop } from "@phosphor-icons/react/dist/ssr";
 import { CalendarCheck } from "@phosphor-icons/react/dist/ssr";
+import { Megaphone } from "@phosphor-icons/react/dist/ssr";
 
 export default async function StudentLayout({
   params,
@@ -25,6 +26,11 @@ export default async function StudentLayout({
             href: `/${studentId}/appointments`,
             label: "Appointments",
             icon: <CalendarCheck />,
+          },
+          {
+            href: `/${studentId}/announcements`,
+            label: "Announcements ",
+            icon: <Megaphone />,
           },
         ]}
       />
