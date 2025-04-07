@@ -2,7 +2,7 @@
 import {
   loginUser,
   LoginUserStatus,
-} from "@/controllers/actions/createUserAction";
+} from "@/controllers/actions/loginUserAction";
 import Link from "next/link";
 import React, { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";

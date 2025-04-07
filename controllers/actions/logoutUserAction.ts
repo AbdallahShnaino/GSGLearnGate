@@ -1,0 +1,23 @@
+"use server";
+import { cookies } from "next/headers";
+
+export async function logoutUser(): Promise<{ success: boolean; message: string }> {
+  try {
+    const cookieStore = await cookies();
+    
+    cookieStore.delete("token");
+    cookieStore.delete("role");
+    cookieStore.delete("userId");
+    
+    return {
+      success: true,
+      message: "Logged out successfully"
+    };
+  } catch (error) {
+    console.error("Logout failed:", error);
+    return {
+      success: false,
+      message: "Logout failed"
+    };
+  }
+}
