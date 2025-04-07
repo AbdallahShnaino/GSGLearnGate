@@ -4,6 +4,7 @@ import CardTskHeader from "@/components/CardTskHeader/CardTskHeader";
 import TaskCardDetails from "@/components/TaskCardDetails/TaskCardDetails";
 
 import PuplicCommments from "@/components/Comments/PublicComments";
+import PublicComments from "@/components/Comments/PublicComments";
 
 const page = () => {
   return (
@@ -12,7 +13,7 @@ const page = () => {
       <div className="border border-orange-100 rounded-lg overflow-hidden">
         <TaskCardDetails />
 
-        <PuplicCommments TaskId={19} />
+        <PublicComments taskId={Number(19)} />
 
         <CardFooter />
       </div>

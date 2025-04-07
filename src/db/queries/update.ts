@@ -16,18 +16,7 @@ export async function updateMeetingRequest(
     .update(appointmentsTable)
     .set(updates)
     .where(eq(appointmentsTable.id, id))
-    .returning({
-      id: appointmentsTable.id,
-      studentId: appointmentsTable.studentId,
-      date: appointmentsTable.date,
-      caption: appointmentsTable.caption,
-      coMonitorId: appointmentsTable.coMonitorId,
-      status: appointmentsTable.status,
-      createdAt: appointmentsTable.createdAt,
-      profileImage: usersTable.image,
-      studentName: usersTable.firstName,
-      studentEmail: usersTable.email,
-    });
+    .returning();
 }
 
 export async function updateCourse(

@@ -14,10 +14,10 @@ interface IProps {
 }
 
 const MeetingRequestsTable = ({ coMonitorCoursesList }: IProps) => {
-  const { value: searchQuery, updateSearchParam } = useSearch("search");
   const {
     courseId,
-    filterRequests,
+
+    meetingRequests,
     selectedRequest,
     isApproveModalOpen,
     isRejectModalOpen,
@@ -35,7 +35,6 @@ const MeetingRequestsTable = ({ coMonitorCoursesList }: IProps) => {
     isLoading,
   } = useMeetingRequests();
 
-  const filteredRequests = filterRequests(searchQuery);
   if (isLoading) {
     return <Loader message="Loading data..." />;
   }
@@ -43,10 +42,6 @@ const MeetingRequestsTable = ({ coMonitorCoursesList }: IProps) => {
   return (
     <div className="container mx-auto p-4">
       <div className="flex">
-        <SearchBar
-          updateSearchParam={updateSearchParam}
-          placeholderText="Search Request... "
-        />
         <div className="my-5">
           <SelectCourse
             options={coMonitorCoursesList}
@@ -70,7 +65,7 @@ const MeetingRequestsTable = ({ coMonitorCoursesList }: IProps) => {
               </tr>
             </thead>
             <tbody>
-              {filteredRequests.map((student) => (
+              {meetingRequests.map((student) => (
                 <tr
                   className="bg-white hover:bg-gray-50 border-b border-gray-100"
                   key={student.id}
@@ -94,15 +89,15 @@ const MeetingRequestsTable = ({ coMonitorCoursesList }: IProps) => {
                   </td>
                   <td className="px-6 py-1.5 text-xs">{student.createdAt}</td>
                   <td className="px-6 py-1.5 text-xs">
-                    {student.date.toISOString().split("T")[0]}
+                    {new Date(student.date).toISOString().split("T")[0]}
                   </td>
                   <td className="px-6 py-1.5 text-xs">
-                    {student.date.toLocaleDateString("en-US", {
+                    {new Date(student.date).toLocaleDateString("en-US", {
                       weekday: "long",
                     })}
                   </td>
                   <td className="px-6 py-1.5 text-xs">
-                    {student.date.toLocaleTimeString("en-US", {
+                    {new Date(student.date).toLocaleTimeString("en-US", {
                       hour: "2-digit",
                       minute: "2-digit",
                       second: "2-digit",

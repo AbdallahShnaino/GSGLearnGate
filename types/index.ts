@@ -205,15 +205,15 @@ export interface StudentCourseChart {
 
 export interface AppointmentWithStudent {
   id: number;
-  coMonitorId: number;
   studentId: number;
   studentName: string;
   studentEmail: string;
   profileImage: string;
   caption: string;
-  date: Date;
+  date: string;
   status: Status;
   createdAt: string;
+  courseName: string;
 }
 export interface ApproveModalProps {
   isOpen: boolean;

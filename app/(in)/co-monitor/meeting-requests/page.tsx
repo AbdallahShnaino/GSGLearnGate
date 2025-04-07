@@ -1,9 +1,8 @@
 import MeetingRequestsTable from "@/components/MeetingRequestsTable/MeetingRequestsTable";
 import { getCoMonitorCoursesNames } from "@/services/courses";
 import React from "react";
-
+import { STATIC_COMONITOR_ID } from "@/context/keys";
 export async function page() {
-  const STATIC_COMONITOR_ID = 9;
   const coursesList = await getCoMonitorCoursesNames(STATIC_COMONITOR_ID);
   return (
     <>
