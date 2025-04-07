@@ -25,11 +25,11 @@ export async function submitUser(
   const city = formData.get("city") as string;
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
-  const first_name = formData.get("first_name") as string;
-  const last_name = formData.get("last_name") as string;
-  const dateOfBirth = formData.get("date_of_birth") as string;
+  const firstName = formData.get("firstName") as string;
+  const lastName = formData.get("lastName") as string;
+  const dateOfBirth = formData.get("dateOfBirth") as string;
 
-  if (!email || !password || !first_name || !last_name || !dateOfBirth) {
+  if (!email || !password || !firstName || !lastName || !dateOfBirth) {
     return {
       success: false,
       message: "Please fill all the fields",
@@ -47,22 +47,18 @@ export async function submitUser(
       userId: undefined,
     };
   }
-
-  const passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
   if (!passwordRegex.test(password)) {
     return {
       success: false,
-      message:
-        "Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters",
-      error:
-        "Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters",
+      message: "Password must be at least 8 characters with at least one letter and one number",
+      error: "Password must be at least 8 characters with at least one letter and one number",
       userId: undefined,
     };
   }
 
   const nameRegex = /^[A-Za-z]+$/;
-  if (!nameRegex.test(first_name) || !nameRegex.test(last_name)) {
+  if (!nameRegex.test(firstName) || !nameRegex.test(lastName)) {
     return {
       success: false,
       message: "First name and last name must contain only letters",
@@ -88,8 +84,8 @@ export async function submitUser(
     city,
     dateOfBirth,
     email,
-    first_name,
-    last_name,
+    firstName,
+    lastName,
     password
   );
 
