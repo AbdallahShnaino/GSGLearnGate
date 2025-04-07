@@ -5,7 +5,7 @@ interface IProps {
   reset: () => void;
 }
 
-const Error = ({ error, reset }: IProps) => {
+const ErrorPage = ({ error, reset }: IProps) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
       <div className="bg-white shadow-xl rounded-2xl p-8 max-w-lg text-center border border-gray-200">
@@ -16,14 +16,8 @@ const Error = ({ error, reset }: IProps) => {
 
         <div className="flex flex-col gap-3 w-full">
           <button
-            onClick={reset}
-            className="bg-[#FFA41F] text-white px-6 py-2 rounded-lg font-medium hover:bg-[#ffa51fc6] transition-all cursor-pointer"
-          >
-            Try Again
-          </button>
-          <button
             onClick={() => window.location.reload()}
-            className="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition-all cursor-pointer"
+            className="bg-[#FFA41F] text-white px-6 py-2 rounded-lg font-medium hover:bg-[#ffa51fc6] transition-all cursor-pointer"
           >
             Refresh Page
           </button>
@@ -38,4 +32,4 @@ const Error = ({ error, reset }: IProps) => {
   );
 };
 
-export default Error;
+export default ErrorPage;

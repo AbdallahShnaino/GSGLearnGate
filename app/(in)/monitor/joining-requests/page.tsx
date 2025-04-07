@@ -1,8 +1,8 @@
 import StudentRequestsTable from "@/components/StudentRequestsTable/StudentRequestsTable";
+import { STATIC_MONITOR_ID } from "@/context/keys";
 import { getMonitorCoursesNames } from "@/services/courses";
 
 export default async function joiningRequestsPage() {
-  const STATIC_MONITOR_ID = 13;
   const coursesList = await getMonitorCoursesNames(STATIC_MONITOR_ID);
   return (
     <div>
