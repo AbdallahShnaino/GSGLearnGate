@@ -1,6 +1,11 @@
 import { db } from "..";
 import { eq } from "drizzle-orm";
-import { appointmentsTable, coursesTable, usersTable } from "../schema";
+import {
+  appointmentsTable,
+  coMonitorAvailabilityTable,
+  coursesTable,
+  usersTable,
+} from "../schema";
 import { AppointmentWithStudent, Course, User } from "@/types";
 
 export async function updateMeetingRequest(
@@ -39,13 +44,23 @@ export async function updateCourse(
 }
 
 export async function updateUser(
-    id: number,
-    data: Partial<Omit<User, "password" | "role">>
-  ): Promise<User | null> {
-    const [updated] = await db
-      .update(usersTable)
-      .set(data)
-      .where(eq(usersTable.id, Number(id)))
-      .returning();
-    return updated ?? null;
-  }
+  id: number,
+  data: Partial<Omit<User, "password" | "role">>
+): Promise<User | null> {
+  const [updated] = await db
+    .update(usersTable)
+    .set(data)
+    .where(eq(usersTable.id, Number(id)))
+    .returning();
+  return updated ?? null;
+}
+
+export async function bookAppointment(appointmentId: number): Promise<boolean> {
+  const [updated] = await db
+    .update(coMonitorAvailabilityTable)
+    .set({ isBooked: true })
+    .where(eq(coMonitorAvailabilityTable.id, appointmentId))
+    .returning();
+
+  return !!updated;
+}
