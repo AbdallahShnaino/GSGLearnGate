@@ -296,6 +296,8 @@ export type StudentCourseDetails = {
   // status: AttendanceStatus;
   description: string | null;
   coMonitors: string | null;
+  startDate: Date;
+  endDate: Date;
 };
 
 export enum StudentAppointmentStatus {
@@ -403,4 +405,8 @@ export type SoonLectures = {
   // weekDay: string;
   // startTime: string;
   // endTime: string;
+};
+
+export type AttendanceRecordOne = {
+  attendanceStatus: AttendanceRecordStatus;
 };

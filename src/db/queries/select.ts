@@ -66,6 +66,7 @@ import {
   CourseSchedule,
   AttendanceRecordStatus,
   SoonLectures,
+  AttendanceRecordOne,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorTasksResponse } from "@/types/tasks";
@@ -1091,6 +1092,8 @@ export async function getCoursesById(
       description: coursesTable.description,
       // attendance: attendanceRecordsTable.status,
       coMonitors: sql<string>`${coMonitorsUsers.firstName} || ' ' || ${coMonitorsUsers.lastName}`,
+      startDate: coursesTable.courseStartDate,
+      endDate: coursesTable.courseEndDate,
     })
     .from(studentsCoursesTable)
     .innerJoin(coursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
@@ -1359,4 +1362,36 @@ export async function getAllCoMonitorAppointments(
     )
     .where(eq(coMonitorAvailabilityTable.coMonitorId, coMonitorId))
     .all();
+}
+
+export async function getStudentAttendanceById(
+  studentId: number,
+  courseId: number
+): Promise<number | null> {
+  const results: AttendanceRecordOne[] = await db
+    .select({
+      attendanceStatus: attendanceRecordsTable.status,
+    })
+    .from(attendanceRecordsTable)
+    .innerJoin(
+      courseSchedulesTable,
+      eq(courseSchedulesTable.id, attendanceRecordsTable.sessionId)
+    )
+    .innerJoin(
+      coursesTable,
+      eq(coursesTable.id, attendanceRecordsTable.courseId)
+    )
+    .innerJoin(
+      studentsTable,
+      eq(studentsTable.id, attendanceRecordsTable.studentId)
+    )
+    .where(and(eq(studentsTable.id, studentId), eq(coursesTable.id, courseId)));
+
+  if (results.length === 0) return null;
+
+  const presentCount = results.filter(
+    (item: AttendanceRecordOne) => item.attendanceStatus !== "ABSENT"
+  ).length;
+
+  return presentCount;
 }
