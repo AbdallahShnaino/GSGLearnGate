@@ -27,6 +27,7 @@ export enum AssignmentStatus {
   PENDING = "PENDING",
   GRADED = "GRADED",
   NOTSUBMITTED = "NOT SUBMITTED",
+  SUBMITTED = "SUBMITTED",
 }
 
 export enum Attachments {
@@ -326,7 +327,6 @@ export type StudentCourseTasks = {
   grade: number;
   gradedAt: Date;
   maxGrade: number;
-
 };
 export interface SubmissionView {
   id: number;
@@ -434,8 +434,6 @@ export type AttendanceRecord = {
   studentId: number;
 };
 
-
-
 export type CourseWithPresenter = Course & {
   presenterName?: string;
   presenterImage?: string;
@@ -472,7 +470,6 @@ export type newComment = {
 export type newAnnouncements = {
   courseTitle: string;
 } & Announcement;
-
 
 export interface PublicComment {
    commentId: number;

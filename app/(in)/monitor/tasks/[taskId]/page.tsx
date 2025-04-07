@@ -28,7 +28,7 @@ const page = async ({ params }: IProps) => {
           paths={paths}
         />
       </div>
-      <CardFooter />
+      <CardFooter taskId={Number(taskId)} />
     </div>
   );
 };

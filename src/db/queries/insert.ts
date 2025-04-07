@@ -1,4 +1,3 @@
-import { eq } from "drizzle-orm/sql/expressions/conditions";
 import { db } from "./../index";
 import {
   usersTable,
@@ -15,14 +14,10 @@ import {
   attachmentsTable,
   courseSchedulesTable,
   joiningRequestsTable,
-
   commentsTable,
   InsertCommentsTable,
   SelectCommentsTable,
   coMonitorAvailabilityTable,
-
-  commentsTable,
-
 } from "./../schema";
 import {
   User,
@@ -45,12 +40,12 @@ interface InsertUserInput {
   role: Role;
   data: Omit<User, "id">;
 }
+
 export async function insertUser({
   data,
   role,
 }: InsertUserInput): Promise<Omit<User, "password">> {
   const [insertedUser] = await db.insert(usersTable).values(data).returning();
-
   const user = insertedUser as Omit<User, "password">;
 
   if (role === Role.ADMIN) {
@@ -65,6 +60,7 @@ export async function insertUser({
   if (role === Role.STUDENT) {
     await db.insert(studentsTable).values({ userId: user.id }).execute();
   }
+
   return user;
 }
 
@@ -72,6 +68,7 @@ export async function insertCourse(data: Omit<Course, "id">): Promise<Course> {
   const [inserted] = await db.insert(coursesTable).values(data).returning();
   return inserted as Course;
 }
+
 export async function insertAnnouncement(
   data: Omit<Announcement, "id">
 ): Promise<Announcement> {
@@ -109,7 +106,7 @@ export async function insertSubmission(
   return inserted as Submission;
 }
 
-export async function insertTask(data: Omit<Task, "id">) {
+export async function insertTask(data: Omit<Task, "id">): Promise<Task> {
   const normalizedData = {
     ...data,
     startedAt: new Date(data.startedAt).toISOString(),
@@ -125,10 +122,11 @@ export async function insertTask(data: Omit<Task, "id">) {
 
   return {
     ...inserted,
-    startedAt: new Date(inserted.startedAt), // Convert back to Date
-    deadline: inserted.deadline, // Already a Date from returning()
+    startedAt: new Date(inserted.startedAt),
+    deadline: inserted.deadline,
   } as Task;
 }
+
 export async function insertAttachment(
   data: Omit<Attachment, "id">
 ): Promise<Attachment> {
@@ -152,7 +150,6 @@ export async function insertStudentAppointmentBookingData(
   return inserted as StudentBookingDate;
 }
 
-
 export async function insertComment(
   data: Omit<InsertCommentsTable, "id">
 ): Promise<SelectCommentsTable> {
@@ -161,10 +158,7 @@ export async function insertComment(
   }
 
   try {
-    const [inserted] = await db
-      .insert(commentsTable)
-      .values(data)
-      .returning();
+    const [inserted] = await db.insert(commentsTable).values(data).returning();
 
     return inserted as SelectCommentsTable;
   } catch (error) {
@@ -172,11 +166,6 @@ export async function insertComment(
     throw new Error("Failed to insert comment.");
   }
 }
-
-
-export async function insertCourseSchedule(data: Omit<CourseSchedule, "id">): Promise<CourseSchedule> {
-  const [inserted] = await db.insert(
-courseSchedulesTable).values(data).returning();
 
 export async function insertCourseSchedule(
   data: Omit<CourseSchedule, "id">
@@ -197,7 +186,7 @@ export async function insertCoMonitorAvailability(
       .insert(coMonitorAvailabilityTable)
       .values({
         ...availability,
-        isBooked: availability.isBooked ?? false, // Default to false if not provided
+        isBooked: availability.isBooked ?? false,
       })
       .returning();
 
@@ -208,7 +197,7 @@ export async function insertCoMonitorAvailability(
   }
 }
 
-export async function insertComment(
+export async function insertNewComment(
   data: Omit<newComment, "id">
 ): Promise<newComment> {
   const [inserted] = await db.insert(commentsTable).values(data).returning();
