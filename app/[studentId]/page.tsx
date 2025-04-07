@@ -4,11 +4,15 @@ import SoonLessonsTable from "@/components/SoonLessonsTable/SoonLessonsTable";
 import Link from "next/link";
 import { getLimitCoursesByStudent } from "@/src/db/queries/select";
 
-const Dashboard = async () => {
-  const courses = await getLimitCoursesByStudent(1, 2);
-  console.log(courses);
+interface IProps {
+  params: Promise<{ studentId: string }>;
+}
 
-  const totalCourses = await getLimitCoursesByStudent(1);
+const Dashboard = async (props: IProps) => {
+  const { studentId } = await props.params;
+  const courses = await getLimitCoursesByStudent(Number(studentId), 2);
+
+  const totalCourses = await getLimitCoursesByStudent(Number(studentId));
 
   return (
     <div className="px-6 py-3 w-full min-h-screen">

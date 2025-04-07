@@ -65,6 +65,7 @@ import {
   UsersNames,
   CourseSchedule,
   AttendanceRecordStatus,
+  SoonLectures,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorTasksResponse } from "@/types/tasks";
@@ -74,6 +75,7 @@ import {
   CourseStudentsList,
 } from "@/types/attendanceOperations";
 import { CoMonitorAppointment } from "@/types/appointments";
+import { addDays, getDay, isAfter, setHours, setMinutes } from "date-fns";
 
 export async function getAllUsers(): Promise<User[]> {
   return await db.select().from(usersTable).all();
@@ -1021,22 +1023,21 @@ export async function getLimitCoursesByStudent(
       id: coursesTable.id,
       title: coursesTable.title,
       monitorName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
-      // attendance: attendanceRecordsTable.status,
+      duration: coursesTable.duration,
+      startDate: coursesTable.courseStartDate,
+      endDate: coursesTable.courseEndDate,
     })
     .from(studentsCoursesTable)
     .innerJoin(coursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
     .innerJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
     .innerJoin(usersTable, eq(monitorsTable.userId, usersTable.id))
-    // .innerJoin(
-    //   attendanceRecordsTable,
-    //   eq(coursesTable.id, attendanceRecordsTable.courseId)
-    // )
     .where(eq(studentsCoursesTable.studentId, studentId))
     .groupBy(
       coursesTable.id,
       coursesTable.title,
       usersTable.firstName,
-      usersTable.lastName
+      usersTable.lastName,
+      coursesTable.duration
     )
     .limit(limit);
 

@@ -271,7 +271,9 @@ export type StudentCourseSmallCard = {
   id: number | null;
   title: string | null;
   monitorName: string | null;
-  // attendance: number;
+  duration: number;
+  startDate: number;
+  endDate: number;
 };
 
 export enum CourseStatus {
@@ -392,4 +394,13 @@ export type AttendanceRecord = {
   status: AttendanceRecordStatus;
   recordedById: number;
   studentId: number;
+};
+
+export type SoonLectures = {
+  courseTitle: string;
+  lectureDate: Date;
+  // courseStartTime: Date;
+  // weekDay: string;
+  // startTime: string;
+  // endTime: string;
 };
