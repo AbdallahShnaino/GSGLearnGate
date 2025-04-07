@@ -3,10 +3,10 @@ import { getCoMonitorByCourseId } from "@/src/db/queries/select";
 import Link from "next/link";
 
 interface IProps {
-  params: Promise<{ courseId: string }>;
+  params: Promise<{ studentId: string; courseId: string }>;
 }
 const BookingPage = async (props: IProps) => {
-  const { courseId } = await props.params;
+  const { studentId, courseId } = await props.params;
   const coMonitor = await getCoMonitorByCourseId(Number(courseId));
   return (
     <div className="w-full max-w-lg mx-auto bg-white shadow-lg rounded-2xl border border-gray-200 p-6 flex flex-col gap-4 mt-10">
@@ -25,7 +25,10 @@ const BookingPage = async (props: IProps) => {
         />
       </div>
 
-      <SelectStudentAppointmentTime coMonitorId={coMonitor![0].coMonitorId} />
+      <SelectStudentAppointmentTime
+        coMonitorId={coMonitor![0].coMonitorId}
+        studentId={studentId}
+      />
 
       <Link
         href="/student/appointments"
