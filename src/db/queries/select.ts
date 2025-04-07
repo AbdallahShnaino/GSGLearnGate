@@ -66,6 +66,11 @@ import {
   UsersNames,
   CourseSchedule,
   AttendanceRecordStatus,
+
+  PrivateComment,
+  SubmissionView,
+  SubmissionAttachment,
+
   CourseWithPresenter,
   SoonLectures,
   AttendanceRecordOne,
@@ -1369,6 +1374,138 @@ export async function getAllCoMonitorAppointments(
     )
     .where(eq(coMonitorAvailabilityTable.coMonitorId, coMonitorId))
     .all();
+}
+
+
+export async function getSubmissionById(
+  submissionId: number
+): Promise<{
+  submission: SubmissionView | null;
+  attachments: SubmissionAttachment;
+}> {
+  const result = await db
+    .select({
+      id: submissionsTable.id,
+      taskId: submissionsTable.taskId,
+      studentId: submissionsTable.studentId,
+      courseId: submissionsTable.courseId,
+      grade: submissionsTable.grade,
+      feedback: submissionsTable.feedback,
+      gradedAt: submissionsTable.gradedAt,
+      status: submissionsTable.status,
+      createdAt: submissionsTable.createdAt,
+      updatedAt: submissionsTable.updatedAt,
+      deletedAt: submissionsTable.deletedAt,
+      StudentName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      StudentEmail: usersTable.email,
+      StudentImage: usersTable.image,
+      TaskTitle: tasksTable.title,
+    })
+    .from(submissionsTable)
+    .leftJoin(usersTable, eq(submissionsTable.studentId, usersTable.id))
+    .leftJoin(tasksTable, eq(submissionsTable.taskId, tasksTable.id))
+    .where(eq(submissionsTable.id, submissionId))
+    .get();
+
+  if (!result) {
+    return {
+      submission: null,
+      attachments: { attachmentId: 0, attachmentPath: '', attachmentType: undefined },
+    };
+  }
+
+  const submission: SubmissionView = {
+    ...result,
+    createdAt: new Date(result.createdAt),
+    updatedAt: new Date(result.updatedAt),
+    deletedAt: result.deletedAt ? new Date(result.deletedAt) : null,
+    gradedAt: result.gradedAt ? new Date(result.gradedAt) : null,
+  };
+
+  const attachmentsResult = await db
+    .select({
+      attachmentId: attachmentsTable.id,
+      attachmentPath: attachmentsTable.path,
+      attachmentType: attachmentsTable.type,
+    })
+    .from(attachmentsTable)
+    .innerJoin(submissionsTable, eq(attachmentsTable.id, submissionsTable.attachmentId))
+    .where(eq(submissionsTable.id, submissionId))
+    .all();
+
+  return {
+    submission,
+    attachments: attachmentsResult[0] || { attachmentId: 0, attachmentPath: '', attachmentType: undefined },
+  };
+}
+export async function getPrivateCommentsBySubmission(
+  submissionId: number
+): Promise<PrivateComment[]> {
+  const submission = await db
+    .select({
+      studentId: submissionsTable.studentId,
+    })
+    .from(submissionsTable)
+    .where(eq(submissionsTable.id, submissionId))
+    .get();
+
+  if (!submission) {
+    throw new Error("Submission not found.");
+  }
+
+  const comments = await db
+    .select({
+      commentId: commentsTable.id,
+      commentText: commentsTable.content,
+      createdAt: commentsTable.createdAt,
+      createdBy: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      image: usersTable.image,
+    })
+    .from(commentsTable)
+    .innerJoin(usersTable, eq(commentsTable.studentId, usersTable.id))
+    .where(
+      and(
+        eq(commentsTable.submissionId, submissionId),
+        eq(commentsTable.studentId, submission.studentId),
+        eq(commentsTable.isPublic, false)
+      )
+    )
+    .orderBy(commentsTable.createdAt);
+
+  console.log("Comments: ", comments);
+  return comments.map((comment) => ({
+    ...comment,
+    createdAt: new Date(comment.createdAt),
+  }));
+}
+export async function getPrivateCommentsReplyBySubmission(
+  submissionId: number,
+  ComentorId: number
+): Promise<PrivateComment[]> {
+ 
+  const comments = await db
+    .select({
+      commentId: commentsTable.id,
+      commentText: commentsTable.content,
+      createdAt: commentsTable.createdAt,
+      createdBy: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      image: usersTable.image,
+    })
+    .from(commentsTable)
+    .innerJoin(usersTable, eq(commentsTable.coMonitorId, usersTable.id))
+    .where(
+      and(
+        eq(commentsTable.submissionId, submissionId),
+        eq(commentsTable.coMonitorId,ComentorId),
+        eq(commentsTable.isPublic, false)
+      )
+    )
+    .orderBy(commentsTable.createdAt);
+
+  return comments.map((comment) => ({
+    ...comment,
+    createdAt: new Date(comment.createdAt),
+  }));
 }
 
 export async function getAllCoursesWithMonitors(): Promise<Course[]> {

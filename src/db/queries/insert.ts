@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm/sql/expressions/conditions";
 import { db } from "./../index";
 import {
   usersTable,
@@ -14,8 +15,14 @@ import {
   attachmentsTable,
   courseSchedulesTable,
   joiningRequestsTable,
-  coMonitorAvailabilityTable,
+
   commentsTable,
+  InsertCommentsTable,
+  SelectCommentsTable,
+  coMonitorAvailabilityTable,
+
+  commentsTable,
+
 } from "./../schema";
 import {
   User,
@@ -145,6 +152,32 @@ export async function insertStudentAppointmentBookingData(
   return inserted as StudentBookingDate;
 }
 
+
+export async function insertComment(
+  data: Omit<InsertCommentsTable, "id">
+): Promise<SelectCommentsTable> {
+  if (!data.submissionId || !data.content || !data.privateRecipientId) {
+    throw new Error("Missing required fields for inserting a comment.");
+  }
+
+  try {
+    const [inserted] = await db
+      .insert(commentsTable)
+      .values(data)
+      .returning();
+
+    return inserted as SelectCommentsTable;
+  } catch (error) {
+    console.error("Error inserting comment:", error);
+    throw new Error("Failed to insert comment.");
+  }
+}
+
+
+export async function insertCourseSchedule(data: Omit<CourseSchedule, "id">): Promise<CourseSchedule> {
+  const [inserted] = await db.insert(
+courseSchedulesTable).values(data).returning();
+
 export async function insertCourseSchedule(
   data: Omit<CourseSchedule, "id">
 ): Promise<CourseSchedule> {
@@ -152,6 +185,7 @@ export async function insertCourseSchedule(
     .insert(courseSchedulesTable)
     .values(data)
     .returning();
+
   return inserted as CourseSchedule;
 }
 
