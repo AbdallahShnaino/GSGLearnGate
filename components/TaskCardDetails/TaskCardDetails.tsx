@@ -4,6 +4,7 @@ import { Clock } from "@phosphor-icons/react/dist/icons/Clock";
 import { FileText } from "@phosphor-icons/react/dist/icons/FileText";
 import React from "react";
 import Attachments from "../Attachments/Attachments";
+import { getTimeRemaining } from "@/utils";
 interface IProps {
   taskId: number;
   createdAt: string;
@@ -14,35 +15,6 @@ interface IProps {
   deadline: Date;
   lastUpdate: string;
   paths: string[];
-}
-
-function getTimeRemaining(createdAt: string | Date): string {
-  // Convert to Date if it's a string
-  const createdDate = new Date(createdAt);
-  const now = new Date();
-  const diffMs = createdDate.getTime() - now.getTime();
-
-  // If time has already passed
-  if (diffMs <= 0) return "Time expired";
-
-  // Calculate time components
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  const diffHrs = Math.floor(
-    (diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-  );
-  const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-  const diffSecs = Math.floor((diffMs % (1000 * 60)) / 1000);
-
-  // Build human-readable string
-  const parts = [];
-  if (diffDays > 0) parts.push(`${diffDays} day${diffDays > 1 ? "s" : ""}`);
-  if (diffHrs > 0) parts.push(`${diffHrs} hour${diffHrs > 1 ? "s" : ""}`);
-  if (diffMins > 0) parts.push(`${diffMins} minute${diffMins > 1 ? "s" : ""}`);
-  if (diffSecs > 0) parts.push(`${diffSecs} second${diffSecs > 1 ? "s" : ""}`);
-
-  return parts.length > 0
-    ? `${parts.join(", ")} remaining`
-    : "Less than a second remaining";
 }
 
 const TaskCardDetails = ({
@@ -56,7 +28,18 @@ const TaskCardDetails = ({
   title,
   paths,
 }: IProps) => {
-  const formattedStartedAt = startedAt.toLocaleString("en-US", {
+  const startedAtDate = new Date(startedAt);
+  const lastUpdateDate = new Date(lastUpdate);
+
+  const formattedStartedAt = startedAtDate.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+  const formattedLastUpdateDate = lastUpdateDate.toLocaleString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -72,7 +55,6 @@ const TaskCardDetails = ({
     minute: "2-digit",
     hour12: true,
   });
-
   return (
     <>
       <div className="bg-orange-50 p-4 border-b border-orange-100">
@@ -109,13 +91,13 @@ const TaskCardDetails = ({
             <FileText size={20} weight="fill" className="text-[#FFA41F]" />
             <div>
               <p className="text-sm text-gray-500">Last Updated</p>
-              <p className="font-medium">{lastUpdate}</p>
+              <p className="font-medium">{formattedLastUpdateDate}</p>
             </div>
           </div>
           <div className="bg-orange-50 p-3 rounded-lg">
             <p className="text-sm text-gray-500">Time Remaining</p>
             <p className="text-lg font-bold text-[#FFA41F]">
-              {getTimeRemaining(startedAt)}
+              {getTimeRemaining(formattedDeadline)}
             </p>
             <p className="text-xs text-gray-500">Due {formattedDeadline}</p>
           </div>
