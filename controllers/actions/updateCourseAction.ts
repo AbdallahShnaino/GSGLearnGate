@@ -1,12 +1,10 @@
 "use server";
-import { randomUUID } from "crypto";
-import path from "path";
-import { promises as fs } from "fs";
 import { Difficulty } from "@/types";
 import { editCourse } from "@/services/courses";
+import { writeFile } from "@/utils/writeFile";
 
 export type CourseState =
-  | { success: false; error: string; message: string;}
+  | { success: false; error: string; message: string }
   | { success: true; message: string; error?: undefined };
 
 export async function submitCourse(
@@ -16,7 +14,7 @@ export async function submitCourse(
   console.log("formData:", Object.fromEntries(formData));
 
   try {
-    const courseId = formData.get('courseId') as string;
+    const courseId = formData.get("courseId") as string;
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
     const difficulty = formData.get("difficulty") as Difficulty;
@@ -30,8 +28,14 @@ export async function submitCourse(
     const adminId = Number(formData.get("adminId"));
     const details = formData.get("details") as string;
     const entryRequirements = formData.get("entryRequirements") as string;
-
-    if (!title || !description || !applyStartDate || !applyEndDate || !courseStartDate || !courseEndDate) {
+    if (
+      !title ||
+      !description ||
+      !applyStartDate ||
+      !applyEndDate ||
+      !courseStartDate ||
+      !courseEndDate
+    ) {
       return {
         success: false,
         error: "Missing required fields",
@@ -42,26 +46,12 @@ export async function submitCourse(
     const image = formData.get("image") as File | null;
     let publicFilePath: string = "";
 
-    if (image) {
-      const fileExtension = path.extname(image.name);
-
-      const randomName = `${randomUUID()}${fileExtension}`;
-      const uploadDir = path.join(process.cwd(), "public", "coursesImages");
-
-      await fs.mkdir(uploadDir, { recursive: true });
-
-      const filePath = path.join(uploadDir, randomName);
-      const fileBuffer = Buffer.from(await image.arrayBuffer());
-
-      await fs.writeFile(filePath, fileBuffer);
-
-      publicFilePath = `/coursesImages/${randomName}`;
-
-      console.log("File uploaded at:", publicFilePath);
+    if (image && image.size > 0) {
+      publicFilePath = await writeFile(image);
     }
 
-     await editCourse(Number(courseId),{
-      id:Number(courseId),
+    await editCourse(Number(courseId), {
+      id: Number(courseId),
       title,
       description,
       image: publicFilePath,

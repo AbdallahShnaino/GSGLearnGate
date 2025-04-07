@@ -125,7 +125,7 @@ const UpdateCourseForm = ({ monitors, coMonitors }: IProps) => {
             >
               {selectedImg ? (
                 <Image
-                  src={selectedImg}
+                  src="https://pbs.twimg.com/profile_images/1785867863191932928/EpOqfO6d_400x400.png"
                   alt="Selected"
                   className="rounded-full object-cover"
                   width={70}
