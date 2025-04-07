@@ -34,4 +34,3 @@ const page = async ({ params }: IProps) => {
 };
 
 export default page;
-//
