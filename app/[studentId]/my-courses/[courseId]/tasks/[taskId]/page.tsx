@@ -2,7 +2,7 @@ import StudentPublicComments from "@/components/StudentComments/StudentPublicCom
 import StudentPrivateComments from "@/components/StudentComments/SudentPrivateComments/StudentPrivateComments";
 import TaskSubmit from "@/components/TaskSubmit/TaskSubmit";
 import {
-  getPublicCommentsByTaskId,
+  getCommentsByTaskId,
   getSubmissionIdByTaskId,
   getTaskByTaskId,
 } from "@/src/db/queries/select";
@@ -13,10 +13,7 @@ interface IProps {
 const Task = async (props: IProps) => {
   const { studentId, courseId, taskId } = await props.params;
   const taskDetails = await getTaskByTaskId(Number(taskId));
-  const comments = await getPublicCommentsByTaskId(
-    Number(courseId),
-    Number(taskId)
-  );
+  const comments = await getCommentsByTaskId(Number(courseId), Number(taskId));
   const submissionId = await getSubmissionIdByTaskId(
     Number(courseId),
     Number(taskId)

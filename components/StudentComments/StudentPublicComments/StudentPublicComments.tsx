@@ -42,13 +42,22 @@ const StudentPublicComments = (props: IProps) => {
             return (
               <div
                 key={comment.id}
-                className="bg-[#FFF5E8] p-4 rounded-lg shadow"
+                className="bg-[#FFF5E8] p-4 rounded-lg shadow flex justify-between items-center"
               >
                 <p className="text-sm text-neutral-700">
                   <span className="font-medium text-[#E99375]">
                     {comment.userName}:
                   </span>{" "}
                   {comment.content}
+                </p>
+                <p className="text-xs text-neutral-700">
+                  {new Date(comment.createdAt).toLocaleDateString("en-GB", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </p>
               </div>
             );

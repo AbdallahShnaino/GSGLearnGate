@@ -50,6 +50,15 @@ const StudentPrivateComments = (props: IProps) => {
                   </span>{" "}
                   {comment.content}
                 </p>
+                <p className="text-xs text-neutral-700">
+                  {new Date(comment.createdAt).toLocaleDateString("en-GB", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
               </div>
             );
           })}

@@ -416,6 +416,7 @@ export type Comments = {
   content: string;
   userName: string;
   isPublic: boolean;
+  createdAt: string;
 };
 
 export type SubmissionId = {

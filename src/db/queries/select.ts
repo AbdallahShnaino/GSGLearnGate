@@ -1400,7 +1400,7 @@ export async function getStudentAttendanceById(
   return presentCount;
 }
 
-export async function getPublicCommentsByTaskId(
+export async function getCommentsByTaskId(
   courseId: number,
   TaskId: number
 ): Promise<Comments[]> {
@@ -1410,6 +1410,7 @@ export async function getPublicCommentsByTaskId(
       content: commentsTable.content,
       userName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
       isPublic: commentsTable.isPublic,
+      createdAt: commentsTable.createdAt,
     })
     .from(commentsTable)
     .innerJoin(usersTable, eq(usersTable.id, commentsTable.privateRecipientId))
