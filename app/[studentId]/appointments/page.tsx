@@ -1,9 +1,13 @@
 import StudentAppointmentsTable from "@/components/StudentAppointmentsTable/StudentAppointmentsTable";
 
-const InterviewsPage = async () => {
+interface IProps {
+  params: Promise<{ studentId: string }>;
+}
+const InterviewsPage = async (props: IProps) => {
+  const { studentId } = await props.params;
   return (
     <div className="min-h-screen bg-[#FFF5E8] p-6">
-      <StudentAppointmentsTable />
+      <StudentAppointmentsTable studentId={studentId} />
     </div>
   );
 };

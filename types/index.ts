@@ -426,3 +426,7 @@ export type SubmissionId = {
 export type newComment = {
   taskId: number;
 } & Comment;
+
+export type newAnnouncements = {
+  courseTitle: string;
+} & Announcement;

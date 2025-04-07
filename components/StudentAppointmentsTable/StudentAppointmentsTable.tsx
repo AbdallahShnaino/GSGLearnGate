@@ -1,7 +1,10 @@
 import { getStudentAppointments } from "@/src/db/queries/select";
 
-const StudentAppointmentsTable = async () => {
-  const appointments = await getStudentAppointments(1);
+interface IProps {
+  studentId: string;
+}
+const StudentAppointmentsTable = async (props: IProps) => {
+  const appointments = await getStudentAppointments(Number(props.studentId));
   const statusStyles = {
     accepted: {
       text: "Accepted",

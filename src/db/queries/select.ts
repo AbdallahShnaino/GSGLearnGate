@@ -70,6 +70,7 @@ import {
   AttendanceRecordOne,
   Comments,
   SubmissionId,
+  newAnnouncements,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorTasksResponse } from "@/types/tasks";
@@ -1436,4 +1437,29 @@ export async function getSubmissionIdByTaskId(
     .where(and(eq(coursesTable.id, courseId), eq(tasksTable.id, TaskId)));
 
   return SubmissionId;
+}
+
+export async function getStudentAnnouncementsById(
+  studentId: number
+): Promise<newAnnouncements[] | null> {
+  const results = await db
+    .select({
+      id: announcementsTable.id,
+      postedBy: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      courseId: coursesTable.id,
+      title: announcementsTable.title,
+      description: announcementsTable.description,
+      createdAt: announcementsTable.createdAt,
+      courseTitle: coursesTable.title,
+    })
+    .from(announcementsTable)
+    .innerJoin(usersTable, eq(usersTable.id, announcementsTable.postedBy))
+    .innerJoin(coursesTable, eq(coursesTable.id, announcementsTable.courseId))
+    .innerJoin(
+      studentsCoursesTable,
+      eq(coursesTable.id, studentsCoursesTable.courseId)
+    )
+    .where(eq(studentsCoursesTable.studentId, studentId));
+
+  return results.length > 0 ? results : null;
 }
