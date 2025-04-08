@@ -27,11 +27,15 @@ const page = async ({ params }: IProps) => {
           taskId={task.id}
           title={task.title}
           paths={paths}
-        />{" "}
-        <PublicComments taskId={Number(taskId)} />
-      </div>
+        />
 
-      <CardFooter taskId={Number(taskId)} Link={"/monitor/tasks/submissions"} />
+        <PublicComments taskId={Number(taskId)} />
+
+        <CardFooter
+          taskId={Number(taskId)}
+          Link={"/co-monitor/tasks/students-submissions-list"}
+        />
+      </div>
     </div>
   );
 };

@@ -81,7 +81,7 @@ export async function fetchCommentsBySubmissionId(submissionId: number, Comentor
     allComments.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
     if (!allComments || allComments.length === 0) {
-      throw new Error("No comments found for the given submission.");
+      return []; 
     }
 
     return allComments;
@@ -127,11 +127,11 @@ export async function saveSubmissionData({
 }
 export async function fetchPublicCommentsByTaskId(taskId: number) {
   try {
-    
     const publicComments = await getPublicCommentsByTaskId(taskId);
 
     if (!publicComments || publicComments.length === 0) {
-      throw new Error("No public comments found for the given task.");
+      console.warn("No public comments found for the given task.");
+      return [];
     }
 
     return publicComments;

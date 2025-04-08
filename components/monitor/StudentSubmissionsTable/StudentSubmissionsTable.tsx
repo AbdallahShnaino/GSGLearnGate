@@ -78,7 +78,7 @@ export default function StudentSubmissionsTable({ taskId }: IProps) {
                 >
                   <option value="All">All Submissions</option>
                   <option value="GRADED">Graded</option>
-                  <option value="PENDING">Pending</option>
+                  <option value="SUBMITTED">SUBMITTED</option>
                   <option value="NOT SUBMITTED">Not Submitted</option>
                 </select>
               </div>

@@ -2,7 +2,7 @@ import { fetchCommentsBySubmissionId } from "@/services/co-mentor-func";
 import { PrivateComment } from "@/types";
 import { useState, useEffect } from "react";
 
-export function usePrivateComments(submissionId: number,ComentorId:number) {
+export function usePrivateComments(submissionId: number, CoMentorId: number) {
   const [privateComments, setPrivateComments] = useState<PrivateComment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -12,8 +12,8 @@ export function usePrivateComments(submissionId: number,ComentorId:number) {
       try {
         setLoading(true);
         setError(null);
-        const comments = await fetchCommentsBySubmissionId(submissionId,ComentorId);
-        setPrivateComments(comments);
+        const comments = await fetchCommentsBySubmissionId(submissionId, CoMentorId);
+        setPrivateComments(comments || []);
       } catch (err) {
         console.error("Error fetching private comments:", err);
         setError("Failed to fetch private comments.");
@@ -25,7 +25,7 @@ export function usePrivateComments(submissionId: number,ComentorId:number) {
     if (submissionId) {
       fetchComments();
     }
-  }, [submissionId]);
+  }, [submissionId, CoMentorId]);
 
-  return { privateComments, loading, error, setPrivateComments,};
+  return { privateComments, loading, error, setPrivateComments };
 }

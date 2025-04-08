@@ -16,17 +16,17 @@ export default function RootLayout({
       icon: <CallBell size={16} />,
     },
     {
-      href: "/co-monitor/announcments",
-      label: "Announcment",
+      href: "/co-monitor/announcements",
+      label: "Announcements",
       icon: <Megaphone size={16} />,
     },
     {
-      href: "/co-monitor/meeting-requests",
-      label: "Meeting Requests",
+      href: "/co-monitor/availability",
+      label: "Meeting Appointments",
       icon: <VideoCamera size={16} />,
     },
     {
-      href: "/co-monitor/task-list",
+      href: "/co-monitor/tasks",
       label: "Tasks",
       icon: <ClipboardText size={16} weight="bold" />,
     },

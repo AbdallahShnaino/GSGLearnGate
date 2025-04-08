@@ -42,7 +42,7 @@ export function useStudentSubmissions(taskId: number, searchQuery: string) {
   ).length;
 
   const pendingCount = submissions.filter(
-    (sub) => sub.status.toLowerCase() === AssignmentStatus.PENDING.toLowerCase()
+    (sub) => sub.status.toLowerCase() === AssignmentStatus.SUBMITTED.toLowerCase()
   ).length;
 
   const notSubmittedCount = submissions.filter(

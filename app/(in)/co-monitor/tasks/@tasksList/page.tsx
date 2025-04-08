@@ -2,11 +2,11 @@
 import TempPagination from "@/components/Pagination/TempPagination";
 import TaskListCom from "@/components/TasksList/TaskListCom";
 import Loader from "@/components/Shared/Loader";
-import { useMonitorTasks } from "@/hooks/useMonitorTasks";
+import { useCoMonitorTasks } from "@/hooks/useCoMonitorTasks";
 
 export default function TasksList() {
   const { loading, studentCounts, tasks, totalPages, page, updatePage } =
-    useMonitorTasks();
+    useCoMonitorTasks();
 
   if (loading) {
     return <Loader message="Loading data..." />;
@@ -23,7 +23,7 @@ export default function TasksList() {
           <TaskListCom
             tasks={tasks}
             courseStudentCount={studentCounts}
-            role="monitor"
+            role="co-monitor"
           />
           <TempPagination
             currentPage={page}

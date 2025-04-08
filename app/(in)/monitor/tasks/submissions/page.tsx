@@ -1,4 +1,4 @@
-import StudentSubmissionsTable from "@/components/monitor/StudentSubmissionsTable/StudentSubmissionsTable";
+import StudentSubmissionsTable from "@/components/StudentSubmissionsTable/StudentSubmissionsTable";
 
 interface IProps {
   searchParams: { [taskId: string]: string };
@@ -18,7 +18,7 @@ const page = async ({ searchParams }: IProps) => {
             Manage and track all student submissions
           </p>
         </div>
-        <StudentSubmissionsTable taskId={Number(taskId)} />
+        <StudentSubmissionsTable taskId={Number(taskId)} role="monitor" />
       </div>
     </div>
   );
