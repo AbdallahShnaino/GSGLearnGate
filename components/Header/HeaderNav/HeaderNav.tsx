@@ -4,6 +4,8 @@ import UserMenu from "../UserMenu/UserMenu";
 import { List } from "@phosphor-icons/react/dist/ssr";
 import HeaderLogo from "../HeaderLogo/HeaderLogo";
 import NavLinks from "@/components/NavLinks/NavLinks";
+import { useCookie } from "@/hooks/useCookie";
+import Link from "next/link";
 
 interface positionProps {
   position: string;
@@ -12,12 +14,11 @@ interface positionProps {
 const HeaderNav = ({ position }: positionProps) => {
   const [showUserDetails, setShowUserDetails] = useState(false);
   const [showNav, setShowNav] = useState(false);
-  const [login, setLogin] = useState(true);
+  const {email, role, token} = useCookie();
+  console.log(token)
   const user = {
-    first_name: "Mohammed",
-    last_name: "Qashqesh",
-    email: "mo.qashqesh@gmail.com",
-    adminRole: true,
+    email: email || "",
+    role: role || "",
   };
 
   return (
@@ -30,13 +31,25 @@ const HeaderNav = ({ position }: positionProps) => {
     >
       <HeaderLogo position={position}/>
       <NavLinks showNav={showNav} setShowNav={setShowNav} position={position}/>
-      <UserMenu
-        user={user}
-        showUserDetails={showUserDetails}
-        setShowUserDetails={setShowUserDetails}
-        login={login}
-        setLogin={setLogin}
-      />
+      {token !==null ? (
+        <UserMenu
+          user={user}
+          showUserDetails={showUserDetails}
+          setShowUserDetails={setShowUserDetails}
+        />
+      ) : (
+        <div className="flex items-center gap-3">
+          <Link className="py-2 px-4 hover:bg-[#f9fafb]" href={"/login"}>
+            Log in
+          </Link>
+          <Link
+            className="py-2 px-4 bg-[var(--primary-color)] rounded text-white"
+            href={"/signup"}
+          >
+            Get started
+          </Link>
+        </div>
+      )}
       <List
         onClick={() => setShowNav(!showNav)}
         size={26}

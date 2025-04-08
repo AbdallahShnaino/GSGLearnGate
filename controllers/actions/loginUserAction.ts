@@ -59,13 +59,13 @@ export async function loginUser(
 
     const cookieStore = await cookies();
     cookieStore.set("token", token, {
-      httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       path: "/",
       maxAge: 7 * 24 * 60 * 60,
     });
     cookieStore.set("role", String(authenticatedUser.role));
     cookieStore.set("userId", String(authenticatedUser.userId));
+    cookieStore.set("email", String(email));
     return {
       success: true,
       message: "Login Successfully",
