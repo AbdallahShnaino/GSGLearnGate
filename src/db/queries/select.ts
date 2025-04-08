@@ -67,23 +67,18 @@ import {
   UsersNames,
   CourseSchedule,
   AttendanceRecordStatus,
-
   PrivateComment,
   SubmissionView,
   SubmissionAttachment,
-
   CourseWithPresenter,
   SoonLectures,
   AttendanceRecordOne,
   Comments,
   SubmissionId,
   newAnnouncements,
-
   PublicComment,
-
-
   Attachments,
-
+  JoiningOrdersResponse,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorTasksResponse } from "@/types/tasks";
@@ -804,6 +799,73 @@ export async function getAllSubmissions(): Promise<Submission[]> {
   return await db.select().from(submissionsTable).all();
 }
 
+export async function getAllJoiningRequestsWithDetails(
+  monitorId: number,
+  courseId: number | undefined,
+  page: number = 1,
+  pageSize: number = 10
+): Promise<JoiningOrdersResponse> {
+  const offset = (page - 1) * pageSize;
+  const whereConditions = [eq(coursesTable.monitorId, monitorId)];
+  if (courseId !== undefined) {
+    whereConditions.push(eq(coursesTable.id, courseId));
+  }
+
+  const totalCountResult = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(joiningRequestsTable)
+    .leftJoin(coursesTable, eq(joiningRequestsTable.courseId, coursesTable.id))
+    .leftJoin(
+      studentsTable,
+      eq(joiningRequestsTable.studentId, studentsTable.id)
+    )
+    .leftJoin(usersTable, eq(studentsTable.userId, usersTable.id))
+    .where(and(...whereConditions))
+    .get();
+
+  const totalCount = totalCountResult?.count ?? 0;
+  const totalPages = Math.ceil(totalCount / pageSize);
+
+  const results = await db
+    .select({
+      id: joiningRequestsTable.id,
+      courseName: coursesTable.title,
+      courseId: coursesTable.id,
+      studentId: usersTable.id,
+      firstName: usersTable.firstName,
+      lastName: usersTable.lastName,
+      email: usersTable.email,
+      image: usersTable.image,
+      interviewStatus: joiningRequestsTable.interviewStatus,
+      joiningStatus: joiningRequestsTable.joiningStatus,
+    })
+    .from(joiningRequestsTable)
+    .leftJoin(coursesTable, eq(joiningRequestsTable.courseId, coursesTable.id))
+    .leftJoin(
+      studentsTable,
+      eq(joiningRequestsTable.studentId, studentsTable.id)
+    )
+    .leftJoin(usersTable, eq(studentsTable.userId, usersTable.id))
+    .where(and(...whereConditions))
+    .limit(pageSize)
+    .offset(offset)
+    .all();
+  return {
+    totalPages,
+    JoiningOrders: results.map((result) => ({
+      id: result.id,
+      courseId: result.courseId,
+      studentId: result.studentId,
+      courseName: result.courseName ?? "Unknown Course",
+      firstName: result.firstName ?? "Unknown",
+      lastName: result.lastName,
+      email: result.email,
+      image: result.image,
+      interviewStatus: result.interviewStatus,
+      joiningStatus: result.joiningStatus,
+    })),
+  };
+}
 export async function getSubmissionsByCourse(
   courseId: number
 ): Promise<Submission[] | null> {
@@ -837,68 +899,6 @@ export async function getAllAttendances(): Promise<Attendance[]> {
 
 export async function getAllJoiningRequests(): Promise<JoiningRequest[]> {
   return await db.select().from(joiningRequestsTable).all();
-}
-
-export async function getAllJoiningRequestsWithDetails(
-  monitorId: number,
-  courseId: number | undefined,
-  page: number = 1,
-  pageSize: number = 10
-): Promise<JoiningOrder[]> {
-  const offset = (page - 1) * pageSize;
-  const whereConditions = [eq(coursesTable.monitorId, monitorId)];
-  if (courseId !== undefined) {
-    whereConditions.push(eq(coursesTable.id, courseId));
-  }
-  const results = await db
-    .select({
-      id: joiningRequestsTable.id,
-      courseName: coursesTable.title,
-      courseId: coursesTable.id,
-      studentId: usersTable.id,
-      firstName: usersTable.firstName,
-      lastName: usersTable.lastName,
-      email: usersTable.email,
-      image: usersTable.image,
-      interviewStatus: joiningRequestsTable.interviewStatus,
-      joiningStatus: joiningRequestsTable.joiningStatus,
-    })
-    .from(joiningRequestsTable)
-    .leftJoin(coursesTable, eq(joiningRequestsTable.courseId, coursesTable.id))
-    .leftJoin(
-      studentsTable,
-      eq(joiningRequestsTable.studentId, studentsTable.id)
-    )
-    .leftJoin(usersTable, eq(studentsTable.userId, usersTable.id))
-    .where(and(...whereConditions))
-    .limit(pageSize)
-    .offset(offset)
-    .all();
-  return results.map(
-    (result: {
-      id: any;
-      courseId: any;
-      studentId: any;
-      courseName: any;
-      firstName: any;
-      lastName: any;
-      email: any;
-      image: any;
-      interviewStatus: any;
-      joiningStatus: any;
-    }) => ({
-      id: result.id,
-      courseId: result.courseId,
-      studentId: result.studentId,
-      courseName: result.courseName ?? "Unknown Course",
-      firstName: result.firstName ?? "Unknown",
-      lastName: result.lastName,
-      email: result.email,
-      image: result.image,
-      interviewStatus: result.interviewStatus,
-      joiningStatus: result.joiningStatus,
-    })
-  );
 }
 
 export async function updateJoiningRequest(
@@ -1382,10 +1382,7 @@ export async function getAllCoMonitorAppointments(
     .all();
 }
 
-
-export async function getSubmissionById(
-  submissionId: number
-): Promise<{
+export async function getSubmissionById(submissionId: number): Promise<{
   submission: SubmissionView | null;
   attachments: SubmissionAttachment;
 }> {
@@ -1416,7 +1413,11 @@ export async function getSubmissionById(
   if (!result) {
     return {
       submission: null,
-      attachments: { attachmentId: 0, attachmentPath: '', attachmentType: undefined },
+      attachments: {
+        attachmentId: 0,
+        attachmentPath: "",
+        attachmentType: undefined,
+      },
     };
   }
 
@@ -1435,13 +1436,20 @@ export async function getSubmissionById(
       attachmentType: attachmentsTable.type,
     })
     .from(attachmentsTable)
-    .innerJoin(submissionsTable, eq(attachmentsTable.id, submissionsTable.attachmentId))
+    .innerJoin(
+      submissionsTable,
+      eq(attachmentsTable.id, submissionsTable.attachmentId)
+    )
     .where(eq(submissionsTable.id, submissionId))
     .all();
 
   return {
     submission,
-    attachments: attachmentsResult[0] || { attachmentId: 0, attachmentPath: '', attachmentType: undefined },
+    attachments: attachmentsResult[0] || {
+      attachmentId: 0,
+      attachmentPath: "",
+      attachmentType: undefined,
+    },
   };
 }
 export async function getPrivateCommentsBySubmission(
@@ -1488,7 +1496,6 @@ export async function getPrivateCommentsReplyBySubmission(
   submissionId: number,
   ComentorId: number
 ): Promise<PrivateComment[]> {
- 
   const comments = await db
     .select({
       commentId: commentsTable.id,
@@ -1502,7 +1509,7 @@ export async function getPrivateCommentsReplyBySubmission(
     .where(
       and(
         eq(commentsTable.submissionId, submissionId),
-        eq(commentsTable.coMonitorId,ComentorId),
+        eq(commentsTable.coMonitorId, ComentorId),
         eq(commentsTable.isPublic, false)
       )
     )
@@ -1554,7 +1561,9 @@ export async function getAllCoursesWithMonitors(): Promise<Course[]> {
   }));
 }
 
-export async function getCourseWithMonitor(id:number): Promise<CourseWithPresenter> {
+export async function getCourseWithMonitor(
+  id: number
+): Promise<CourseWithPresenter> {
   const results = await db
     .select({
       id: coursesTable.id,
@@ -1583,15 +1592,17 @@ export async function getCourseWithMonitor(id:number): Promise<CourseWithPresent
     })
     .from(coursesTable)
     .leftJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
-    .leftJoin(usersTable, eq(monitorsTable.userId, usersTable.id)).where(eq(coursesTable.id, id)).get();
+    .leftJoin(usersTable, eq(monitorsTable.userId, usersTable.id))
+    .where(eq(coursesTable.id, id))
+    .get();
 
-    return {
-      ...results,
-      presenterName: results.monitorFirstName 
-        ? `${results.monitorFirstName} ${results.monitorLastName}`
-        : 'Unknown',
-      presenterImage: results.monitorImage || null
-    };
+  return {
+    ...results,
+    presenterName: results.monitorFirstName
+      ? `${results.monitorFirstName} ${results.monitorLastName}`
+      : "Unknown",
+    presenterImage: results.monitorImage || null,
+  };
 }
 
 export async function getStudentAttendanceById(
@@ -1689,7 +1700,6 @@ export async function getStudentAnnouncementsById(
   return results.length > 0 ? results : null;
 }
 
-
 export async function getPublicCommentsByTaskId(
   taskId: number
 ): Promise<PublicComment[]> {
@@ -1717,17 +1727,23 @@ export async function getPublicCommentsByTaskId(
     })
     .from(commentsTable)
     .leftJoin(studentsTable, eq(commentsTable.studentId, studentsTable.id))
-    .leftJoin(coMonitorsTable, eq(commentsTable.coMonitorId, coMonitorsTable.id))
+    .leftJoin(
+      coMonitorsTable,
+      eq(commentsTable.coMonitorId, coMonitorsTable.id)
+    )
     .leftJoin(monitorsTable, eq(commentsTable.monitorId, monitorsTable.id))
-    .innerJoin(usersTable, sql`
+    .innerJoin(
+      usersTable,
+      sql`
       ${usersTable.id} = COALESCE(
         ${studentsTable.userId},
         ${coMonitorsTable.userId},
         ${monitorsTable.userId}
       )
-    `)
+    `
+    )
     .where(
-      and(eq(commentsTable.taskId, taskId) , eq(commentsTable.isPublic, true))
+      and(eq(commentsTable.taskId, taskId), eq(commentsTable.isPublic, true))
     )
     .orderBy(asc(commentsTable.createdAt));
 
@@ -1745,4 +1761,3 @@ export async function getAttachmentPathsByTaskId(
 
   return attachments.map((attachment: Attachment) => attachment.path);
 }
-
