@@ -187,6 +187,10 @@ export type JoiningRequest = {
   joiningStatus: Status;
 } & Timestamps;
 
+export interface JoiningOrdersResponse {
+  totalPages: number;
+  JoiningOrders: JoiningOrder[];
+}
 export interface JoiningOrder {
   id: number;
   courseId: number | null;
@@ -311,7 +315,7 @@ export type StudentAppointments = {
   id: number | null;
   coMonitor: string | null;
   date: Date;
-  status: StudentAppointmentStatus;
+  startTime: string;
   courseTitle: string;
 };
 
@@ -474,12 +478,12 @@ export type newAnnouncements = {
 } & Announcement;
 
 export interface PublicComment {
-   commentId: number;
-    commentText: string;
-    createdAt: string;
-    isPublic: boolean;
-    userName: string;
-    userEmail: string | null;
-    userImage: string | null;
-    userType: string;
+  commentId: number;
+  commentText: string;
+  createdAt: string;
+  isPublic: boolean;
+  userName: string;
+  userEmail: string | null;
+  userImage: string | null;
+  userType: string;
 }

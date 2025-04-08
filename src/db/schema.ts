@@ -191,7 +191,7 @@ export const tasksTable = sqliteTable("tasks", {
       onDelete: "cascade",
     }),
   deadline: integer("deadline", { mode: "timestamp" }).notNull(),
-  points: int("grade"),
+  points: int("points"),
   ...timestamps,
 });
 
@@ -200,7 +200,7 @@ export const attachmentsTable = sqliteTable("attachments", {
   taskId: int("task_id")
     .notNull()
     .references((): AnySQLiteColumn => tasksTable.id),
-  creatorId: int("student_id")
+  creatorId: int("creatorId")
     .notNull()
     .references((): AnySQLiteColumn => studentsTable.id),
   courseId: int("course_id")

@@ -44,10 +44,13 @@ export async function updateUser(
   return updated ?? null;
 }
 
-export async function bookAppointment(appointmentId: number): Promise<boolean> {
+export async function bookAppointment(
+  appointmentId: number,
+  studentId: number
+): Promise<boolean> {
   const [updated] = await db
     .update(coMonitorAvailabilityTable)
-    .set({ isBooked: true })
+    .set({ isBooked: true, bookedByStudentId: studentId })
     .where(eq(coMonitorAvailabilityTable.id, appointmentId))
     .returning();
 

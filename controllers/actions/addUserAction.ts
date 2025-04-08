@@ -1,10 +1,8 @@
 "use server";
-import { randomUUID } from "crypto";
-import path from "path";
-import { promises as fs } from "fs";
 import { Role } from "@/types";
 import { addUser } from "@/services/users";
 import bcrypt from "bcryptjs";
+import { writeFile } from "@/utils/writeFile";
 
 export type UserState =
   | { success: false; error: string; message: string; id: undefined }
@@ -38,19 +36,8 @@ export async function submitUser(
     let publicFilePath: string = "";
 
     if (image) {
-      const fileExtension = path.extname(image.name);
 
-      const randomName = `${randomUUID()}${fileExtension}`;
-      const uploadDir = path.join(process.cwd(), "public", "usersImages");
-
-      await fs.mkdir(uploadDir, { recursive: true });
-
-      const filePath = path.join(uploadDir, randomName);
-      const fileBuffer = Buffer.from(await image.arrayBuffer());
-
-      await fs.writeFile(filePath, fileBuffer);
-
-      publicFilePath = `/usersImages/${randomName}`;
+      publicFilePath = await writeFile(image);
     }
 
     const newUser= await addUser({

@@ -58,8 +58,11 @@ export function useMonitorTasks() {
         setLoading(false);
       }
     }
-
-    fetchTasks();
+    try {
+      fetchTasks();
+    } catch (error) {
+      throw new Error("CODE:DATABASE_CONNECTION_ISSUE");
+    }
   }, [taskStatus, page]);
 
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);

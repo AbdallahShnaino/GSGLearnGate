@@ -5,20 +5,7 @@ interface IProps {
 }
 const StudentAppointmentsTable = async (props: IProps) => {
   const appointments = await getStudentAppointments(Number(props.studentId));
-  const statusStyles = {
-    accepted: {
-      text: "Accepted",
-      color: "bg-[#FFA41F] text-white",
-    },
-    pending: {
-      text: "Pending",
-      color: "bg-[#E99375] text-white",
-    },
-    rejected: {
-      text: "Rejected",
-      color: "bg-gray-400 text-white",
-    },
-  };
+
   return (
     <div className="w-full max-w-4xl mx-auto p-4 space-y-4">
       <div className="overflow-hidden border border-gray-200 shadow-sm rounded-xl">
@@ -30,7 +17,6 @@ const StudentAppointmentsTable = async (props: IProps) => {
               <th className="px-4 py-4 text-left">Co-Monitor</th>
               <th className="px-4 py-4 text-left">Date</th>
               <th className="px-4 py-4 text-center">Time</th>
-              <th className="px-4 py-4 text-center">Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -49,22 +35,7 @@ const StudentAppointmentsTable = async (props: IProps) => {
                   {appointment.date?.toLocaleDateString("en-GB")}
                 </td>
                 <td className="px-4 py-4 text-gray-700">
-                  {appointment.date!.toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </td>
-                <td
-                  className={`px-4 py-2 rounded-lg font-semibold ${
-                    statusStyles[appointment.status.toLowerCase()]?.color ||
-                    "bg-gray-200 text-black"
-                  }`}
-                >
-                  {statusStyles[appointment.status.toLowerCase()]?.text ||
-                    "Unknown"}
-                </td>
-                <td>
-                  <div className="flex justify-evenly"></div>
+                  {appointment.startTime}
                 </td>
               </tr>
             ))}

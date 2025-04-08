@@ -31,7 +31,7 @@ const CourseComponent = ({ courses }: IProps) => {
   return (
     <div className="grid grid-cols-[repeat(auto-fill,_minmax(300px,_1fr))] gap-8">
       {currentCourses.map((course) => {
-        const imageUrl = "https://pbs.twimg.com/profile_images/1785867863191932928/EpOqfO6d_400x400.png";
+        const imageUrl = course.image || "https://pbs.twimg.com/profile_images/1785867863191932928/EpOqfO6d_400x400.png";
         return (
           <Link
             href={`/course-details/${course.id}`}

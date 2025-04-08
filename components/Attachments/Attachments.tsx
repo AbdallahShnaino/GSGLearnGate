@@ -34,9 +34,7 @@ const Attachments = ({ paths }: IProps) => {
     }));
 
     try {
-      console.log(filePath);
       const headResponse = await fetch(filePath, { method: "HEAD" });
-      console.log(headResponse);
 
       if (!headResponse.ok) {
         throw new Error("File not found on server");

@@ -22,6 +22,11 @@ export default function RootLayout({
     },
     {
       href: "/co-monitor/availability",
+      label: "Availability",
+      icon: <Megaphone size={16} />,
+    },
+    {
+      href: "/co-monitor/meeting-requests",
       label: "Meeting Appointments",
       icon: <VideoCamera size={16} />,
     },
