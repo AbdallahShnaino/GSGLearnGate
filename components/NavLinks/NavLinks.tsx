@@ -48,14 +48,6 @@ const NavLinks: React.FC<ShowNavProps> = ({
             Contact Us
           </Link>
         </li>
-        <li className="lg:text-white font-bold max-lg:w-full">
-          <Link
-            className={`${position === "absolute" ?"lg:text-white" :"lg:text-black"} max-lg:text-lg py-2 px-4 hover:text-[var(--primary-color)]  max-lg:py-4 max-lg:w-full max-lg:block`}
-            href={"/fq"}
-          >
-            FQ
-          </Link>
-        </li>
       </ul>
     </nav>
   );
