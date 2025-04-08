@@ -1,5 +1,3 @@
-
-
 export interface Student {
   id: number;
   name: string;
@@ -22,3 +20,16 @@ export interface MeetingRequest {
   profilePicture: string;
   caption: string;
 }
+export type StudentItem = {
+  id: number;
+  userId: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  image: string | null;
+};
+
+export type StudentsListResponse = {
+  students: StudentItem[];
+  totalPages: number;
+};
