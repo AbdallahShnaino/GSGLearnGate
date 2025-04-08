@@ -58,11 +58,11 @@ export default function SendAnnouncementForm({ courses }: IProps) {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto py-6 px-4">
+    <div className="w-full mx-auto mt-4 mb-10">
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="bg-white rounded-lg shadow-2xl overflow-hidden">
-        <div className="px-6 py-10">
-          <form action={formAction} className="space-y-4">
+      <div className="bg-white rounded-lg shadow-md border-1 border-gray-300 overflow-hidden">
+        <div className="p-5">
+          <form action={formAction} className="space-y-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label
@@ -109,13 +109,15 @@ export default function SendAnnouncementForm({ courses }: IProps) {
                 name="description"
                 placeholder="Enter Course Description"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 resize-none"
+                rows={12}
               />
             </div>
             <div className="flex justify-center">
               <button
                 type="submit"
-                className="w-1/3 px-4 py-2 text-white bg-[#FFA41F] rounded-md shadow-sm text-sm font-medium hover:bg-orange-500 transition"
+                className="w-full py-2 border-none rounded-md shadow-sm text-lg text-white bg-[#FFA41F]
+              cursor-pointer hover:shadow-md hover:bg-[#ffb11f]"
               >
                 {isPending ? "Submitting" : "Submit"}
               </button>
