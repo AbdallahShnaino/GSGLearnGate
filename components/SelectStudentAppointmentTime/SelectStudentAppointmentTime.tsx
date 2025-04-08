@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 interface IProps {
   coMonitorId: number;
+  studentId: string;
 }
 const SelectStudentAppointmentTime = (props: IProps) => {
   const [selectedDate, setSelectedDate] = useState("");
@@ -30,7 +31,7 @@ const SelectStudentAppointmentTime = (props: IProps) => {
 
   const handleBooking = async () => {
     try {
-      await bookAppointment(selectedRecord!.id);
+      await bookAppointment(selectedRecord!.id, Number(props.studentId));
       alert(`Appointment booked on ${selectedDate} at ${time}`);
     } catch (error) {
       console.error("Booking failed:", error);
