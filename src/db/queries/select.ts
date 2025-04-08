@@ -12,7 +12,8 @@ import {
   gte,
   lt,
   inArray,
-  asc,desc,
+  asc,
+  desc,
 } from "drizzle-orm";
 
 import {
@@ -79,7 +80,6 @@ import {
   PublicComment,
   Attachments,
   JoiningOrdersResponse,
-
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorTasksResponse } from "@/types/tasks";
@@ -91,7 +91,7 @@ import {
 import { CoMonitorAppointment } from "@/types/appointments";
 import { addDays, getDay, isAfter, setHours, setMinutes } from "date-fns";
 import { boolean } from "drizzle-orm/gel-core";
-
+import { StudentsListResponse } from "@/types/students";
 
 export async function getAllUsers(): Promise<User[]> {
   return await db.select().from(usersTable).all();
@@ -276,7 +276,6 @@ export async function getStudents(
 
   return { users: result, totalCount: totalCount.length };
 }
-
 
 export async function getAllCourses(): Promise<Course[]> {
   return await db.select().from(coursesTable).all();
@@ -527,10 +526,8 @@ export async function getCoMonitorAppointments(
 }> {
   const offset = (page - 1) * pageSize;
 
- 
   const whereConditions = [eq(appointmentsTable.coMonitorId, coMonitorId)];
 
-  
   if (courseId !== undefined) {
     whereConditions.push(eq(appointmentsTable.courseId, courseId));
   }
@@ -557,7 +554,6 @@ export async function getCoMonitorAppointments(
     .limit(pageSize)
     .offset(offset);
 
-  
   const countResults = await db
     .select({ count: sql<number>`count(*)` })
     .from(appointmentsTable)
@@ -1759,4 +1755,98 @@ export async function getAttachmentPathsByTaskId(
     .execute();
 
   return attachments.map((attachment: Attachment) => attachment.path);
+}
+
+export async function getStudentsListByCourseId(
+  courseId?: number,
+  page: number = 1,
+  itemsPerPage: number = 10,
+  monitorId?: number,
+  coMonitorId?: number
+): Promise<StudentsListResponse> {
+  console.log("courseId ", courseId);
+
+  try {
+    // Validate that either monitorId or coMonitorId is provided when no courseId is specified
+    if (!courseId && !monitorId && !coMonitorId) {
+      throw new Error(
+        "Either courseId or monitorId/coMonitorId must be provided"
+      );
+    }
+
+    // Base query for counting
+    let countQuery = db
+      .select({ count: count() })
+      .from(studentsCoursesTable)
+      .innerJoin(
+        studentsTable,
+        eq(studentsCoursesTable.studentId, studentsTable.id)
+      )
+      .innerJoin(usersTable, eq(studentsTable.userId, usersTable.id))
+      .innerJoin(
+        coursesTable,
+        eq(studentsCoursesTable.courseId, coursesTable.id)
+      );
+
+    let studentsQuery = db
+      .select({
+        id: studentsTable.id,
+        userId: studentsTable.userId,
+        firstName: usersTable.firstName,
+        lastName: usersTable.lastName,
+        email: usersTable.email,
+        image: usersTable.image,
+        courseId: coursesTable.id,
+        courseTitle: coursesTable.title,
+      })
+      .from(studentsCoursesTable)
+      .innerJoin(
+        studentsTable,
+        eq(studentsCoursesTable.studentId, studentsTable.id)
+      )
+      .innerJoin(usersTable, eq(studentsTable.userId, usersTable.id))
+      .innerJoin(
+        coursesTable,
+        eq(studentsCoursesTable.courseId, coursesTable.id)
+      )
+      .limit(itemsPerPage)
+      .offset((page - 1) * itemsPerPage);
+
+    if (courseId) {
+      countQuery = countQuery.where(
+        eq(studentsCoursesTable.courseId, courseId)
+      );
+      studentsQuery = studentsQuery.where(
+        eq(studentsCoursesTable.courseId, courseId)
+      );
+    } else {
+      if (monitorId) {
+        countQuery = countQuery.where(eq(coursesTable.monitorId, monitorId));
+        studentsQuery = studentsQuery.where(
+          eq(coursesTable.monitorId, monitorId)
+        );
+      } else if (coMonitorId) {
+        countQuery = countQuery.where(
+          eq(coursesTable.coMonitorId, coMonitorId)
+        );
+        studentsQuery = studentsQuery.where(
+          eq(coursesTable.coMonitorId, coMonitorId)
+        );
+      }
+    }
+
+    const totalStudentsResult = await countQuery;
+    const totalStudents = totalStudentsResult[0]?.count || 0;
+    const totalPages = Math.ceil(totalStudents / itemsPerPage);
+
+    const students = await studentsQuery;
+    console.log(students);
+    return {
+      students,
+      totalPages,
+    };
+  } catch (error) {
+    console.error("Error fetching students:", error);
+    throw error;
+  }
 }

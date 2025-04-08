@@ -3,10 +3,16 @@ import {
   Student,
   UserGear,
   UserCirclePlus,
+  BookOpenUser,
 } from "@phosphor-icons/react/dist/ssr";
 import { SidebarLink } from "@/types/user";
 
 export const links: SidebarLink[] = [
+  {
+    href: "/monitor/students",
+    label: "Students",
+    icon: <BookOpenUser size={24} weight="bold" />,
+  },
   {
     href: "/monitor/joining-requests",
     label: "Joining Requests",
