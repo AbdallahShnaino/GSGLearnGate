@@ -7,7 +7,6 @@ export async function logoutUser(): Promise<{ success: boolean; message: string 
     
     cookieStore.delete("token");
     cookieStore.delete("role");
-    cookieStore.delete("userId");
     
     return {
       success: true,

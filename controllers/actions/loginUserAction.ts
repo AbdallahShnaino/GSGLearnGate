@@ -55,7 +55,7 @@ export async function loginUser(
       role: undefined,
     };
   } else {
-    const token = generateToken({ userId: authenticatedUser.userId, email });
+    const token = generateToken({ userId: authenticatedUser.userId, email, role:authenticatedUser.role });
 
     const cookieStore = await cookies();
     cookieStore.set("token", token, {
@@ -64,8 +64,6 @@ export async function loginUser(
       maxAge: 7 * 24 * 60 * 60,
     });
     cookieStore.set("role", String(authenticatedUser.role));
-    cookieStore.set("userId", String(authenticatedUser.userId));
-    cookieStore.set("email", String(email));
     return {
       success: true,
       message: "Login Successfully",
