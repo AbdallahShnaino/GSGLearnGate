@@ -12,7 +12,7 @@ import {
   gte,
   lt,
   inArray,
-  asc,
+  asc,desc,
 } from "drizzle-orm";
 
 import {
@@ -79,6 +79,7 @@ import {
   PublicComment,
   Attachments,
   JoiningOrdersResponse,
+
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorTasksResponse } from "@/types/tasks";
@@ -90,6 +91,7 @@ import {
 import { CoMonitorAppointment } from "@/types/appointments";
 import { addDays, getDay, isAfter, setHours, setMinutes } from "date-fns";
 import { boolean } from "drizzle-orm/gel-core";
+
 
 export async function getAllUsers(): Promise<User[]> {
   return await db.select().from(usersTable).all();
@@ -274,6 +276,7 @@ export async function getStudents(
 
   return { users: result, totalCount: totalCount.length };
 }
+
 
 export async function getAllCourses(): Promise<Course[]> {
   return await db.select().from(coursesTable).all();
@@ -519,63 +522,53 @@ export async function getCoMonitorAppointments(
   page: number = 1,
   pageSize: number = 10
 ): Promise<{
-  coMonitorId: number;
   appointments: AppointmentWithStudent[];
   totalCount: number;
 }> {
   const offset = (page - 1) * pageSize;
 
+ 
   const whereConditions = [eq(appointmentsTable.coMonitorId, coMonitorId)];
 
+  
   if (courseId !== undefined) {
-    whereConditions.push(eq(coursesTable.id, courseId));
+    whereConditions.push(eq(appointmentsTable.courseId, courseId));
   }
 
   const results = await db
     .select({
       id: appointmentsTable.id,
       studentId: appointmentsTable.studentId,
-      date: appointmentsTable.date,
+      date: appointmentsTable.dateTime,
       caption: appointmentsTable.caption,
-      coMonitorId: appointmentsTable.coMonitorId,
       status: appointmentsTable.status,
       createdAt: appointmentsTable.createdAt,
       profileImage: usersTable.image,
       studentName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
       studentEmail: usersTable.email,
       courseName: coursesTable.title,
-      courseId: coursesTable.id,
     })
     .from(appointmentsTable)
     .innerJoin(studentsTable, eq(appointmentsTable.studentId, studentsTable.id))
     .innerJoin(usersTable, eq(studentsTable.userId, usersTable.id))
-    .innerJoin(
-      coursesTable,
-      eq(coursesTable.coMonitorId, appointmentsTable.coMonitorId)
-    )
+    .innerJoin(coursesTable, eq(appointmentsTable.courseId, coursesTable.id))
     .where(and(...whereConditions))
+    .orderBy(desc(appointmentsTable.createdAt))
     .limit(pageSize)
     .offset(offset);
 
-  const uniqueResults = Array.from(
-    new Map(results.map((item) => [item.studentId, item])).values()
-  );
-
+  
   const countResults = await db
-    .select({ count: sql<number>`COUNT(*)` })
+    .select({ count: sql<number>`count(*)` })
     .from(appointmentsTable)
     .innerJoin(studentsTable, eq(appointmentsTable.studentId, studentsTable.id))
     .innerJoin(usersTable, eq(studentsTable.userId, usersTable.id))
-    .innerJoin(
-      coursesTable,
-      eq(coursesTable.coMonitorId, appointmentsTable.coMonitorId)
-    )
+    .innerJoin(coursesTable, eq(appointmentsTable.courseId, coursesTable.id))
     .where(and(...whereConditions));
 
   return {
-    coMonitorId,
-    appointments: uniqueResults.length > 0 ? uniqueResults : [],
-    totalCount: countResults[0]?.count || 0,
+    appointments: results,
+    totalCount: Number(countResults[0]?.count) || 0,
   };
 }
 
@@ -1136,20 +1129,26 @@ export async function getStudentAppointments(
 ): Promise<StudentAppointments[] | null> {
   const results = await db
     .selectDistinct({
-      id: appointmentsTable.id,
-      coMonitor: sql<string>`${coMonitorsUsers.firstName} || ' ' || ${coMonitorsUsers.lastName}`,
-      date: appointmentsTable.dateTime,
-      status: appointmentsTable.status,
+      id: coMonitorAvailabilityTable.id,
+      coMonitor: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      date: coMonitorAvailabilityTable.date,
+      startTime: coMonitorAvailabilityTable.startTime,
       courseTitle: coursesTable.title,
     })
-    .from(appointmentsTable)
-    .innerJoin(studentsTable, eq(studentsTable.id, appointmentsTable.studentId))
+    .from(coMonitorAvailabilityTable)
+    .innerJoin(
+      studentsTable,
+      eq(studentsTable.id, coMonitorAvailabilityTable.bookedByStudentId)
+    )
     .innerJoin(
       coMonitorsTable,
-      eq(coMonitorsTable.id, appointmentsTable.coMonitorId)
+      eq(coMonitorsTable.id, coMonitorAvailabilityTable.coMonitorId)
     )
-    .innerJoin(coMonitorsUsers, eq(coMonitorsTable.userId, coMonitorsUsers.id))
-    .innerJoin(coursesTable, eq(coursesTable.id, appointmentsTable.courseId))
+    .innerJoin(usersTable, eq(coMonitorsTable.userId, usersTable.id))
+    .innerJoin(
+      coursesTable,
+      eq(coursesTable.id, coMonitorAvailabilityTable.courseId)
+    )
     .where(eq(studentsTable.id, studentId));
 
   return results.length > 0 ? results : null;
