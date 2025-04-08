@@ -18,7 +18,7 @@ const TempPagination = ({
 }: IProps) => {
   console.log(totalPages);
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between max-sm:w-[95%] max-sm:m-auto">
       <p className="text-sm text-gray-500">
         Page {currentPage} of {totalPages}
       </p>
