@@ -23,13 +23,11 @@ const AdminDashboard = async() => {
           <UserCircle size={32} weight="duotone" className="text-[#FFA41F]" />
         </div>
       </div>
-      <div className="w-11/12 m-auto">
-        <div className="grid grid-cols-1 ml-11 sm:grid-cols-3 sm:ml-11 md:ml-0 gap-10 p-4">
+        <div className="grid grid-cols-[repeat(auto-fill,_minmax(300px,_1fr))] gap-8 mt-4 mb-10">
           <StatisticCard title={"Total Students"} total={totalStudents} icon={<Student size={32} color="#FFA41F" weight="duotone"  />}/>
           <StatisticCard title={"Total Monitors"} total={totalMonitors} icon={<UserCircle size={32} color="#FFA41F" weight="duotone"  />}/>
           <StatisticCard title={"Total Courses"} total={totalCourses} icon={<Notebook size={32} color="#FFA41F" weight="duotone"  />}/>
         </div>
-      </div>
       <CustomBarChart chartData={chartData}/>
     </div>
   );
