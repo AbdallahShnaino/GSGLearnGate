@@ -11,29 +11,24 @@ export default function RootLayout({
 }) {
   const links: SidebarLink[] = [
     {
+      href: "/co-monitor/tasks",
+      label: "Tasks",
+      icon: <ClipboardText size={18} weight="bold" />,
+    },
+    {
       href: "/co-monitor/schedule",
       label: "Attendance",
-      icon: <CallBell size={16} />,
+      icon: <CallBell size={18} weight="bold" />,
     },
     {
       href: "/co-monitor/announcements",
       label: "Announcements",
-      icon: <Megaphone size={16} />,
+      icon: <Megaphone size={18} weight="bold" />,
     },
     {
       href: "/co-monitor/availability",
       label: "Availability",
-      icon: <Megaphone size={16} />,
-    },
-    {
-      href: "/co-monitor/meeting-requests",
-      label: "Meeting Appointments",
-      icon: <VideoCamera size={16} />,
-    },
-    {
-      href: "/co-monitor/tasks",
-      label: "Tasks",
-      icon: <ClipboardText size={16} weight="bold" />,
+      icon: <VideoCamera size={18} weight="bold" />,
     },
   ];
 
