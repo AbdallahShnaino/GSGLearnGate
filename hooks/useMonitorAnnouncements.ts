@@ -47,7 +47,11 @@ export default function useMonitorAnnouncements() {
   );
 
   useEffect(() => {
-    fetchRequests(courseId, currentPage);
+    try {
+      fetchRequests(courseId, currentPage);
+    } catch (error) {
+      throw new Error("CODE:DATABASE_CONNECTION_ISSUE");
+    }
   }, [courseId, currentPage, fetchRequests]);
 
   const updateUrl = useCallback(

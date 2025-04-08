@@ -186,6 +186,10 @@ export type JoiningRequest = {
   joiningStatus: Status;
 } & Timestamps;
 
+export interface JoiningOrdersResponse {
+  totalPages: number;
+  JoiningOrders: JoiningOrder[];
+}
 export interface JoiningOrder {
   id: number;
   courseId: number | null;

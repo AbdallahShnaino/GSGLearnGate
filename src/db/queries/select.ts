@@ -78,6 +78,8 @@ import {
   newAnnouncements,
   PublicComment,
   Attachments,
+  JoiningOrdersResponse,
+
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorTasksResponse } from "@/types/tasks";
@@ -790,6 +792,73 @@ export async function getAllSubmissions(): Promise<Submission[]> {
   return await db.select().from(submissionsTable).all();
 }
 
+export async function getAllJoiningRequestsWithDetails(
+  monitorId: number,
+  courseId: number | undefined,
+  page: number = 1,
+  pageSize: number = 10
+): Promise<JoiningOrdersResponse> {
+  const offset = (page - 1) * pageSize;
+  const whereConditions = [eq(coursesTable.monitorId, monitorId)];
+  if (courseId !== undefined) {
+    whereConditions.push(eq(coursesTable.id, courseId));
+  }
+
+  const totalCountResult = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(joiningRequestsTable)
+    .leftJoin(coursesTable, eq(joiningRequestsTable.courseId, coursesTable.id))
+    .leftJoin(
+      studentsTable,
+      eq(joiningRequestsTable.studentId, studentsTable.id)
+    )
+    .leftJoin(usersTable, eq(studentsTable.userId, usersTable.id))
+    .where(and(...whereConditions))
+    .get();
+
+  const totalCount = totalCountResult?.count ?? 0;
+  const totalPages = Math.ceil(totalCount / pageSize);
+
+  const results = await db
+    .select({
+      id: joiningRequestsTable.id,
+      courseName: coursesTable.title,
+      courseId: coursesTable.id,
+      studentId: usersTable.id,
+      firstName: usersTable.firstName,
+      lastName: usersTable.lastName,
+      email: usersTable.email,
+      image: usersTable.image,
+      interviewStatus: joiningRequestsTable.interviewStatus,
+      joiningStatus: joiningRequestsTable.joiningStatus,
+    })
+    .from(joiningRequestsTable)
+    .leftJoin(coursesTable, eq(joiningRequestsTable.courseId, coursesTable.id))
+    .leftJoin(
+      studentsTable,
+      eq(joiningRequestsTable.studentId, studentsTable.id)
+    )
+    .leftJoin(usersTable, eq(studentsTable.userId, usersTable.id))
+    .where(and(...whereConditions))
+    .limit(pageSize)
+    .offset(offset)
+    .all();
+  return {
+    totalPages,
+    JoiningOrders: results.map((result) => ({
+      id: result.id,
+      courseId: result.courseId,
+      studentId: result.studentId,
+      courseName: result.courseName ?? "Unknown Course",
+      firstName: result.firstName ?? "Unknown",
+      lastName: result.lastName,
+      email: result.email,
+      image: result.image,
+      interviewStatus: result.interviewStatus,
+      joiningStatus: result.joiningStatus,
+    })),
+  };
+}
 export async function getSubmissionsByCourse(
   courseId: number
 ): Promise<Submission[] | null> {
@@ -823,68 +892,6 @@ export async function getAllAttendances(): Promise<Attendance[]> {
 
 export async function getAllJoiningRequests(): Promise<JoiningRequest[]> {
   return await db.select().from(joiningRequestsTable).all();
-}
-
-export async function getAllJoiningRequestsWithDetails(
-  monitorId: number,
-  courseId: number | undefined,
-  page: number = 1,
-  pageSize: number = 10
-): Promise<JoiningOrder[]> {
-  const offset = (page - 1) * pageSize;
-  const whereConditions = [eq(coursesTable.monitorId, monitorId)];
-  if (courseId !== undefined) {
-    whereConditions.push(eq(coursesTable.id, courseId));
-  }
-  const results = await db
-    .select({
-      id: joiningRequestsTable.id,
-      courseName: coursesTable.title,
-      courseId: coursesTable.id,
-      studentId: usersTable.id,
-      firstName: usersTable.firstName,
-      lastName: usersTable.lastName,
-      email: usersTable.email,
-      image: usersTable.image,
-      interviewStatus: joiningRequestsTable.interviewStatus,
-      joiningStatus: joiningRequestsTable.joiningStatus,
-    })
-    .from(joiningRequestsTable)
-    .leftJoin(coursesTable, eq(joiningRequestsTable.courseId, coursesTable.id))
-    .leftJoin(
-      studentsTable,
-      eq(joiningRequestsTable.studentId, studentsTable.id)
-    )
-    .leftJoin(usersTable, eq(studentsTable.userId, usersTable.id))
-    .where(and(...whereConditions))
-    .limit(pageSize)
-    .offset(offset)
-    .all();
-  return results.map(
-    (result: {
-      id: any;
-      courseId: any;
-      studentId: any;
-      courseName: any;
-      firstName: any;
-      lastName: any;
-      email: any;
-      image: any;
-      interviewStatus: any;
-      joiningStatus: any;
-    }) => ({
-      id: result.id,
-      courseId: result.courseId,
-      studentId: result.studentId,
-      courseName: result.courseName ?? "Unknown Course",
-      firstName: result.firstName ?? "Unknown",
-      lastName: result.lastName,
-      email: result.email,
-      image: result.image,
-      interviewStatus: result.interviewStatus,
-      joiningStatus: result.joiningStatus,
-    })
-  );
 }
 
 export async function updateJoiningRequest(
