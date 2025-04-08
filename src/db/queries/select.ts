@@ -1850,3 +1850,44 @@ export async function getStudentsListByCourseId(
     throw error;
   }
 }
+
+export async function getStudentsCountByMonitor(
+  monitorId: number
+): Promise<number> {
+  const result = await db
+    .select({ count: count() })
+    .from(studentsCoursesTable)
+    .innerJoin(coursesTable, eq(studentsCoursesTable.courseId, coursesTable.id))
+    .where(eq(coursesTable.monitorId, monitorId));
+
+  return result[0]?.count || 0;
+}
+
+export async function getCoursesCountByMonitor(
+  monitorId: number
+): Promise<number> {
+  const result = await db
+    .select({ count: count() })
+    .from(coursesTable)
+    .where(eq(coursesTable.monitorId, monitorId));
+
+  return result[0]?.count || 0;
+}
+export async function getCoursesWithStudentCounts(
+  monitorId: number
+): Promise<{ course: string; students: number }[]> {
+  const results = await db
+    .select({
+      course: coursesTable.title,
+      students: count(studentsCoursesTable.studentId),
+    })
+    .from(coursesTable)
+    .leftJoin(
+      studentsCoursesTable,
+      eq(coursesTable.id, studentsCoursesTable.courseId)
+    )
+    .where(eq(coursesTable.monitorId, monitorId))
+    .groupBy(coursesTable.id, coursesTable.title);
+
+  return results;
+}

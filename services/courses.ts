@@ -19,6 +19,7 @@ import {
   getAllCoursesWithMonitors,
   getCourseWithMonitor,
   getStudentsListByCourseId,
+  getCoursesWithStudentCounts,
 } from "@/src/db/queries/select";
 
 export async function addStudentToCourse(studentId: number, courseId: number) {
@@ -108,4 +109,7 @@ export async function getStudentsWithMonitorCorse(
     monitorId,
     coMonitorId
   );
+}
+export async function getMonitorTeachingStats(monitorId: number) {
+  return await getCoursesWithStudentCounts(monitorId);
 }
