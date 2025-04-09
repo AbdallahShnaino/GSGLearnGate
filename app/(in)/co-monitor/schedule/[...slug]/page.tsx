@@ -10,6 +10,7 @@ import { CourseStudentsList } from "@/types/attendanceOperations";
 import Loader from "@/components/Shared/Loader";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { STATIC_COMONITOR_ID } from "@/context/keys";
 
 function getStatusColor(status: AttendanceRecordStatus) {
   const colors = {
@@ -29,7 +30,7 @@ export default function AttendanceEvaluationPage() {
   const params = useParams();
   const courseId = params?.slug?.[0] ? Number(params.slug[0]) : -1;
   const sessionId = params?.slug?.[1] ? Number(params.slug[1]) : -1;
-  const MONITOR_ID = 3;
+
   const [students, setStudents] = useState<CourseStudentsList[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -125,11 +126,7 @@ export default function AttendanceEvaluationPage() {
                               name="courseId"
                               value={courseId}
                             />
-                            <input
-                              type="hidden"
-                              name="monitorId"
-                              value={MONITOR_ID}
-                            />
+                            <input type="hidden" name="monitorId" value={STATIC_COMONITOR_ID} />
                             <input
                               type="hidden"
                               name="sessionId"

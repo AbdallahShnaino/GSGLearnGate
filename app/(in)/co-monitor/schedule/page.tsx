@@ -1,4 +1,5 @@
 import SelectCourse from "@/components/Dropdowns/SelectCourse";
+import { STATIC_COMONITOR_ID } from "@/context/keys";
 import { getCourseLectures } from "@/services/attendance";
 import { getCoMonitorCoursesNames } from "@/services/courses";
 import { CourseScheduleList } from "@/types/attendanceOperations";
@@ -9,8 +10,7 @@ const SchedulePage = async ({
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
 }) => {
-  const MONITOR_ID = 20;
-  const coursesList = await getCoMonitorCoursesNames(MONITOR_ID);
+  const coursesList = await getCoMonitorCoursesNames(STATIC_COMONITOR_ID);
 
   const selectedCourseId = searchParams.courseId
     ? Number(searchParams.courseId)

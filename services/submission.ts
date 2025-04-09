@@ -2,6 +2,7 @@ import {
   getLateSubmissionsCountByCoMonitor,
   getLateSubmissionsCountByMonitor,
   getTaskSubmissionStats,
+  getTaskSubmissionStatsByCoMonitor,
 } from "@/src/db/queries/select";
 
 export async function getLateSubmissionsCount(monitorId: number) {
@@ -16,4 +17,10 @@ export async function getTaskSubmissionsOverStudentsCount(
   taskId: number
 ) {
   return await getTaskSubmissionStats(monitorId, taskId);
+}
+export async function getTaskSubmissionsOverStudentsCountByCoMonitor(
+  coMonitorId: number,
+  taskId: number
+) {
+  return await getTaskSubmissionStatsByCoMonitor(coMonitorId, taskId);
 }
