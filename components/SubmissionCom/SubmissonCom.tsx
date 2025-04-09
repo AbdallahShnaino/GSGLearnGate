@@ -1,7 +1,6 @@
 "use client";
 
 import TaskHeader from "./TaskHeader";
-import { Paperclip } from "@phosphor-icons/react";
 import { FolderPlus } from "@phosphor-icons/react";
 
 import { insertCommentByCoMentor } from "@/controllers/actions/addPraivetCommrnt";

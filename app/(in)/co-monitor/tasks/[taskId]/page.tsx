@@ -29,7 +29,7 @@ const page = async ({ params }: IProps) => {
           paths={paths}
         />
 
-        <PublicComments taskId={Number(taskId)} />
+        <PublicComments taskId={Number(taskId)} roles={"co-monitor"} />
 
         <CardFooter
           taskId={Number(taskId)}
