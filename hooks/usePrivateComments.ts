@@ -12,7 +12,10 @@ export function usePrivateComments(submissionId: number, CoMentorId: number) {
       try {
         setLoading(true);
         setError(null);
-        const comments = await fetchCommentsBySubmissionId(submissionId, CoMentorId);
+        const comments = await fetchCommentsBySubmissionId(
+          submissionId,
+          CoMentorId
+        );
         setPrivateComments(comments || []);
       } catch (err) {
         console.error("Error fetching private comments:", err);

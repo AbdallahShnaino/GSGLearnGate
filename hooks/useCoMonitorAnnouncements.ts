@@ -37,8 +37,8 @@ export default function useCoMonitorAnnouncements() {
         requests && setTotalPages(Math.ceil(requests.total / pageSize));
         setAnnouncements(requests.announcements);
       } catch (error) {
-        console.error("Failed to fetch announcements:", error);
         setAnnouncements(null);
+        throw new Error("CODE:10007");
       } finally {
         setIsLoading(false);
       }

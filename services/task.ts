@@ -11,6 +11,7 @@ import {
   getCoMonitorSubmissionsNotGradedCount,
 } from "@/src/db/queries/select";
 import { TaskStatus } from "@/types";
+import { getTaskSubmissionsOverStudentsCount } from "./submission";
 
 export async function createTaskByMonitor(
   creatorId: number,
@@ -92,9 +93,46 @@ export async function getActiveTasksCoMonitorCount(coMonitorId: number) {
 export async function getNotGradedSubmissionsCount(monitorId: number) {
   return await getMonitorSubmissionsNotGradedCount(monitorId);
 }
-export async function getNotGradedSubmissionsCoMonitorCount(coMonitorId: number) {
+export async function getNotGradedSubmissionsCoMonitorCount(
+  coMonitorId: number
+) {
   return await getCoMonitorSubmissionsNotGradedCount(coMonitorId);
 }
 export async function getTask(taskId: number) {
   return await getTaskById(taskId);
+}
+
+export async function getTasksWithSubmissions(
+  monitorId: number,
+  taskStatus: TaskStatus,
+  page: number,
+  itemsPerPage: number
+) {
+  const { tasks, total } = await getMonitorTasks(
+    monitorId,
+    taskStatus,
+    page,
+    itemsPerPage
+  );
+
+  const tasksWithCounts = await Promise.all(
+    tasks.map(async (task) => {
+      try {
+        const { studentCount, submissionCount } =
+          await getTaskSubmissionsOverStudentsCount(monitorId, task.id);
+        return {
+          ...task,
+          submissionCount,
+          studentCount,
+        };
+      } catch (error) {
+        throw new Error("CODE:1008");
+      }
+    })
+  );
+
+  return {
+    tasks: tasksWithCounts,
+    total,
+  };
 }
