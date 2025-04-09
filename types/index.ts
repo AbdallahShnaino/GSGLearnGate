@@ -160,6 +160,7 @@ export type Submission = {
   feedback: string;
   gradedAt: Date;
   status: AssignmentStatus;
+  attachmentId: number;
 } & Timestamps;
 
 export type Attachment = {
@@ -291,6 +292,10 @@ export type StudentCourseBigCard = {
   endDate: Date;
   totalTasks: number;
   completedTasks: number;
+  applyEndDate: number;
+  description: string;
+  details: string;
+  entryRequirements: string;
 } & StudentCourseSmallCard;
 
 export type StudentCourseDetails = {
@@ -302,6 +307,10 @@ export type StudentCourseDetails = {
   coMonitors: string | null;
   startDate: Date;
   endDate: Date;
+  applyEndDate: number;
+  details: string;
+  entryRequirements: string;
+  duration: number;
 };
 
 export enum StudentAppointmentStatus {

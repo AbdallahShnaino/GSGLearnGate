@@ -87,6 +87,7 @@ const Task = async (props: IProps) => {
 
         <div className="flex-shrink-0 lg:w-1/3 space-y-8 mt-8 lg:mt-0">
           <TaskSubmit
+            deadline={taskDetails![0].deadline}
             taskId={taskId}
             courseId={courseId}
             studentId={studentId}

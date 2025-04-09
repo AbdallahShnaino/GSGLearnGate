@@ -34,6 +34,7 @@ import {
   CourseSchedule,
   AvailabilitySlot,
   newComment,
+  JoiningRequest,
 } from "@/types/index";
 
 interface InsertUserInput {
@@ -202,4 +203,14 @@ export async function insertNewComment(
 ): Promise<newComment> {
   const [inserted] = await db.insert(commentsTable).values(data).returning();
   return inserted as newComment;
+}
+
+export async function insertJoiningRequest(
+  data: Omit<JoiningRequest, "id">
+): Promise<JoiningRequest> {
+  const [inserted] = await db
+    .insert(joiningRequestsTable)
+    .values(data)
+    .returning();
+  return inserted as JoiningRequest;
 }

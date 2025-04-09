@@ -1,14 +1,15 @@
 "use client";
 
-import { insertAttachment } from "@/src/db/queries/insert";
+import { insertAttachment, insertSubmission } from "@/src/db/queries/insert";
 import { getAttachmentPathsByTaskId } from "@/src/db/queries/select";
-import { Attachments } from "@/types";
+import { AssignmentStatus, Attachments } from "@/types";
 import { useEffect, useState } from "react";
 
 interface IProps {
   taskId: string;
   courseId: string;
   studentId: string;
+  deadline: Date;
 }
 const TaskSubmit = (props: IProps) => {
   const [showPopup, setShowPopup] = useState<string | null>(null);
@@ -22,7 +23,6 @@ const TaskSubmit = (props: IProps) => {
       Number(props.taskId)
     );
     setAttachment(studentAttachment![0]);
-    console.log(studentAttachment);
   };
 
   const handleSubmissionType = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -34,12 +34,22 @@ const TaskSubmit = (props: IProps) => {
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      await insertAttachment({
+      const insertedAttachment = await insertAttachment({
         taskId: Number(props.taskId),
         creatorId: Number(props.studentId),
         courseId: Number(props.courseId),
         type: submissionType === "link" ? Attachments.LINK : Attachments.FILE,
         path: path,
+      });
+      await insertSubmission({
+        taskId: Number(props.taskId),
+        studentId: Number(props.studentId),
+        courseId: Number(props.courseId),
+        grade: null,
+        feedback: "",
+        gradedAt: new Date(),
+        status: AssignmentStatus.SUBMITTED,
+        attachmentId: insertedAttachment.id,
       });
       alert("Attachment Added Successfully");
     } catch (error) {
@@ -66,7 +76,13 @@ const TaskSubmit = (props: IProps) => {
   }, []);
   return (
     <>
-      {attachment ? (
+      {new Date(props.deadline) < new Date() && !attachment ? (
+        <section className="bg-white p-6 rounded-xl shadow-md">
+          <h2 className="text-xl font-semibold text-[#FFA41F] mb-4">
+            Task Time Expired
+          </h2>
+        </section>
+      ) : attachment ? (
         <section className="bg-white p-6 rounded-xl shadow-md">
           <h2 className="text-xl font-semibold text-[#FFA41F] mb-4">
             Your Submitted Attachment:{" "}
