@@ -41,7 +41,7 @@ export default function AddMonitorForm() {
       <div className="bg-white rounded shadow-md overflow-hidden p-5 border-1 border-gray-300">
         <h1 className="text-xl font-semibold text-[#FFA41F]">Add User</h1>
         <form action={formAction} className="space-y-5">
-          <div className="flex flex-col items-center mb-10 mt-10">
+          <div className="flex flex-col items-center">
             <input
               type="file"
               id="image"
@@ -67,6 +67,9 @@ export default function AddMonitorForm() {
                 <ImageIcon className="w-8 h-8 text-gray-500" />
               )}
             </label>
+            <span className="text-sm text-gray-600 mt-5">
+              Upload Monitor / CO-Monitor Image
+            </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
