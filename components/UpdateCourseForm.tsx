@@ -113,11 +113,11 @@ const UpdateCourseForm = ({ monitors, coMonitors }: IProps) => {
     }));
   };
   return (
-    <div className="w-full max-w-4xl m-auto py-2 px-4">
+    <div className="w-full mx-auto mt-4 mb-10">
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="bg-white rounded-lg shadow-2xl px-6 py-4">
+      <div className="bg-white rounded shadow-md overflow-hidden p-5 border-1 border-gray-300">
         <h1 className="text-xl font-semibold text-[#FFA41F]">Update Course</h1>
-        <form className="space-y-4" action={formAction}>
+        <form className="space-y-5" action={formAction}>
           <div className="flex flex-col items-center">
             <label
               htmlFor="image"
@@ -135,7 +135,7 @@ const UpdateCourseForm = ({ monitors, coMonitors }: IProps) => {
                 <ImageIcon className="w-8 h-8 text-gray-500" />
               )}
             </label>
-            <span className="text-sm text-gray-600">Upload Course Image</span>
+            <span className="text-sm text-gray-600 mt-5">Upload Course Image</span>
             <input
               type="file"
               id="image"
@@ -255,7 +255,8 @@ const UpdateCourseForm = ({ monitors, coMonitors }: IProps) => {
               placeholder="Provide a brief course description"
               required
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm resize-none"
+              rows={10}
             />
           </div>
 
@@ -401,7 +402,8 @@ const UpdateCourseForm = ({ monitors, coMonitors }: IProps) => {
           <div className="flex justify-center">
             <button
               type="submit"
-              className="w-1/3 px-4 py-2 rounded-md text-white hover:bg-[#f89705] bg-[#FFA41F]"
+              className="w-full py-2 border-none rounded-md shadow-sm text-lg text-white bg-[#FFA41F]
+              cursor-pointer hover:shadow-md hover:bg-[#ffb11f]"
             >
               {isPending ? "Submitting..." : "Submit"}
             </button>
