@@ -3,6 +3,7 @@ import { Gauge } from "@phosphor-icons/react/dist/ssr";
 import { Laptop } from "@phosphor-icons/react/dist/ssr";
 import { CalendarCheck } from "@phosphor-icons/react/dist/ssr";
 import { Megaphone } from "@phosphor-icons/react/dist/ssr";
+import { Clock } from "@phosphor-icons/react/dist/ssr";
 
 export default async function StudentLayout({
   params,
@@ -31,6 +32,11 @@ export default async function StudentLayout({
             href: `/${studentId}/announcements`,
             label: "Announcements ",
             icon: <Megaphone />,
+          },
+          {
+            href: `/${studentId}/coming-soon-courses`,
+            label: "Soon Courses",
+            icon: <Clock />,
           },
         ]}
       />

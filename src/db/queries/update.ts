@@ -50,7 +50,11 @@ export async function bookAppointment(
 ): Promise<boolean> {
   const [updated] = await db
     .update(coMonitorAvailabilityTable)
-    .set({ isBooked: true, bookedByStudentId: studentId })
+    .set({
+      isBooked: true,
+      bookedByStudentId: studentId,
+      updatedAt: new Date().toISOString().slice(0, 19).replace("T", " "),
+    })
     .where(eq(coMonitorAvailabilityTable.id, appointmentId))
     .returning();
 
