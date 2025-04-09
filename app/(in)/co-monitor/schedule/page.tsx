@@ -3,6 +3,7 @@ import { getCourseLectures } from "@/services/attendance";
 import { getCoMonitorCoursesNames } from "@/services/courses";
 import { CourseScheduleList } from "@/types/attendanceOperations";
 import Link from "next/link";
+import { UserCircle } from "@phosphor-icons/react/dist/ssr";
 
 const SchedulePage = async ({
   searchParams,
@@ -35,9 +36,15 @@ const SchedulePage = async ({
   }
 
   return (
-    <div className="p-4 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Team Training Schedule</h1>
-      <div className="max-w-xs">
+    <div className="w-11/12 m-auto flex flex-col">
+      <div className="flex items-center justify-between p-2">
+        <h1 className="text-xl font-semibold">Team Training Schedule</h1>
+        <div className="flex items-center gap-2">
+          <span className="text-gray-600">Hi, CO-Monitor</span>
+          <UserCircle size={32} weight="duotone" className="text-[#FFA41F]" />
+        </div>
+      </div>
+      <div className="max-w-xs mb-4 mt-4">
         {coursesList && (
           <SelectCourse
             options={coursesList}
@@ -46,7 +53,7 @@ const SchedulePage = async ({
           />
         )}
       </div>
-      <div className="overflow-x-auto">
+      <div className="overflow-hidden border border-gray-200 shadow-sm rounded-xl mb-10 overflow-x-auto">
         <table className="min-w-full bg-white rounded-lg overflow-hidden">
           <thead className="bg-gray-100">
             <tr>
