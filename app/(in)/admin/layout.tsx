@@ -9,6 +9,21 @@ import {
   UserPlus
 } from "@phosphor-icons/react/dist/ssr";
 import { SidebarLink } from "@/types/user";
+import { Metadata } from "next";
+export const metadata: Metadata = {
+  title: "Admin Dashboard - Manage courses, students, monitors and co-monitors, sending course announcement",
+  description:
+    "Manage courses, students, monitors and co-monitors, sending course announcement, schedule courses.",
+  keywords:
+    "admin dashboard, manage students, manage monitors, manage co-monitors, course management",
+  openGraph: {
+    title: "Admin Dashboard - Manage Monitors, Co-monitors, Students & Courses",
+    description:
+      "Easily manage student, monitors, co-monitors, and courses in one place.",
+    url: "https://gsg-learn-gate.vercel.app/admin",
+    type: "website",
+  },
+};
 
 export const links: SidebarLink[] = [
   {
