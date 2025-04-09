@@ -32,7 +32,7 @@ export default function useStudentsList({ role }: IProps) {
       setTotalPages(totalPages);
       setStudents(students);
     } catch (error) {
-      console.error("Error fetching students:", error);
+      throw new Error("CODE:10003");
     } finally {
       setIsLoading(false);
     }

@@ -50,7 +50,7 @@ export default function useMonitorAnnouncements() {
     try {
       fetchRequests(courseId, currentPage);
     } catch (error) {
-      throw new Error("CODE:DATABASE_CONNECTION_ISSUE");
+      throw new Error("CODE:1001");
     }
   }, [courseId, currentPage, fetchRequests]);
 

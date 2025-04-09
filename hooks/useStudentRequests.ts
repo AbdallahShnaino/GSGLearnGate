@@ -40,7 +40,7 @@ export default function useStudentRequests() {
     try {
       fetchRequests();
     } catch (error) {
-      throw new Error("CODE:DATABASE_CONNECTION_ISSUE");
+      throw new Error("CODE:10002");
     }
   }, [currentPage, searchParams, courseId]);
 

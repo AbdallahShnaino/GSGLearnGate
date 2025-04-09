@@ -1,6 +1,6 @@
-import { MonitorsTasks } from "@/types/tasksOperations";
+import { MonitorsTask } from "@/types/tasks";
 
-export function isTaskActive(task: MonitorsTasks): boolean {
+export function isTaskActive(task: MonitorsTask): boolean {
   const now = new Date();
   return task.deadline < now;
 }
