@@ -4,7 +4,7 @@ import AddCourseScheduleForm from "@/components/AddCourseScheduleForm/AddCourseS
 
 const AddCourseSchedulePage = () => {
   return (
-    <div className="flex flex-col">
+    <div className="w-11/12 m-auto flex flex-col">
       <div className="flex items-center justify-between p-2">
         <h1 className="text-xl font-semibold">Add Course Schedule</h1>
         <div className="flex items-center gap-2">
