@@ -4,16 +4,34 @@ import Image from "next/image";
 import { fetchPublicCommentsByTaskId } from "@/services/co-mentor-func";
 import { PublicComment } from "@/types";
 import Loader from "../Shared/Loader";
+import { insertPublicComment } from "@/controllers/actions/addPublicCommrnt";
+import {
+  STATIC_COMONITOR_ID,
+  STATIC_MONITOR_ID,
+  STATIC_STUDENT_ID,
+} from "@/context/keys";
 
 interface Props {
   taskId: number;
+  roles: string;
 }
 
-const PublicComments = ({ taskId }: Props) => {
+const PublicComments = ({ taskId, roles }: Props) => {
   const [publicComments, setPublicComments] = useState<PublicComment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [replyText, setReplyText] = useState<string>("");
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [createById, setCreateById] = useState<number>(0);
+  useEffect(() => {
+    if (roles === "monitor") {
+      setCreateById(STATIC_MONITOR_ID);
+    } else if (roles === "co-monitor") {
+      setCreateById(STATIC_COMONITOR_ID);
+    } else {
+      setCreateById(STATIC_STUDENT_ID);
+    }
+  }, [roles]);
   useEffect(() => {
     const fetchComments = async () => {
       try {
@@ -30,6 +48,34 @@ const PublicComments = ({ taskId }: Props) => {
 
     fetchComments();
   }, [taskId]);
+  const handleAddComment = async () => {
+    if (!replyText.trim()) {
+      alert("Please enter a comment before submitting.");
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      await insertPublicComment({
+        TaskId: taskId,
+        createById: createById,
+        text: replyText,
+        role: roles,
+      });
+
+      const updatedComments = await fetchPublicCommentsByTaskId(taskId);
+
+      setPublicComments(updatedComments);
+
+      setReplyText("");
+    } catch (error) {
+      console.error("Error adding comment:", error);
+      alert("Failed to add comment. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (loading) return <Loader />;
 
@@ -37,16 +83,10 @@ const PublicComments = ({ taskId }: Props) => {
     return (
       <div className="bg-red-50 text-red-600 p-4 rounded-md my-4">{error}</div>
     );
-
-  if (publicComments.length === 0)
-    return (
-      <div className="space-y-2 bg-white rounded-xl p-2 w-[97%] items-center m-auto border border-orange-100 mb-5">
-        <h3 className="text-xl font-bold text-[#FFA41F] mb-6 border-r-4 border-[#FFA41F] pr-3">
-          Public Comments ({publicComments.length})
-        </h3>
-        <div className="text-center py-8 text-gray-500">No comments yet</div>
-      </div>
-    );
+  let message = false;
+  if (publicComments.length === 0) {
+    message = true;
+  }
 
   const getUserBadgeColor = (userType?: string) => {
     switch (userType) {
@@ -66,7 +106,9 @@ const PublicComments = ({ taskId }: Props) => {
       <h3 className="text-xl font-bold text-[#FFA41F] mb-6 border-r-4 border-[#FFA41F] pr-3">
         Public Comments ({publicComments.length})
       </h3>
-
+      {message && (
+        <div className="text-center py-8 text-gray-500">No comments yet</div>
+      )}
       <div className="divide-y divide-orange-100">
         {publicComments.map((comment) => (
           <div
@@ -124,6 +166,26 @@ const PublicComments = ({ taskId }: Props) => {
             </div>
           </div>
         ))}
+      </div>
+      <div className="mt-2">
+        <textarea
+          placeholder="Add a reply..."
+          value={replyText}
+          onChange={(e) => setReplyText(e.target.value)}
+          className="w-full p-2 border rounded-md text-sm  text-orange-800 focus:outline-none focus:ring-1 focus:ring-[#FFA41F] focus:border-[#FFA41F]"
+        ></textarea>
+        <button
+          type="button"
+          onClick={handleAddComment}
+          disabled={isSaving}
+          className={`mt-1 px-3 py-1 rounded-md text-sm text-white ${
+            isSaving
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-[#FFA41F] hover:bg-[#FF9800]"
+          }`}
+        >
+          {isSaving ? "Loading..." : "Reply"}
+        </button>
       </div>
     </div>
   );
