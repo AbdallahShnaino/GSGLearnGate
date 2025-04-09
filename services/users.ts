@@ -5,6 +5,8 @@ import {
   getMonitors,
   getStudents,
   getStudentsCountByMonitor,
+  getAllMonitors as fetchAllMonitors,
+  getAllStudents as fetchAllStudents
 } from "@/src/db/queries/select";
 import { Role, User } from "@/types";
 
@@ -29,4 +31,12 @@ export async function getStudentsNumber(monitorId: number) {
 }
 export async function getMonitorCoursesNumber(monitorId: number) {
   return await getCoursesCountByMonitor(monitorId);
+}
+
+export async function fetchMonitors(){
+  return await fetchAllMonitors();
+}
+
+export async function fetchStudents(){
+  return await fetchAllStudents();
 }
