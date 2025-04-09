@@ -19,6 +19,7 @@ export default function Layout({
       lateSubmissionsCard={lateSubmissionsCard}
       submissionsAwaitingReview={submissionsAwaitingReview}
       tasksList={tasksList}
+      role="monitor"
     />
   );
 }

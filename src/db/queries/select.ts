@@ -843,18 +843,55 @@ export async function getTaskSubmissionStats(
     submissionCount: submissionCountResult?.count ?? 0,
     studentCount: studentCountResult?.count ?? 0,
   };
+}export async function getTaskSubmissionStatsByCoMonitor(
+  coMonitorId: number,
+  taskId: number
+): Promise<{
+  submissionCount: number;
+  studentCount: number;
+}> {
+  const task = await db
+    .select({
+      courseId: tasksTable.courseId,
+    })
+    .from(tasksTable)
+    .where(and(eq(tasksTable.id, taskId), eq(tasksTable.creatorId, coMonitorId)))
+    .get();
+
+  if (!task) {
+    throw new Error("CODE:10008");
+  }
+
+  const submissionCountResult = await db
+    .select({ count: count() })
+    .from(submissionsTable)
+    .where(eq(submissionsTable.taskId, taskId))
+    .get();
+
+  const studentCountResult = await db
+    .select({ count: count() })
+    .from(studentsCoursesTable)
+    .where(eq(studentsCoursesTable.courseId, task.courseId))
+    .get();
+
+  return {
+    submissionCount: submissionCountResult?.count ?? 0,
+    studentCount: studentCountResult?.count ?? 0,
+  };
 }
 
 export async function getTasksByCoMonitor(
-  CoMonitorId: number,
+  coMonitorId: number,
   status: TaskStatus,
   page: number = 1,
   pageSize: number = 10
 ): Promise<MonitorTasksResponse> {
   const offset = (page - 1) * pageSize;
   const now = new Date().toISOString().replace("T", " ").slice(0, 19);
+
+  // Type-safe where condition
   const whereCondition = and(
-    eq(coMonitorsTable.userId, CoMonitorId),
+    eq(coMonitorsTable.userId,coMonitorId),
     status === TaskStatus.IN_PROGRESS
       ? and(
           lte(tasksTable.startedAt, now),
@@ -865,18 +902,17 @@ export async function getTasksByCoMonitor(
       : undefined
   );
 
+  // Type-safe count query
   const countQuery = await db
     .select({
       total: sql<number>`count(distinct ${tasksTable.id})`.as("total"),
     })
     .from(tasksTable)
-    .innerJoin(
-      coMonitorsTable,
-      eq(coMonitorsTable.userId, tasksTable.creatorId)
-    )
-    .where(whereCondition);
+    .innerJoin(coMonitorsTable, eq(coMonitorsTable.userId, tasksTable.creatorId))
+    .where(whereCondition)
+    .execute();
 
-  const total = countQuery[0]?.total || 0;
+  const total = countQuery[0]?.total ?? 0;
 
   const rawTasks = await db
     .select({
@@ -890,45 +926,36 @@ export async function getTasksByCoMonitor(
       createdAt: tasksTable.createdAt,
       updatedAt: tasksTable.updatedAt,
       courseTitle: coursesTable.title,
-      submissionCount: sql<number>`count(distinct ${submissionsTable.id})`.as(
-        "submission_count"
-      ),
-      studentCount:
-        sql<number>`count(distinct ${studentsCoursesTable.studentId})`.as(
-          "student_count"
-        ),
+      submissionCount: sql<number>`
+        (SELECT COUNT(*) FROM ${submissionsTable} 
+         WHERE ${submissionsTable.taskId} = ${tasksTable.id}
+         AND ${submissionsTable.studentId} IN (
+           SELECT ${studentsCoursesTable.studentId}
+           FROM ${studentsCoursesTable}
+           WHERE ${studentsCoursesTable.courseId} = ${tasksTable.courseId}
+         ))
+      `.as("submission_count"),
+      studentCount: sql<number>`
+        (SELECT COUNT(*) FROM ${studentsCoursesTable} 
+         WHERE ${studentsCoursesTable.courseId} = ${tasksTable.courseId})
+      `.as("student_count"),
     })
     .from(tasksTable)
-    .innerJoin(
-      coMonitorsTable,
-      eq(coMonitorsTable.userId, tasksTable.creatorId)
-    )
+    .innerJoin(coMonitorsTable, eq(coMonitorsTable.userId, tasksTable.creatorId))
     .leftJoin(coursesTable, eq(tasksTable.courseId, coursesTable.id))
-    .leftJoin(submissionsTable, eq(tasksTable.id, submissionsTable.taskId))
-    .leftJoin(
-      studentsCoursesTable,
-      eq(tasksTable.courseId, studentsCoursesTable.courseId)
-    )
     .where(whereCondition)
-    .groupBy(
-      tasksTable.id,
-      tasksTable.title,
-      tasksTable.description,
-      tasksTable.courseId,
-      tasksTable.startedAt,
-      tasksTable.deadline,
-      tasksTable.points,
-      tasksTable.createdAt,
-      tasksTable.updatedAt,
-      coursesTable.title
-    )
     .limit(pageSize)
-    .offset(offset);
+    .offset(offset)
+    .execute();
 
-  const tasks: MonitorsTasks[] = rawTasks.map((task) => ({
+  const tasks: MonitorsTask[] = rawTasks.map((task) => ({
     ...task,
     startedAt: new Date(task.startedAt),
-    deadline: task.deadline,
+    deadline: new Date(task.deadline),
+    createdAt: new Date(task.createdAt),
+    updatedAt: new Date(task.updatedAt),
+    courseTitle: task.courseTitle ?? null,
+    description: task.description ?? null,
   }));
 
   return {
