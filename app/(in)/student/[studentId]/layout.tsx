@@ -17,24 +17,28 @@ export default async function StudentLayout({
     <div className="flex">
       <Sidebar
         links={[
-          { href: `/${studentId}`, label: "Dashboard", icon: <Gauge /> },
           {
-            href: `/${studentId}/my-courses`,
+            href: `/student/${studentId}`,
+            label: "Dashboard",
+            icon: <Gauge />,
+          },
+          {
+            href: `/student/${studentId}/my-courses`,
             label: "My Courses",
             icon: <Laptop />,
           },
           {
-            href: `/${studentId}/appointments`,
+            href: `/student/${studentId}/appointments`,
             label: "Appointments",
             icon: <CalendarCheck />,
           },
           {
-            href: `/${studentId}/announcements`,
+            href: `/student/${studentId}/announcements`,
             label: "Announcements ",
             icon: <Megaphone />,
           },
           {
-            href: `/${studentId}/coming-soon-courses`,
+            href: `/student/${studentId}/coming-soon-courses`,
             label: "Soon Courses",
             icon: <Clock />,
           },

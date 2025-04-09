@@ -11,7 +11,7 @@ interface IProps {
 const CourseTask = (props: IProps) => {
   return (
     <Link
-      href={`/${props.studentId}/my-courses/${props.courseId}/tasks/${props.task.taskId}`}
+      href={`/student/${props.studentId}/my-courses/${props.courseId}/tasks/${props.task.taskId}`}
       className="p-4"
     >
       <div className="p-4 bg-white shadow rounded-lg">

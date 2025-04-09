@@ -21,7 +21,7 @@ const Dashboard = async (props: IProps) => {
         {courses?.map((course) => (
           <CourseCard key={course.id} course={course} studentId={studentId} />
         ))}
-        <Link href={`/${studentId}/my-courses`}>
+        <Link href={`/student/${studentId}/my-courses`}>
           <button className="px-10 py-2 bg-[#FFA41F] text-white rounded-lg hover:bg-[#FF8C00] transition cursor-pointer">
             Show All
           </button>
@@ -37,7 +37,7 @@ const Dashboard = async (props: IProps) => {
           <h3 className="text-lg font-semibold">
             You are registered for {totalCourses?.length} courses
           </h3>
-          <Link href={`/${studentId}/my-courses`}>
+          <Link href={`/student/${studentId}/my-courses`}>
             <button className="mt-3 px-4 py-2 bg-[#FFA41F] text-white rounded-lg hover:bg-[#FF8C00] transition cursor-pointer w-full sm:w-auto">
               Show All Courses
             </button>
