@@ -1,4 +1,4 @@
-import UpdateCourseForm from '@/components/UpdateCourseForm';
+import UpdateCourseForm from '@/components/UpdateCourseForm/UpdateCourseForm';
 import { getCoMonitorsNames, getMonitorsNames } from '@/src/db/queries/select';
 import { UserCircle } from '@phosphor-icons/react/dist/ssr';
 import React from 'react';

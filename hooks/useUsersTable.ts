@@ -11,7 +11,6 @@ export const useUsersTable = (role: string) => {
   const { value, setValue, updateSearchParam } = useSearch("name");
   const [users, setUsers] = useState<MonitorsJoinUsers[] | null>(null);
   const [open, setOpen] = useState(false);
-  const [selectedMonitor, setSelectedMonitor] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -51,18 +50,6 @@ export const useUsersTable = (role: string) => {
     updateSearchParam(searchValue);
   };
 
-  const handleDeleteClick = (id: number) => {
-    setSelectedMonitor(id);
-    setOpen(true);
-  };
-
-  const confirmDelete = () => {
-    if (selectedMonitor) {
-      console.log(`Deleting monitor with ID: ${selectedMonitor}`);
-    }
-    setOpen(false);
-  };
-
   const handleNextPage = () => {
     setCurrentPage((prev) => prev + 1);
   };
@@ -89,9 +76,6 @@ export const useUsersTable = (role: string) => {
     filteredUsers,
     open,
     setOpen,
-    selectedMonitor,
-    handleDeleteClick,
-    confirmDelete,
     isLoading,
     handleNextPage,
     handlePreviousPage,
