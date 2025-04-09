@@ -4,8 +4,9 @@ import React from "react";
 import { useRouter } from "next/navigation";
 interface IProps {
   taskId: number;
+  Link?: string;
 }
-const CardFooter = ({ taskId }: IProps) => {
+const CardFooter = ({ taskId, Link }: IProps) => {
   const router = useRouter();
 
   return (
@@ -18,9 +19,7 @@ const CardFooter = ({ taskId }: IProps) => {
         Back to Tasks
       </button>
       <button
-        onClick={() =>
-          router.push(`/monitor/tasks/submissions?taskId=${taskId}`)
-        }
+        onClick={() => router.push(`${Link}?taskId=${taskId}`)}
         className="px-4 py-2 bg-[#FFA41F] text-white rounded-md hover:bg-orange-600 cursor-pointer"
       >
         View Submissions

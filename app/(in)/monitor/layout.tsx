@@ -3,7 +3,6 @@ import {
   Student,
   UserGear,
   UserCirclePlus,
-  BookOpenUser,
   Control,
 } from "@phosphor-icons/react/dist/ssr";
 import { SidebarLink } from "@/types/user";
@@ -12,27 +11,27 @@ export const links: SidebarLink[] = [
   {
     href: "/monitor",
     label: "Dashboard",
-    icon: <Control size={24} weight="bold" />,
+    icon: <Control size={20} weight="bold" />,
   },
   {
     href: "/monitor/students",
     label: "Students",
-    icon: <BookOpenUser size={24} weight="bold" />,
+    icon: <Student size={20} weight="bold" />,
   },
   {
     href: "/monitor/joining-requests",
     label: "Joining Requests",
-    icon: <UserCirclePlus size={24} weight="bold" />,
+    icon: <UserCirclePlus size={20} weight="bold" />,
   },
   {
     href: "/monitor/tasks",
     label: "Tasks",
-    icon: <Student size={24} weight="bold" />,
+    icon: <Student size={20} weight="bold" />,
   },
   {
     href: "/monitor/announcements",
     label: "Announcement",
-    icon: <UserGear size={24} weight="bold" />,
+    icon: <UserGear size={20} weight="bold" />,
   },
 ];
 

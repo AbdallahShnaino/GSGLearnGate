@@ -40,7 +40,12 @@ const PublicComments = ({ taskId }: Props) => {
 
   if (publicComments.length === 0)
     return (
-      <div className="text-center py-8 text-gray-500">No comments found</div>
+      <div className="space-y-2 bg-white rounded-xl p-2 w-[97%] items-center m-auto border border-orange-100 mb-5">
+        <h3 className="text-xl font-bold text-[#FFA41F] mb-6 border-r-4 border-[#FFA41F] pr-3">
+          Public Comments ({publicComments.length})
+        </h3>
+        <div className="text-center py-8 text-gray-500">No comments yet</div>
+      </div>
     );
 
   const getUserBadgeColor = (userType?: string) => {

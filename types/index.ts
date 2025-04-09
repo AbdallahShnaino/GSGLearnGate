@@ -149,6 +149,7 @@ export type SubmissionsTask = {
   taskName: string;
   courseName: string;
   taskId: number;
+  points: number | null;
 } & Timestamps;
 
 export type Submission = {
@@ -348,6 +349,7 @@ export interface SubmissionView {
   StudentEmail: string | null;
   StudentImage: string | null;
   TaskTitle: string | null;
+  points: number | null;
 }
 
 export interface SubmissionAttachment {

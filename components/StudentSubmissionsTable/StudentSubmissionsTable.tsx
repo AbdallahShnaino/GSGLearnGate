@@ -12,10 +12,14 @@ import SearchBar from "../SearchBar/SearchBar";
 import { useSearch } from "@/hooks/useSearch";
 
 interface IdTaskIprops {
-  TaskId: number;
+  taskId: number;
+  role?: string;
 }
 
-export default function StudentSubmissionsTable({ TaskId }: IdTaskIprops) {
+export default function StudentSubmissionsTable({
+  taskId,
+  role,
+}: IdTaskIprops) {
   const { value: searchQuery, updateSearchParam } = useSearch("search");
   const {
     SelectedStatus,
@@ -31,12 +35,15 @@ export default function StudentSubmissionsTable({ TaskId }: IdTaskIprops) {
     handlePreviousPage,
     onPageChange,
     loading,
-  } = useStudentSubmissions(TaskId, searchQuery);
-
+  } = useStudentSubmissions(taskId, searchQuery);
+  console.log("Submissions:", submissions);
   if (loading) {
     return <Loader message="Loading data..." />;
   }
-
+  let hidden: boolean = true;
+  if (role === "monitor") {
+    hidden = false;
+  }
   return (
     <div className="min-h-screen">
       <div className="container mx-auto flex-col gap-6 mb-8">
@@ -105,7 +112,7 @@ export default function StudentSubmissionsTable({ TaskId }: IdTaskIprops) {
               >
                 <option value="All">All Submissions</option>
                 <option value="GRADED">Graded</option>
-                <option value="PENDING">Pending</option>
+                <option value="SUBMITTED">SUBMITTED</option>
                 <option value="NOT SUBMITTED">Not Submitted</option>
               </select>
             </div>
@@ -125,7 +132,7 @@ export default function StudentSubmissionsTable({ TaskId }: IdTaskIprops) {
                     <th className="px-6 py-3">Task</th>
                     <th className="px-6 py-3">Grade</th>
                     <th className="px-6 py-3">Status</th>
-                    <th className="px-6 py-3">Action</th>
+                    {hidden && <th className="px-6 py-3">Action</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -155,7 +162,7 @@ export default function StudentSubmissionsTable({ TaskId }: IdTaskIprops) {
                       <td className="px-6 py-3">{submission.courseName}</td>
                       <td className="px-6 py-3">{submission.taskName}</td>
                       <td className="px-6 py-3 font-semibold text-orange-600">
-                        {submission.grade}
+                        {submission.grade}/{submission.points}
                       </td>
                       <td
                         className={`px-6 py-3 font-semibold ${
@@ -168,23 +175,25 @@ export default function StudentSubmissionsTable({ TaskId }: IdTaskIprops) {
                       >
                         {submission.status}
                       </td>
-                      <td className="px-6 py-3">
-                        <Link
-                          href={`/co-monitor/submission/${submission.submissionId}`}
-                        >
-                          <button
-                            className={`w-[100px] rounded-xl flex h-10 justify-center items-center transition duration-300 cursor-pointer ${
-                              submission.status === "NOT SUBMITTED"
-                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                : "bg-orange-400 hover:bg-orange-500 text-white"
-                            }`}
-                            disabled={submission.status === "NOT SUBMITTED"}
+                      {hidden && (
+                        <td className="px-6 py-3">
+                          <Link
+                            href={`/co-monitor/tasks/students-submissions-list/${submission.submissionId}`}
                           >
-                            <Share size={20} className="mr-2" />
-                            <span>View</span>
-                          </button>
-                        </Link>
-                      </td>
+                            <button
+                              className={`w-[100px] rounded-xl flex h-10 justify-center items-center transition duration-300 cursor-pointer ${
+                                submission.status === "NOT SUBMITTED"
+                                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                  : "bg-orange-400 hover:bg-orange-500 text-white"
+                              }`}
+                              disabled={submission.status === "NOT SUBMITTED"}
+                            >
+                              <Share size={20} className="mr-2" />
+                              <span>View</span>
+                            </button>
+                          </Link>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>

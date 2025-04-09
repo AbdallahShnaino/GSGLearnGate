@@ -12,9 +12,14 @@ import Link from "next/link";
 interface IProps {
   tasks: MonitorsTasks[];
   courseStudentCount: { [key: number]: number };
+  role: string;
 }
 
-export default function TaskListCom({ tasks, courseStudentCount }: IProps) {
+export default function TaskListCom({
+  tasks,
+  courseStudentCount,
+  role,
+}: IProps) {
   const [studentCounts, setStudentCounts] = useState<{ [key: number]: number }>(
     courseStudentCount
   );
@@ -38,7 +43,7 @@ export default function TaskListCom({ tasks, courseStudentCount }: IProps) {
           <div className="col-span-12 md:col-span-6 mb-2 md:mb-0">
             <div className="flex items-start">
               <div className="flex-1">
-                <Link href={`/monitor/tasks/${task.id}`}>
+                <Link href={`/${role}/tasks/${task.id}`}>
                   <h3 className="font-medium text-[#FFA41F]">{task.title}</h3>
                 </Link>
                 <div className="flex items-center mt-1 text-sm text-gray-500 md:hidden">

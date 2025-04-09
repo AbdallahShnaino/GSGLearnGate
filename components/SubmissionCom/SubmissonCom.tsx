@@ -8,7 +8,7 @@ import { insertCommentByCoMentor } from "@/controllers/actions/addPraivetCommrnt
 import { useEffect, useState } from "react";
 import StudentInfoCard from "./StudentInfoCard";
 import Image from "next/image";
-import { Attachments } from "@/types";
+import Attachments from "../Attachments/Attachments";
 import { useViewSubmission } from "@/hooks/useViewSubmission";
 import { usePrivateComments } from "@/hooks/usePrivateComments";
 import Loader from "../Shared/Loader";
@@ -121,54 +121,20 @@ const SubmissonCom = ({ id, CoMentorId }: SubmissionIdProps) => {
           <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
             <TaskHeader
               title={submission?.TaskTitle || "No Title"}
-              id={submission?.studentId || 0}
+              points={submission?.points || 0}
               submittedAt={submission?.createdAt}
             />
 
             <div className="p-5 space-y-6">
               <section>
-                <h3 className="text-lg font-medium mb-3 pb-2 border-b">
+                <h3 className="text-lg text-[#FFA41F] font-semibold  mb-3 pb-2 border-b">
                   Student Submission
                 </h3>
-
-                <div>
-                  <h4 className="font-medium mb-2 flex items-center gap-1">
-                    <Paperclip size={22} className="text-[#FFA41F]" />
-                    Attachments:
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {attachments && (
-                      <a
-                        href={attachments.attachmentPath}
-                        target={
-                          attachments.attachmentType === Attachments.LINK
-                            ? "_blank"
-                            : "_self"
-                        }
-                        rel={
-                          attachments.attachmentType === Attachments.LINK
-                            ? "noopener noreferrer"
-                            : undefined
-                        }
-                        download={
-                          attachments.attachmentType === Attachments.FILE
-                            ? true
-                            : undefined
-                        }
-                        className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded text-sm"
-                      >
-                        {attachments.attachmentType === Attachments.LINK
-                          ? "Open Link"
-                          : attachments.attachmentPath.split("/").pop() ||
-                            "Download File"}
-                      </a>
-                    )}
-                  </div>
-                </div>
+                <Attachments paths={[attachments.attachmentPath]} />
               </section>
 
               <section className="pt-2">
-                <h3 className="text-lg font-medium mb-3 pb-2 border-b">
+                <h3 className="text-lg text-[#FFA41F] font-medium mb-3 pb-2 border-b">
                   Grading
                 </h3>
 
@@ -176,7 +142,7 @@ const SubmissonCom = ({ id, CoMentorId }: SubmissionIdProps) => {
                   <div className="md:col-span-2">
                     <label
                       htmlFor="feedback"
-                      className="block mb-2 font-medium"
+                      className="block mb-2 font-medium text-[#FFA41F]"
                     >
                       Feedback
                     </label>
@@ -186,23 +152,26 @@ const SubmissonCom = ({ id, CoMentorId }: SubmissionIdProps) => {
                       value={feedback}
                       onChange={(e) => setFeedback(e.target.value)}
                       placeholder="Enter your feedback here..."
-                      className="w-full p-3 border rounded-md focus:outline-none focus:ring-1 focus:ring-[#FFA41F] focus:border-[#FFA41F]"
+                      className="w-full p-3 border text-[#FFA41F] rounded-md focus:outline-none focus:ring-1 focus:ring-[#FFA41F] focus:border-[#FFA41F]"
                     ></textarea>
                   </div>
 
                   <div>
-                    <label htmlFor="grade" className="block mb-2 font-medium">
-                      Grade (0-100)
+                    <label
+                      htmlFor="grade"
+                      className="block text-[#FFA41F] mb-2 font-medium"
+                    >
+                      {`Grade (0-${submission?.points || 0})`}
                     </label>
                     <input
                       id="grade"
                       type="number"
                       min="0"
-                      max="100"
+                      max={submission?.points || 0}
                       value={grade}
                       onChange={(e) => setGrade(e.target.value)}
                       placeholder="Enter grade"
-                      className="w-full p-3 border rounded-md focus:outline-none focus:ring-1 focus:ring-[#FFA41F] focus:border-[#FFA41F] text-lg"
+                      className="w-full p-3 text-[#FFA41F] border rounded-md focus:outline-none focus:ring-1 focus:ring-[#FFA41F] focus:border-[#FFA41F] text-lg"
                       required
                     />
                   </div>
@@ -210,23 +179,23 @@ const SubmissonCom = ({ id, CoMentorId }: SubmissionIdProps) => {
               </section>
 
               <section className="pt-2">
-                <h3 className="text-lg font-medium mb-3 pb-2 border-b flex items-center gap-2">
+                <h3 className="text-lg text-[#FFA41F] font-medium mb-3 pb-2 border-b flex items-center gap-2">
                   Comments
                   <span className="ml-1 bg-[#FFA41F] text-white rounded-full px-2 py-0.5 text-xs">
                     {privateComments.length}
                   </span>
                 </h3>
 
-                <div className="space-y-3 mb-4">
+                <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
                   {privateComments.map((comment) => (
                     <div
                       key={comment.commentId}
-                      className="border p-2 rounded-md"
+                      className="border p-2 rounded-md text-orange-800 bg-orange-50"
                     >
                       <div className="flex justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <Image
-                            src={comment.image || "/default-avatar.png"}
+                            src={comment.image || "/profile (7).png"}
                             alt={comment.createdBy || "User"}
                             width={28}
                             height={28}
@@ -255,7 +224,7 @@ const SubmissonCom = ({ id, CoMentorId }: SubmissionIdProps) => {
                     placeholder="Add a reply..."
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
-                    className="w-full p-2 border rounded-md text-sm"
+                    className="w-full p-2 border rounded-md text-sm  text-orange-800 focus:outline-none focus:ring-1 focus:ring-[#FFA41F] focus:border-[#FFA41F]"
                   ></textarea>
                   <button
                     type="button"
@@ -273,10 +242,10 @@ const SubmissonCom = ({ id, CoMentorId }: SubmissionIdProps) => {
               </section>
             </div>
 
-            <div className="bg-gray-50 p-4 border-t flex justify-between items-center">
+            <div className="bg-gray-50 p-4 border-t border-amber-700 flex justify-between items-center">
               <button
                 type="button"
-                className="px-4 py-2 border rounded-md hover:bg-gray-100"
+                className="px-4 py-2 border rounded-md hover:bg-gray-100  text-orange-800 "
               >
                 Back to List
               </button>

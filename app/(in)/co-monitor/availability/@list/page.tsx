@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 export default function ListAppointmentPage() {
   const [availability, setAvailability] = useState<CoMonitorAppointment[]>();
   const [loading, setLoading] = useState(true);
-  const CO_MONITOR_ID = 20;
+  const CO_MONITOR_ID = 5;
 
   const fetchData = async () => {
     try {

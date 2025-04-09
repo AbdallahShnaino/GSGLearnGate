@@ -1,7 +1,12 @@
 "use client";
 import SideBar from "@/components/SideBar/SideBar";
 import { SidebarLink } from "@/types/user";
-import { Megaphone, CallBell, ClipboardText } from "@phosphor-icons/react";
+import {
+  Megaphone,
+  CallBell,
+  ClipboardText,
+  Student,
+} from "@phosphor-icons/react";
 import { VideoCamera } from "@phosphor-icons/react/dist/ssr";
 
 export default function RootLayout({
@@ -11,29 +16,29 @@ export default function RootLayout({
 }) {
   const links: SidebarLink[] = [
     {
-      href: "/co-monitor/schedule",
-      label: "Attendance",
-      icon: <CallBell size={16} />,
+      href: "/co-monitor/tasks",
+      label: "Tasks",
+      icon: <ClipboardText size={20} weight="bold" />,
     },
     {
-      href: "/co-monitor/announcments",
-      label: "Announcment",
-      icon: <Megaphone size={16} />,
+      href: "/co-monitor/students",
+      label: "Students",
+      icon: <Student size={20} weight="bold" />,
+    },
+    {
+      href: "/co-monitor/schedule",
+      label: "Attendance",
+      icon: <CallBell size={20} weight="bold" />,
+    },
+    {
+      href: "/co-monitor/announcements",
+      label: "Announcements",
+      icon: <Megaphone size={20} weight="bold" />,
     },
     {
       href: "/co-monitor/availability",
-      label: "Availability",
-      icon: <Megaphone size={16} />,
-    },
-    {
-      href: "/co-monitor/meeting-requests",
-      label: "Meeting Requests",
-      icon: <VideoCamera size={16} />,
-    },
-    {
-      href: "/co-monitor/task-list",
-      label: "Tasks",
-      icon: <ClipboardText size={16} weight="bold" />,
+      label: "Meetings Appointments",
+      icon: <VideoCamera size={20} weight="bold" />,
     },
   ];
 

@@ -9,8 +9,8 @@ import { useActionState, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Submit from "./Submit";
 
-export default function createAppointmentPage() {
-  const CO_MONITOR_ID = 20;
+export default function CreateAppointmentPage() {
+  const CO_MONITOR_ID = 5;
 
   const [coursesList, setCoursesList] = useState<
     | {

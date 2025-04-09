@@ -1,13 +1,15 @@
 import SubmissonCom from "@/components/SubmissionCom/SubmissonCom";
+import { STATIC_COMONITOR_ID } from "@/context/keys";
+
 import React from "react";
 interface Props {
-  params: Promise<{ Id: number }>;
+  params: Promise<{ subId: number }>;
 }
 export default async function page({ params }: Props) {
-  const { Id } = await params;
+  const { subId } = await params;
   return (
     <div>
-      <SubmissonCom id={12} CoMentorId={5} />
+      <SubmissonCom id={subId} CoMentorId={STATIC_COMONITOR_ID} />
     </div>
   );
 }
