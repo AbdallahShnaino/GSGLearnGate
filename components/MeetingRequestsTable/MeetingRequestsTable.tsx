@@ -40,7 +40,7 @@ const MeetingRequestsTable = ({ coMonitorCoursesList }: IProps) => {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="w-full mx-auto mt-4 mb-10 space-y-4">
       <div className="flex">
         <div className="my-5">
           <SelectCourse
