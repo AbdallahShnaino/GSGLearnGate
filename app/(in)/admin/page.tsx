@@ -1,14 +1,14 @@
 import CustomBarChart from "@/components/BarChart/CustomBarChart";
 import StatisticCard from "@/components/StatisticCard/StatisticCard";
-import { getCourses } from "@/services/courses";
-import { getAllCourses, getAllMonitors, getAllStudents } from "@/src/db/queries/select";
+import { fetchAllCourses, getCourses } from "@/services/courses";
+import { fetchMonitors, fetchStudents } from "@/services/users";
 import { Notebook, Student, UserCircle } from "@phosphor-icons/react/dist/ssr";
 import React from "react";
 
 const AdminDashboard = async() => {
-  const totalStudents = (await getAllStudents()).length;
-  const totalMonitors = (await getAllMonitors()).length;
-  const totalCourses = (await getAllCourses()).length;
+  const totalStudents = (await fetchStudents()).length;
+  const totalMonitors = (await fetchMonitors()).length;
+  const totalCourses = (await fetchAllCourses()).length;
   const coursesWithStudent = await getCourses(1,5);
   const chartData = coursesWithStudent?.courses.map(course => ({
     course: course.title,
