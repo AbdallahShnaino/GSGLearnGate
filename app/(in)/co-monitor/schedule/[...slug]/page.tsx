@@ -73,10 +73,10 @@ export default function AttendanceEvaluationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
-      <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+      <div className="overflow-hidden border border-gray-200 shadow-sm rounded-xl">
+        <div className="p-5">
           <h1 className="text-xl font-semibold text-gray-800">
             Attendance Evaluation
           </h1>
