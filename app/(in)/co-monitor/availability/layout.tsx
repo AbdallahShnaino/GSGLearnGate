@@ -12,11 +12,11 @@ export default function Layout({
   list: React.ReactNode;
 }) {
   return (
-    <div className="max-w-6xl mx-auto p-4 space-y-8">
+    <div className="w-11/12 m-auto flex flex-col">
       <ToastContainer position="top-right" />
 
       {children}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-10 mb-10">
         {create}
         {list}
       </div>

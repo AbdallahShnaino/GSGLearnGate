@@ -56,7 +56,7 @@ export default function createAppointmentPage() {
   if (loading) return <Loader message="Loading availability..." />;
 
   return (
-    <section className="bg-white rounded-xl shadow-sm p-6">
+    <section className="bg-white rounded shadow-md overflow-hidden p-5 border-1 border-gray-300">
       <h2 className="text-lg font-semibold mb-4">Add New Slot</h2>
       <form action={formAction} className="space-y-4">
         {coursesList && coursesList?.length > 0 && (
