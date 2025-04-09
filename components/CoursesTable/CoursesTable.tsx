@@ -79,6 +79,7 @@ export default function CoursesTable() {
                     color="#ee1717"
                     weight="fill"
                     onClick={() => handleDeleteClick(course.id)}
+                    className="cursor-pointer"
                   />
                   <Link href={`/admin/courses/${course.id}`}>
                     <PencilSimple size={18} color="#1cc925" weight="fill" />

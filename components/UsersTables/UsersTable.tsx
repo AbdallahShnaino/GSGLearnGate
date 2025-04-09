@@ -83,7 +83,7 @@ export default function UsersTable(props: IProps) {
                 <td>
                   <div className="flex justify-evenly">
                     <button onClick={() => handleDeleteClick(user.userId)}>
-                      <TrashSimple size={18} color="#ee1717" weight="fill" />
+                      <TrashSimple size={18} color="#ee1717" weight="fill" className="cursor-pointer"/>
                     </button>
                     <Link href={`/admin/users/${user.userId}`}>
                       <PencilSimple size={18} color="#1cc925" weight="fill" />
