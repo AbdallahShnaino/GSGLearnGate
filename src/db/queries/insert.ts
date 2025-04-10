@@ -7,7 +7,6 @@ import {
   studentsTable,
   coursesTable,
   announcementsTable,
-  appointmentsTable,
   studentsCoursesTable,
   submissionsTable,
   tasksTable,
@@ -23,7 +22,6 @@ import {
   User,
   Course,
   Announcement,
-  Appointment,
   StudentCourse,
   Submission,
   Task,
@@ -80,16 +78,6 @@ export async function insertAnnouncement(
   return inserted as Announcement;
 }
 
-export async function insertAppointment(
-  data: Omit<Appointment, "id">
-): Promise<Appointment> {
-  const [inserted] = await db
-    .insert(appointmentsTable)
-    .values(data)
-    .returning();
-  return inserted as Appointment;
-}
-
 export async function insertStudentCourse(
   data: Omit<StudentCourse, "id">
 ): Promise<StudentCourse> {
@@ -119,7 +107,7 @@ export async function insertTask(data: Omit<Task, "id">): Promise<Task> {
     .values(normalizedData)
     .returning();
 
-  if (!inserted) throw new Error("Failed to insert task");
+  if (!inserted) throw new Error("CODE:803");
 
   return {
     ...inserted,
@@ -141,21 +129,11 @@ export async function insertAttachment(
   return inserted as Attachment;
 }
 
-export async function insertStudentAppointmentBookingData(
-  data: Omit<StudentBookingDate, "id">
-): Promise<StudentBookingDate> {
-  const [inserted] = await db
-    .insert(appointmentsTable)
-    .values(data)
-    .returning();
-  return inserted as StudentBookingDate;
-}
-
 export async function insertComment(
   data: Omit<InsertCommentsTable, "id">
 ): Promise<SelectCommentsTable> {
   if (!data.submissionId || !data.content || !data.privateRecipientId) {
-    throw new Error("Missing required fields for inserting a comment.");
+    throw new Error("CODE:801");
   }
 
   try {
@@ -163,8 +141,7 @@ export async function insertComment(
 
     return inserted as SelectCommentsTable;
   } catch (error) {
-    console.error("Error inserting comment:", error);
-    throw new Error("Failed to insert comment.");
+    throw new Error("CODE:802");
   }
 }
 
@@ -193,8 +170,7 @@ export async function insertCoMonitorAvailability(
 
     return newAvailability;
   } catch (error) {
-    console.error("Error inserting co-monitor availability:", error);
-    throw new Error("Failed to create availability slot");
+    throw new Error("CODE:805");
   }
 }
 
