@@ -19,7 +19,7 @@ export default function StudentRequestsTable({ coursesList, role }: IProps) {
     handleNextPage,
     totalPages,
     courseId,
-  } = useStudentsList({ role: role });
+  } = useStudentsList();
 
   if (isLoading) {
     return <Loader message="Loading data..." />;

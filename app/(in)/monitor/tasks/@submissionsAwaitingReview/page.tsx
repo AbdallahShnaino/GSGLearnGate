@@ -1,8 +1,10 @@
 import { Clock } from "@phosphor-icons/react/dist/ssr";
 import { getNotGradedSubmissionsCount } from "@/services/task";
-import { STATIC_MONITOR_ID } from "@/context/keys";
+import { useAuth } from "@/context/user";
 export default async function SubmissionsAwaitingReview() {
-  const count = await getNotGradedSubmissionsCount(STATIC_MONITOR_ID);
+  const { userId } = useAuth();
+
+  const count = await getNotGradedSubmissionsCount(userId ?? -1);
   return (
     <div className="bg-white border border-[#FFA41F]/30 rounded-lg p-4 shadow-sm">
       <div className="flex items-center justify-between">

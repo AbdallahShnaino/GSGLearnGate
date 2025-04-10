@@ -23,7 +23,7 @@ export default function CreateAppointmentPage() {
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("17:00");
 
-  const [formState, formAction, isPending] = useActionState(saveAvailability, {
+  const [formState, formAction, _] = useActionState(saveAvailability, {
     success: false,
     message: "",
     errors: null,
