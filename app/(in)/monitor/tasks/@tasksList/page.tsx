@@ -29,7 +29,6 @@ export default async function MonitorTasksPage({
       initialTotal={total}
       initialPage={page}
       initialStatus={taskStatus}
-      role="monitor"
     />
   );
 }
