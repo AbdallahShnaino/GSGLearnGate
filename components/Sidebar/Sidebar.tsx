@@ -11,7 +11,7 @@ interface IProps {
   links: SidebarLink[];
 }
 
-export default function Sidebar({ links }: IProps) {
+export default function SideBar({ links }: IProps) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
@@ -20,7 +20,7 @@ export default function Sidebar({ links }: IProps) {
     const result = await logoutUser();
     if (result.success) {
       router.push("/login");
-      router.refresh(); 
+      router.refresh();
     }
   };
 
@@ -82,7 +82,12 @@ export default function Sidebar({ links }: IProps) {
         <div className="mt-auto pt-4 border-t border-[#4A4F57]">
           <div className="flex items-center gap-2 p-2 cursor-pointer rounded-lg hover:bg-red-100 hover:text-white">
             <SignOut size={24} />
-            <button onClick={handleLogout} className=" text-red-400 font-bold text-[14px]">Log Out</button>
+            <button
+              onClick={handleLogout}
+              className=" text-red-400 font-bold text-[14px]"
+            >
+              Log Out
+            </button>
           </div>
         </div>
       </aside>
