@@ -12,27 +12,24 @@ const StudentAppointmentsTable = (props: IProps) => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-  const [appointments, setAppointments] = useState(props.appointments);
-  const [registeredCourses, setRegisteredCourses] = useState(
-    props.registeredCourses
+  const [filteredAppointments, setFilteredAppointments] = useState(
+    props.appointments
   );
-  const [filteredAppointments, setFilteredAppointments] =
-    useState(appointments);
   const [selectedCourse, setSelectedCourse] = useState("");
 
   useEffect(() => {
     const courseParam = searchParams.get("course") || "";
     setSelectedCourse(courseParam);
 
-    if (!courseParam || !appointments) {
-      setFilteredAppointments(appointments);
+    if (!courseParam || !props.appointments) {
+      setFilteredAppointments(props.appointments);
     } else {
-      const filtered = appointments.filter(
+      const filtered = props.appointments.filter(
         (appointment) => appointment.courseTitle === courseParam
       );
       setFilteredAppointments(filtered);
     }
-  }, [searchParams, appointments]);
+  }, [searchParams, props.appointments]);
 
   const handleCourseFilter = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
@@ -61,7 +58,7 @@ const StudentAppointmentsTable = (props: IProps) => {
             className="px-3 py-2 border border-gray-300 rounded-md"
           >
             <option value="">All Courses</option>
-            {registeredCourses?.map((course) => (
+            {props.registeredCourses?.map((course) => (
               <option key={course.id} value={course.title}>
                 {course.title}
               </option>

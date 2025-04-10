@@ -31,7 +31,7 @@ const BookingPage = async (props: IProps) => {
       />
 
       <Link
-        href={`/${studentId}/appointments`}
+        href={`/student/${studentId}/appointments`}
         className="text-center text-[#FFA41F] hover:underline mt-4"
       >
         View My Appointments

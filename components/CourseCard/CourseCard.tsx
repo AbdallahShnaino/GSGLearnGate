@@ -7,13 +7,6 @@ interface IProps {
   studentId: string;
 }
 
-// const oneWeekInSeconds = 7 * 24 * 60 * 60;
-// const differenceInSeconds = Math.abs(
-//   props.course.endDate / 1000 - props.course.startDate / 1000
-// );
-// const differenceInWeeks = Math.floor(differenceInSeconds / oneWeekInSeconds);
-// const hoursNumber = differenceInWeeks * 6;
-
 const CourseCard = async (props: IProps) => {
   const progressPercentage = (4 / (props.course.duration * 6)) * 100;
   return (
@@ -42,7 +35,7 @@ const CourseCard = async (props: IProps) => {
           <span className="font-medium">{props.course.monitorName}</span>
         </p>
         <Link
-          href={`/${props.studentId}/my-courses/${props.course.id}`}
+          href={`/student/${props.studentId}/my-courses/${props.course.id}`}
           className="mt-3 px-4 py-2 bg-[#FFA41F] text-white rounded-lg hover:bg-[#FF8C00] transition cursor-pointer"
         >
           More Details

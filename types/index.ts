@@ -496,3 +496,8 @@ export interface PublicComment {
   userImage: string | null;
   userType: string;
 }
+
+export type StudentSubmission = {
+  path: string;
+  feedback: string;
+};

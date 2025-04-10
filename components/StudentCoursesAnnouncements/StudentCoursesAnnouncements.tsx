@@ -1,13 +1,73 @@
-import { newAnnouncements } from "@/types";
+"use client";
+import { Course, newAnnouncements } from "@/types";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface IProps {
   announcements: newAnnouncements[] | null;
+  courses: Course[] | null;
 }
 const StudentCoursesAnnouncements = (props: IProps) => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const [filteredAnnouncements, setFilteredAnnouncements] = useState(
+    props.announcements
+  );
+  const [selectedCourse, setSelectedCourse] = useState("");
+
+  useEffect(() => {
+    const courseParam = searchParams.get("course") || "";
+    setSelectedCourse(courseParam);
+
+    if (!courseParam || !props.announcements) {
+      setFilteredAnnouncements(props.announcements);
+    } else {
+      const filtered = props.announcements.filter(
+        (announcement) => announcement.courseTitle === courseParam
+      );
+      setFilteredAnnouncements(filtered);
+    }
+  }, [searchParams, props.announcements]);
+
+  const handleCourseFilter = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+
+    const newParams = new URLSearchParams(searchParams);
+    if (value) {
+      newParams.set("course", value);
+    } else {
+      newParams.delete("course");
+    }
+    router.push(`${pathname}?${newParams.toString()}`);
+  };
+
   return (
     <div className="flex flex-col gap-6">
-      {props.announcements && props.announcements?.length >= 1 ? (
-        props.announcements?.map((announcement) => (
+      <div className="space-y-2">
+        <div className="flex justify-between items-center">
+          <label
+            htmlFor="course-filter"
+            className="text-sm font-medium text-gray-700"
+          >
+            Filter by Course
+          </label>
+          <select
+            id="course-filter"
+            onChange={handleCourseFilter}
+            className="px-3 py-2 border border-gray-300 rounded-md"
+          >
+            <option value="">All Courses</option>
+            {props.courses?.map((course) => (
+              <option key={course.id} value={course.title}>
+                {course.title}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+      {filteredAnnouncements && filteredAnnouncements?.length >= 1 ? (
+        filteredAnnouncements?.map((announcement) => (
           <div
             className="bg-white shadow-lg rounded-xl border border-gray-200 p-6 w-full"
             key={announcement.id}
