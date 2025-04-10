@@ -1,4 +1,4 @@
-import Sidebar from "@/components/SideBar/SideBar";
+import Sidebar from "@/components/Sidebar/Sidebar";
 import { SidebarLink } from "@/types/user";
 import {
   Megaphone,
