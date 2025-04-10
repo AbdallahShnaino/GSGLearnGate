@@ -43,9 +43,9 @@ const StudentAppointmentsTable = (props: IProps) => {
     router.push(`${pathname}?${newParams.toString()}`);
   };
   return (
-    <div className="w-full max-w-4xl mx-auto p-4 space-y-4">
+    <div className="w-full max-w-4xl mx-auto p-4 space-y-4 flex-grow">
       <div className="space-y-2">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col gap-3">
           <label
             htmlFor="course-filter"
             className="text-sm font-medium text-gray-700"
@@ -66,8 +66,8 @@ const StudentAppointmentsTable = (props: IProps) => {
           </select>
         </div>
       </div>
-      <div className="overflow-hidden border border-gray-200 shadow-sm rounded-xl">
-        <table className="w-full border-collapse bg-white text-sm">
+      <div className="overflow-x-auto overflow-hidden border border-gray-200 shadow-sm rounded-xl">
+        <table className="w-full max-w-full border-collapse bg-white text-sm">
           <thead className="text-left text-xs text-gray-700 uppercase bg-gray-100">
             <tr className="bg-gray-50">
               <th className="px-4 py-4 text-left">#</th>
