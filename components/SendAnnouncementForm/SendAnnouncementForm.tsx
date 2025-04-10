@@ -122,6 +122,15 @@ export default function SendAnnouncementForm({ courses }: IProps) {
                 {isPending ? "Submitting" : "Submit"}
               </button>
             </div>
+            <input
+                id="postedBy"
+                name="postedBy"
+                defaultValue={user.userId!}
+                type="text"
+                placeholder="e.g., Online/Offline course details"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                hidden
+            />
           </form>
         </div>
       </div>
