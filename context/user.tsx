@@ -5,29 +5,33 @@ import jwt from "jsonwebtoken";
 interface DecodedToken {
   email?: string;
   role?: string;
-  userId?: string;
+  id?: number;
+  userId?: number;
+}
+
+interface User {
+  email: string;
+  role: string;
+  userId: number | null;
+  id: number | null;
 }
 
 interface AuthContextType {
   token: string | null;
-  user: {
-    email: string;
-    role: string;
-    userId: string;
-  };
-  userId: string | null;
+  user: User;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [user, setUser] = useState({
+  const [user, setUser] = useState<User>({
     email: "",
     role: "",
-    userId: "",
+    userId: null,
+    id: null,
   });
+
   useEffect(() => {
     function getCookie(name: string) {
       const value = `; ${document.cookie}`;
@@ -39,17 +43,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     setToken(getCookie("token") || null);
   }, []);
+
   useEffect(() => {
     if (token) {
       try {
         const decodedToken = jwt.decode(token) as DecodedToken | null;
         if (decodedToken) {
-          setUser({
+          const newUser = {
             email: decodedToken.email || "",
             role: decodedToken.role || "",
-            userId: decodedToken.userId || "",
-          });
-          setUserId(decodedToken.userId || "");
+            userId: decodedToken.userId || null,
+            id: decodedToken.id || null,
+
+          };
+          setUser(newUser);
         }
       } catch (error) {
         console.error("Error decoding token:", error);
@@ -58,7 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [token]);
 
   return (
-    <AuthContext.Provider value={{ token, user, userId }}>
+    <AuthContext.Provider value={{ token, user }}>
       {children}
     </AuthContext.Provider>
   );

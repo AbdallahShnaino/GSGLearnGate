@@ -13,6 +13,7 @@ export async function authenticateUser(email: string, password: string) {
         message: "Invalid email or password",
         error: "User not found",
         userId: undefined,
+        id: undefined,
         role: undefined
       };
     }
@@ -29,6 +30,7 @@ export async function authenticateUser(email: string, password: string) {
         message: "Invalid email or password",
         error: "Incorrect password",
         userId: undefined,
+        id: undefined,
         role: undefined
       };
     } else {
@@ -38,6 +40,7 @@ export async function authenticateUser(email: string, password: string) {
         message: "Login successful",
         error: undefined,
         userId: user.roleId,
+        id: user.id,
         role: user.role as Role
       };
     }
@@ -49,6 +52,7 @@ export async function authenticateUser(email: string, password: string) {
       message: "An error occurred during authentication",
       error: "Internal server error",
       userId: undefined,
+      id: undefined,
       role: undefined
     };
   }
