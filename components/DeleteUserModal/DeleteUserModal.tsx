@@ -14,7 +14,7 @@ const DeleteUserModal = (props:IProps) => {
         Delete User
       </h2>
       <p className="text-gray-600 mt-2">
-        Are you sure you want to delete <b>{props.selectedUser?props.selectedUser:props.selectedCourse}</b>?
+        Are you sure you want to delete this course?
       </p>
       <div className="mt-4 flex justify-end space-x-3">
         <button
