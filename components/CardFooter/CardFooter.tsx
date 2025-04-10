@@ -14,6 +14,7 @@ const CardFooter = ({ taskId, Link }: IProps) => {
       <button
         onClick={() => router.back()}
         className="flex items-center px-4 py-2 border border-orange-200 text-[#FFA41F] rounded-md hover:bg-white cursor-pointer"
+        className="flex items-center px-4 py-2 border border-orange-200 text-[#FFA41F] rounded-md hover:bg-white cursor-pointer"
       >
         <ArrowLeft size={16} weight="bold" className="mr-2" />
         Back to Tasks

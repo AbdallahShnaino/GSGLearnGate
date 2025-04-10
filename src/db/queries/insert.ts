@@ -40,6 +40,7 @@ interface InsertUserInput {
   data: Omit<User, "id">;
 }
 
+
 export async function insertUser({
   data,
   role,
@@ -60,6 +61,7 @@ export async function insertUser({
     await db.insert(studentsTable).values({ userId: user.id }).execute();
   }
 
+
   return user;
 }
 
@@ -67,6 +69,7 @@ export async function insertCourse(data: Omit<Course, "id">): Promise<Course> {
   const [inserted] = await db.insert(coursesTable).values(data).returning();
   return inserted as Course;
 }
+
 
 export async function insertAnnouncement(
   data: Omit<Announcement, "id">
@@ -96,6 +99,7 @@ export async function insertSubmission(
 }
 
 export async function insertTask(data: Omit<Task, "id">): Promise<Task> {
+export async function insertTask(data: Omit<Task, "id">): Promise<Task> {
   const normalizedData = {
     ...data,
     startedAt: new Date(data.startedAt).toISOString(),
@@ -113,8 +117,11 @@ export async function insertTask(data: Omit<Task, "id">): Promise<Task> {
     ...inserted,
     startedAt: new Date(inserted.startedAt),
     deadline: inserted.deadline,
+    startedAt: new Date(inserted.startedAt),
+    deadline: inserted.deadline,
   } as Task;
 }
+
 
 export async function insertAttachment(
   data: Omit<Attachment, "id">
@@ -152,7 +159,6 @@ export async function insertCourseSchedule(
     .insert(courseSchedulesTable)
     .values(data)
     .returning();
-
   return inserted as CourseSchedule;
 }
 
@@ -165,6 +171,7 @@ export async function insertCoMonitorAvailability(
       .values({
         ...availability,
         isBooked: availability.isBooked ?? false,
+        isBooked: availability.isBooked ?? false,
       })
       .returning();
 
@@ -174,6 +181,7 @@ export async function insertCoMonitorAvailability(
   }
 }
 
+export async function insertNewComment(
 export async function insertNewComment(
   data: Omit<newComment, "id">
 ): Promise<newComment> {
