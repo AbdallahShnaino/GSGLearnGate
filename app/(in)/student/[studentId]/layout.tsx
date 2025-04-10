@@ -1,4 +1,4 @@
-import Sidebar from "@/components/SideBar/SideBar";
+import SideBar from "@/components/Sidebar/Sidebar";
 import { Gauge } from "@phosphor-icons/react/dist/ssr";
 import { Laptop } from "@phosphor-icons/react/dist/ssr";
 import { CalendarCheck } from "@phosphor-icons/react/dist/ssr";
@@ -15,7 +15,7 @@ export default async function StudentLayout({
   const { studentId } = await params;
   return (
     <div className="flex">
-      <Sidebar
+      <SideBar
         links={[
           {
             href: `/student/${studentId}`,
