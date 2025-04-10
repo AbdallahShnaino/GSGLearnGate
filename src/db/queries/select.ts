@@ -2130,6 +2130,24 @@ export async function getCoursesWithStudentCounts(
 
   return results;
 }
+export async function getCoursesWithStudentCountsByCoMonitor(
+  coMonitorId: number
+): Promise<{ course: string; students: number }[]> {
+  const results = await db
+    .select({
+      course: coursesTable.title,
+      students: count(studentsCoursesTable.studentId),
+    })
+    .from(coursesTable)
+    .leftJoin(
+      studentsCoursesTable,
+      eq(coursesTable.id, studentsCoursesTable.courseId)
+    )
+    .where(eq(coursesTable.coMonitorId, coMonitorId))
+    .groupBy(coursesTable.id, coursesTable.title);
+
+  return results;
+}
 
 export async function getNotStartedCoursesNotRegisteredByStudent(
   studentId: number
@@ -2195,4 +2213,62 @@ export async function getJoiningRequestStatus(
     );
 
   return results.length > 0 ? results : null;
+}
+export async function getTotalStudentsByCoMonitor(
+  coMonitorId: number
+): Promise<number> {
+  const result = await db
+    .select({ totalStudents: count(studentsCoursesTable.studentId) })
+    .from(studentsCoursesTable)
+    .innerJoin(coursesTable, eq(studentsCoursesTable.courseId, coursesTable.id))
+    .where(eq(coursesTable.coMonitorId, coMonitorId))
+    .get();
+
+  return result?.totalStudents || 0;
+}
+export async function getTotalCoursesByCoMonitor(
+  coMonitorId: number
+): Promise<number> {
+  const result = await db
+    .select({ totalCourses: count(coursesTable.id) })
+    .from(coursesTable)
+    .where(eq(coursesTable.coMonitorId, coMonitorId))
+    .get();
+
+  return result?.totalCourses || 0;
+}
+export async function getTotalTasksByCoMonitor(
+  coMonitorId: number
+): Promise<number> {
+  const result = await db
+    .select({ totalTasks: count(tasksTable.id) })
+    .from(tasksTable)
+    .innerJoin(coursesTable, eq(tasksTable.courseId, coursesTable.id))
+    .where(eq(coursesTable.coMonitorId, coMonitorId))
+    .get();
+
+  return result?.totalTasks || 0;
+}
+export async function getCoMonitorUserDetails(
+  coMonitorId: number
+): Promise<User | null> {
+  const result = await db
+    .select({
+      id: usersTable.id,
+      firstName: usersTable.firstName,
+      lastName: usersTable.lastName,
+      email: usersTable.email,
+      dateOfBirth: usersTable.dateOfBirth,
+      image: usersTable.image,
+      role: usersTable.role,
+      city: usersTable.city,
+      createdAt: usersTable.createdAt,
+      updatedAt: usersTable.updatedAt,
+    })
+    .from(coMonitorsTable)
+    .innerJoin(usersTable, eq(coMonitorsTable.userId, usersTable.id))
+    .where(eq(coMonitorsTable.id, coMonitorId))
+    .get();
+
+  return result || null;
 }

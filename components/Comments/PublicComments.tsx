@@ -109,7 +109,10 @@ const PublicComments = ({ taskId, roles }: Props) => {
       {message && (
         <div className="text-center py-8 text-gray-500">No comments yet</div>
       )}
-      <div className="divide-y divide-orange-100">
+      <div
+        className="divide-y divide-orange-100 max-h-96 overflow-y-auto pr-2"
+        style={{ scrollbarWidth: "thin", scrollbarColor: "#FFA41F #F8FAFC" }}
+      >
         {publicComments.map((comment) => (
           <div
             key={comment.commentId}

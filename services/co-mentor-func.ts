@@ -1,8 +1,8 @@
 "use server";
 
-import { getPrivateCommentsBySubmission, getPrivateCommentsReplyBySubmission, getPublicCommentsByTaskId, getSubmissionById, getSubmissionsAndNonSubmissionsForTask } from "@/src/db/queries/select";
+import { getCoMonitorUserDetails, getPrivateCommentsBySubmission, getPrivateCommentsReplyBySubmission, getPublicCommentsByTaskId, getSubmissionById, getSubmissionsAndNonSubmissionsForTask, getTotalCoursesByCoMonitor, getTotalStudentsByCoMonitor, getTotalTasksByCoMonitor } from "@/src/db/queries/select";
 import { updateMeetingRequest } from "@/src/db/queries/update";
-import { Status } from "@/types";
+import { Status, User } from "@/types";
 import { db } from "@/src/db";
 import {  submissionsTable, tasksTable } from "@/src/db/schema";
 import { eq } from "drizzle-orm";
@@ -138,5 +138,47 @@ export async function fetchPublicCommentsByTaskId(taskId: number) {
   } catch (error) {
     console.error("Error fetching public comments:", error);
     throw new Error("Failed to fetch public comments.");
+  }
+}
+export async function fetchTotalStudentsByCoMonitor(coMonitorId: number): Promise<number> {
+  try {
+    const totalStudents = await getTotalStudentsByCoMonitor(coMonitorId);
+    return totalStudents;
+  } catch (error) {
+    console.error("Error fetching total students:", error);
+    throw new Error("Failed to fetch total students.");
+  }
+}
+
+
+export async function fetchTotalCoursesByCoMonitor(coMonitorId: number): Promise<number> {
+  try {
+    const totalCourses = await getTotalCoursesByCoMonitor(coMonitorId);
+    return totalCourses;
+  } catch (error) {
+    console.error("Error fetching total courses:", error);
+    throw new Error("Failed to fetch total courses.");
+  }
+}
+
+
+export async function fetchTotalTasksByCoMonitor(coMonitorId: number): Promise<number> {
+  try {
+    const totalTasks = await getTotalTasksByCoMonitor(coMonitorId);
+    return totalTasks;
+  } catch (error) {
+    console.error("Error fetching total tasks:", error);
+    throw new Error("Failed to fetch total tasks.");
+  }
+}
+
+
+export async function fetchCoMonitorUserDetails(coMonitorId: number): Promise<User | null> {
+  try {
+    const userDetails = await getCoMonitorUserDetails(coMonitorId);
+    return userDetails;
+  } catch (error) {
+    console.error("Error fetching Co-Mentor user details:", error);
+    throw new Error("Failed to fetch Co-Mentor user details.");
   }
 }
