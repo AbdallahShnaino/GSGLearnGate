@@ -1,15 +1,12 @@
 "use server";
 
 import { getCoMonitorUserDetails, getPrivateCommentsBySubmission, getPrivateCommentsReplyBySubmission, getPublicCommentsByTaskId, getSubmissionById, getSubmissionsAndNonSubmissionsForTask, getTotalCoursesByCoMonitor, getTotalStudentsByCoMonitor, getTotalTasksByCoMonitor } from "@/src/db/queries/select";
-import { updateMeetingRequest } from "@/src/db/queries/update";
 import { Status, User } from "@/types";
 import { db } from "@/src/db";
 import {  submissionsTable, tasksTable } from "@/src/db/schema";
 import { eq } from "drizzle-orm";
 
-export async function updateMeetingRequestStatus(id: number, status: Status) {
-  return await updateMeetingRequest(id, { status });
-}
+
 
 export async function fetchSubmissions(
   taskId: number,
@@ -26,7 +23,7 @@ export async function fetchSubmissions(
       .all();
 
     if (!taskData || taskData.length === 0) {
-      throw new Error("Failed to fetch courseId for the given taskId.");
+      return [];
     }
 
     const courseId = taskData[0].courseId;

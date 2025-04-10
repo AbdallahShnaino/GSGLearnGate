@@ -5,7 +5,6 @@ import { fetchPublicCommentsByTaskId } from "@/services/co-mentor-func";
 import { PublicComment, Role } from "@/types";
 import Loader from "../Shared/Loader";
 import { insertPublicComment } from "@/controllers/actions/addPublicCommrnt";
-import { STATIC_COMONITOR_ID, STATIC_STUDENT_ID } from "@/context/keys";
 import { useAuth } from "@/context/user";
 
 interface Props {

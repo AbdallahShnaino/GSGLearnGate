@@ -2,6 +2,7 @@
 
 import { db } from "@/src/db";
 import { commentsTable,  tasksTable } from "@/src/db/schema";
+import { Role } from "@/types";
 import { eq } from "drizzle-orm";
 
 export async function insertPublicComment({
@@ -30,7 +31,7 @@ export async function insertPublicComment({
       throw new Error("Submission not found.");
     }
 
-   if(role === "co-monitor"){ 
+   if(role === Role.CO_MONITOR){ 
 
     const [insertedComment] = await db
       .insert(commentsTable)
@@ -46,7 +47,7 @@ export async function insertPublicComment({
       .returning();
 
     return insertedComment;}
-    else if(role === "monitor"){
+    else if(role === Role.MONITOR){
 
         const [insertedComment] = await db
         .insert(commentsTable)
