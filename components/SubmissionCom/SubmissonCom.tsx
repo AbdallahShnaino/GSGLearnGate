@@ -15,6 +15,7 @@ import {
   fetchCommentsBySubmissionId,
   saveSubmissionData,
 } from "@/services/co-mentor-func";
+import { useRouter } from "next/navigation";
 
 interface SubmissionIdProps {
   id: number;
@@ -29,7 +30,7 @@ const SubmissonCom = ({ id, CoMentorId }: SubmissionIdProps) => {
     error: commentsError,
     setPrivateComments,
   } = usePrivateComments(id, CoMentorId);
-
+  const router = useRouter();
   const [grade, setGrade] = useState<string>("");
   const [feedback, setFeedback] = useState<string>("");
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -185,7 +186,13 @@ const SubmissonCom = ({ id, CoMentorId }: SubmissionIdProps) => {
                   </span>
                 </h3>
 
-                <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
+                <div
+                  className="space-y-3 divide-y divide-orange-100 max-h-96 overflow-y-auto pr-2"
+                  style={{
+                    scrollbarWidth: "thin",
+                    scrollbarColor: "#FFA41F #F8FAFC",
+                  }}
+                >
                   {privateComments.map((comment) => (
                     <div
                       key={comment.commentId}
@@ -244,10 +251,12 @@ const SubmissonCom = ({ id, CoMentorId }: SubmissionIdProps) => {
             <div className="bg-gray-50 p-4 border-t border-amber-700 flex justify-between items-center">
               <button
                 type="button"
+                onClick={() => router.back()}
                 className="px-4 py-2 border rounded-md hover:bg-gray-100  text-orange-800 "
               >
                 Back to List
               </button>
+
               <button
                 type="submit"
                 disabled={isSaving}

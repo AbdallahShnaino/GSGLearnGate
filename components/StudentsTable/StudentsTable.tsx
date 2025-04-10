@@ -35,7 +35,10 @@ export default function StudentRequestsTable({ coursesList, role }: IProps) {
         />
       </div>
       <div className="max-w-6xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
-        <div className="h-[400px] overflow-x-auto border border-gray-200">
+        <div
+          className="divide-y divide-orange-100 max-h-96 overflow-y-auto pr-2"
+          style={{ scrollbarWidth: "thin", scrollbarColor: "#FFA41F #F8FAFC" }}
+        >
           {students.length > 0 ? (
             <table className="w-full text-sm text-left text-gray-800">
               <thead className="text-xs text-gray-700 uppercase bg-gray-100 items-center">
@@ -47,7 +50,7 @@ export default function StudentRequestsTable({ coursesList, role }: IProps) {
                 {students.map((student) => (
                   <tr
                     className="bg-white hover:bg-gray-50 h-full border-b border-gray-100"
-                    key={student.id}
+                    key={Date.now() + Math.random()}
                   >
                     <td>
                       <PersonCard

@@ -6,12 +6,13 @@ import {
   Student,
   Megaphone,
   UserGear,
-  UserPlus
+  UserPlus,
 } from "@phosphor-icons/react/dist/ssr";
 import { SidebarLink } from "@/types/user";
 import { Metadata } from "next";
 export const metadata: Metadata = {
-  title: "Admin Dashboard - Manage courses, students, monitors and co-monitors, sending course announcement",
+  title:
+    "Admin Dashboard - Manage courses, students, monitors and co-monitors, sending course announcement",
   description:
     "Manage courses, students, monitors and co-monitors, sending course announcement, schedule courses.",
   keywords:
@@ -39,7 +40,7 @@ export const links: SidebarLink[] = [
   {
     href: "/admin/monitors",
     label: "Monitors",
-    icon: <UserGear size={24} weight="bold" />, 
+    icon: <UserGear size={24} weight="bold" />,
   },
   {
     href: "/admin/co-monitors",
