@@ -1,7 +1,21 @@
 "use server";
 
 import { db } from "./../index";
-import { eq, sql, and, count, lte, gt, or, gte, lt } from "drizzle-orm";
+import {
+  eq,
+  sql,
+  and,
+  count,
+  lte,
+  gt,
+  or,
+  gte,
+  lt,
+  inArray,
+  asc,
+  desc,
+  isNull,
+} from "drizzle-orm";
 
 import {
   usersTable,
@@ -16,8 +30,11 @@ import {
   submissionsTable,
   tasksTable,
   attachmentsTable,
-  attendancesTable,
   joiningRequestsTable,
+  courseSchedulesTable,
+  attendanceRecordsTable,
+  coMonitorAvailabilityTable,
+  commentsTable,
 } from "./../schema";
 import {
   Admin,
@@ -41,22 +58,73 @@ import {
   SubmissionsTask,
   CourseWithNames,
   TaskStatus,
-  UsersNames,
   CourseStatus,
   StudentCourseSmallCard,
   StudentCourseBigCard,
   StudentCourseDetails,
   StudentAppointments,
+  StudentCourseTasks,
+  StudentCourseTask,
+  coMonitorName,
+  UsersNames,
+  CourseSchedule,
+  AttendanceRecordStatus,
+  PrivateComment,
+  SubmissionView,
+  SubmissionAttachment,
+  CourseWithPresenter,
+  SoonLectures,
+  AttendanceRecordOne,
+  Comments,
+  SubmissionId,
+  newAnnouncements,
+  PublicComment,
+  Attachments,
+  JoiningOrdersResponse,
+  Status,
+  StudentSubmission,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
-import { MonitorTasksResponse } from "@/types/tasks";
+import { MonitorsTask, MonitorTasksResponse } from "@/types/tasks";
 import { MonitorsTasks } from "@/types/tasksOperations";
+import {
+  CourseScheduleList,
+  CourseStudentsList,
+} from "@/types/attendanceOperations";
+import { CoMonitorAppointment } from "@/types/appointments";
+import { addDays, getDay, isAfter, setHours, setMinutes } from "date-fns";
+import { boolean } from "drizzle-orm/gel-core";
+import { StudentsListResponse } from "@/types/students";
 
 export async function getAllUsers(): Promise<User[]> {
   return await db.select().from(usersTable).all();
 }
+export async function getCourseSchedule(
+  courseId?: number
+): Promise<CourseScheduleList[]> {
+  let query = db
+    .select({
+      id: courseSchedulesTable.id,
+      courseId: courseSchedulesTable.courseId,
+      courseName: coursesTable.title,
+      dayOfWeek: courseSchedulesTable.dayOfWeek,
+      startTime: courseSchedulesTable.startTime,
+      endTime: courseSchedulesTable.endTime,
+    })
+    .from(courseSchedulesTable)
+    .leftJoin(coursesTable, eq(courseSchedulesTable.courseId, coursesTable.id));
+
+  if (courseId !== undefined) {
+    query = query.where(eq(courseSchedulesTable.courseId, courseId));
+  }
 
 export async function getUserByEmail(email: string): Promise<User | null> {
+  const result = await query.all();
+  return result;
+}
+export async function getUserByEmail(
+  email: string
+): Promise<Omit<User, "password"> | null> {
   const result = await db
     .select()
     .from(usersTable)
@@ -457,7 +525,6 @@ export async function getCoMonitorAppointments(
   page: number = 1,
   pageSize: number = 10
 ): Promise<{
-  coMonitorId: number;
   appointments: AppointmentWithStudent[];
   totalCount: number;
 }> {
@@ -466,54 +533,42 @@ export async function getCoMonitorAppointments(
   const whereConditions = [eq(appointmentsTable.coMonitorId, coMonitorId)];
 
   if (courseId !== undefined) {
-    whereConditions.push(eq(coursesTable.id, courseId));
+    whereConditions.push(eq(appointmentsTable.courseId, courseId));
   }
 
   const results = await db
     .select({
       id: appointmentsTable.id,
       studentId: appointmentsTable.studentId,
-      date: appointmentsTable.date,
+      date: appointmentsTable.dateTime,
       caption: appointmentsTable.caption,
-      coMonitorId: appointmentsTable.coMonitorId,
       status: appointmentsTable.status,
       createdAt: appointmentsTable.createdAt,
       profileImage: usersTable.image,
       studentName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
       studentEmail: usersTable.email,
       courseName: coursesTable.title,
-      courseId: coursesTable.id,
     })
     .from(appointmentsTable)
     .innerJoin(studentsTable, eq(appointmentsTable.studentId, studentsTable.id))
     .innerJoin(usersTable, eq(studentsTable.userId, usersTable.id))
-    .innerJoin(
-      coursesTable,
-      eq(coursesTable.coMonitorId, appointmentsTable.coMonitorId)
-    )
+    .innerJoin(coursesTable, eq(appointmentsTable.courseId, coursesTable.id))
     .where(and(...whereConditions))
+    .orderBy(desc(appointmentsTable.createdAt))
     .limit(pageSize)
     .offset(offset);
 
-  const uniqueResults = Array.from(
-    new Map(results.map((item) => [item.studentId, item])).values()
-  );
-
   const countResults = await db
-    .select({ count: sql<number>`COUNT(*)` })
+    .select({ count: sql<number>`count(*)` })
     .from(appointmentsTable)
     .innerJoin(studentsTable, eq(appointmentsTable.studentId, studentsTable.id))
     .innerJoin(usersTable, eq(studentsTable.userId, usersTable.id))
-    .innerJoin(
-      coursesTable,
-      eq(coursesTable.coMonitorId, appointmentsTable.coMonitorId)
-    )
+    .innerJoin(coursesTable, eq(appointmentsTable.courseId, coursesTable.id))
     .where(and(...whereConditions));
 
   return {
-    coMonitorId,
-    appointments: uniqueResults.length > 0 ? uniqueResults : [],
-    totalCount: countResults[0]?.count || 0,
+    appointments: results,
+    totalCount: Number(countResults[0]?.count) || 0,
   };
 }
 
@@ -625,7 +680,25 @@ export async function getMonitorTasksDeadlines(
   );
   return deadlines;
 }
+export async function getCoMonitorTasksDeadlines(
+  coMonitorId: number
+): Promise<Date[]> {
+  const results = await db
+    .select({
+      deadline: tasksTable.deadline,
+    })
+    .from(tasksTable)
+    .innerJoin(
+      coMonitorsTable,
+      eq(coMonitorsTable.userId, tasksTable.creatorId)
+    )
+    .where(eq(coMonitorsTable.userId, coMonitorId));
 
+  const deadlines = results.map(
+    (result: { deadline: string | number | Date }) => new Date(result.deadline)
+  );
+  return deadlines;
+}
 export async function getMonitorSubmissionsNotGradedCount(
   monitorId: number
 ): Promise<number> {
@@ -638,6 +711,21 @@ export async function getMonitorSubmissionsNotGradedCount(
     );
   return result[0]?.total || 0;
 }
+export async function getCoMonitorSubmissionsNotGradedCount(
+  coMonitorId: number
+): Promise<number> {
+  const result = await db
+    .select({ total: count() })
+    .from(submissionsTable)
+    .innerJoin(coursesTable, eq(submissionsTable.courseId, coursesTable.id))
+    .where(
+      and(
+        eq(coursesTable.coMonitorId, coMonitorId),
+        lte(submissionsTable.grade, 0)
+      )
+    );
+  return result[0]?.total || 0;
+}
 
 export async function getTasksByMonitor(
   monitorId: number,
@@ -647,6 +735,8 @@ export async function getTasksByMonitor(
 ): Promise<MonitorTasksResponse> {
   const offset = (page - 1) * pageSize;
   const now = new Date().toISOString().replace("T", " ").slice(0, 19);
+
+  // Type-safe where condition
   const whereCondition = and(
     eq(monitorsTable.userId, monitorId),
     status === TaskStatus.IN_PROGRESS
@@ -659,15 +749,17 @@ export async function getTasksByMonitor(
       : undefined
   );
 
+  // Type-safe count query
   const countQuery = await db
     .select({
       total: sql<number>`count(distinct ${tasksTable.id})`.as("total"),
     })
     .from(tasksTable)
     .innerJoin(monitorsTable, eq(monitorsTable.userId, tasksTable.creatorId))
-    .where(whereCondition);
+    .where(whereCondition)
+    .execute();
 
-  const total = countQuery[0]?.total || 0;
+  const total = countQuery[0]?.total ?? 0;
 
   const rawTasks = await db
     .select({
@@ -681,42 +773,191 @@ export async function getTasksByMonitor(
       createdAt: tasksTable.createdAt,
       updatedAt: tasksTable.updatedAt,
       courseTitle: coursesTable.title,
-      submissionCount: sql<number>`count(distinct ${submissionsTable.id})`.as(
-        "submission_count"
-      ),
-      studentCount:
-        sql<number>`count(distinct ${studentsCoursesTable.studentId})`.as(
-          "student_count"
-        ),
+      submissionCount: sql<number>`
+        (SELECT COUNT(*) FROM ${submissionsTable} 
+         WHERE ${submissionsTable.taskId} = ${tasksTable.id}
+         AND ${submissionsTable.studentId} IN (
+           SELECT ${studentsCoursesTable.studentId}
+           FROM ${studentsCoursesTable}
+           WHERE ${studentsCoursesTable.courseId} = ${tasksTable.courseId}
+         ))
+      `.as("submission_count"),
+      studentCount: sql<number>`
+        (SELECT COUNT(*) FROM ${studentsCoursesTable} 
+         WHERE ${studentsCoursesTable.courseId} = ${tasksTable.courseId})
+      `.as("student_count"),
     })
     .from(tasksTable)
     .innerJoin(monitorsTable, eq(monitorsTable.userId, tasksTable.creatorId))
     .leftJoin(coursesTable, eq(tasksTable.courseId, coursesTable.id))
-    .leftJoin(submissionsTable, eq(tasksTable.id, submissionsTable.taskId))
-    .leftJoin(
-      studentsCoursesTable,
-      eq(tasksTable.courseId, studentsCoursesTable.courseId)
-    )
     .where(whereCondition)
-    .groupBy(
-      tasksTable.id,
-      tasksTable.title,
-      tasksTable.description,
-      tasksTable.courseId,
-      tasksTable.startedAt,
-      tasksTable.deadline,
-      tasksTable.points,
-      tasksTable.createdAt,
-      tasksTable.updatedAt,
-      coursesTable.title
-    )
     .limit(pageSize)
-    .offset(offset);
+    .offset(offset)
+    .execute();
 
-  const tasks: MonitorsTasks[] = rawTasks.map((task) => ({
+  const tasks: MonitorsTask[] = rawTasks.map((task) => ({
     ...task,
     startedAt: new Date(task.startedAt),
-    deadline: task.deadline,
+    deadline: new Date(task.deadline),
+    createdAt: new Date(task.createdAt),
+    updatedAt: new Date(task.updatedAt),
+    courseTitle: task.courseTitle ?? null,
+    description: task.description ?? null,
+  }));
+
+  return {
+    tasks,
+    total,
+  };
+}
+export async function getTaskSubmissionStats(
+  monitorId: number,
+  taskId: number
+): Promise<{
+  submissionCount: number;
+  studentCount: number;
+}> {
+  const task = await db
+    .select({
+      courseId: tasksTable.courseId,
+    })
+    .from(tasksTable)
+    .where(and(eq(tasksTable.id, taskId), eq(tasksTable.creatorId, monitorId)))
+    .get();
+
+  if (!task) {
+    throw new Error("CODE:10008");
+  }
+
+  const submissionCountResult = await db
+    .select({ count: count() })
+    .from(submissionsTable)
+    .where(eq(submissionsTable.taskId, taskId))
+    .get();
+
+  const studentCountResult = await db
+    .select({ count: count() })
+    .from(studentsCoursesTable)
+    .where(eq(studentsCoursesTable.courseId, task.courseId))
+    .get();
+
+  return {
+    submissionCount: submissionCountResult?.count ?? 0,
+    studentCount: studentCountResult?.count ?? 0,
+  };
+}export async function getTaskSubmissionStatsByCoMonitor(
+  coMonitorId: number,
+  taskId: number
+): Promise<{
+  submissionCount: number;
+  studentCount: number;
+}> {
+  const task = await db
+    .select({
+      courseId: tasksTable.courseId,
+    })
+    .from(tasksTable)
+    .where(and(eq(tasksTable.id, taskId), eq(tasksTable.creatorId, coMonitorId)))
+    .get();
+
+  if (!task) {
+    throw new Error("CODE:10008");
+  }
+
+  const submissionCountResult = await db
+    .select({ count: count() })
+    .from(submissionsTable)
+    .where(eq(submissionsTable.taskId, taskId))
+    .get();
+
+  const studentCountResult = await db
+    .select({ count: count() })
+    .from(studentsCoursesTable)
+    .where(eq(studentsCoursesTable.courseId, task.courseId))
+    .get();
+
+  return {
+    submissionCount: submissionCountResult?.count ?? 0,
+    studentCount: studentCountResult?.count ?? 0,
+  };
+}
+
+export async function getTasksByCoMonitor(
+  coMonitorId: number,
+  status: TaskStatus,
+  page: number = 1,
+  pageSize: number = 10
+): Promise<MonitorTasksResponse> {
+  const offset = (page - 1) * pageSize;
+  const now = new Date().toISOString().replace("T", " ").slice(0, 19);
+
+  // Type-safe where condition
+  const whereCondition = and(
+    eq(coMonitorsTable.userId,coMonitorId),
+    status === TaskStatus.IN_PROGRESS
+      ? and(
+          lte(tasksTable.startedAt, now),
+          gte(tasksTable.deadline, new Date())
+        )
+      : status === TaskStatus.COMPLETED
+      ? or(gt(tasksTable.startedAt, now), lt(tasksTable.deadline, new Date()))
+      : undefined
+  );
+
+  // Type-safe count query
+  const countQuery = await db
+    .select({
+      total: sql<number>`count(distinct ${tasksTable.id})`.as("total"),
+    })
+    .from(tasksTable)
+    .innerJoin(coMonitorsTable, eq(coMonitorsTable.userId, tasksTable.creatorId))
+    .where(whereCondition)
+    .execute();
+
+  const total = countQuery[0]?.total ?? 0;
+
+  const rawTasks = await db
+    .select({
+      id: tasksTable.id,
+      title: tasksTable.title,
+      description: tasksTable.description,
+      courseId: tasksTable.courseId,
+      startedAt: tasksTable.startedAt,
+      deadline: tasksTable.deadline,
+      points: tasksTable.points,
+      createdAt: tasksTable.createdAt,
+      updatedAt: tasksTable.updatedAt,
+      courseTitle: coursesTable.title,
+      submissionCount: sql<number>`
+        (SELECT COUNT(*) FROM ${submissionsTable} 
+         WHERE ${submissionsTable.taskId} = ${tasksTable.id}
+         AND ${submissionsTable.studentId} IN (
+           SELECT ${studentsCoursesTable.studentId}
+           FROM ${studentsCoursesTable}
+           WHERE ${studentsCoursesTable.courseId} = ${tasksTable.courseId}
+         ))
+      `.as("submission_count"),
+      studentCount: sql<number>`
+        (SELECT COUNT(*) FROM ${studentsCoursesTable} 
+         WHERE ${studentsCoursesTable.courseId} = ${tasksTable.courseId})
+      `.as("student_count"),
+    })
+    .from(tasksTable)
+    .innerJoin(coMonitorsTable, eq(coMonitorsTable.userId, tasksTable.creatorId))
+    .leftJoin(coursesTable, eq(tasksTable.courseId, coursesTable.id))
+    .where(whereCondition)
+    .limit(pageSize)
+    .offset(offset)
+    .execute();
+
+  const tasks: MonitorsTask[] = rawTasks.map((task) => ({
+    ...task,
+    startedAt: new Date(task.startedAt),
+    deadline: new Date(task.deadline),
+    createdAt: new Date(task.createdAt),
+    updatedAt: new Date(task.updatedAt),
+    courseTitle: task.courseTitle ?? null,
+    description: task.description ?? null,
   }));
 
   return {
@@ -737,6 +978,73 @@ export async function getAllSubmissions(): Promise<Submission[]> {
   return await db.select().from(submissionsTable).all();
 }
 
+export async function getAllJoiningRequestsWithDetails(
+  monitorId: number,
+  courseId: number | undefined,
+  page: number = 1,
+  pageSize: number = 10
+): Promise<JoiningOrdersResponse> {
+  const offset = (page - 1) * pageSize;
+  const whereConditions = [eq(coursesTable.monitorId, monitorId)];
+  if (courseId !== undefined) {
+    whereConditions.push(eq(coursesTable.id, courseId));
+  }
+
+  const totalCountResult = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(joiningRequestsTable)
+    .leftJoin(coursesTable, eq(joiningRequestsTable.courseId, coursesTable.id))
+    .leftJoin(
+      studentsTable,
+      eq(joiningRequestsTable.studentId, studentsTable.id)
+    )
+    .leftJoin(usersTable, eq(studentsTable.userId, usersTable.id))
+    .where(and(...whereConditions))
+    .get();
+
+  const totalCount = totalCountResult?.count ?? 0;
+  const totalPages = Math.ceil(totalCount / pageSize);
+
+  const results = await db
+    .select({
+      id: joiningRequestsTable.id,
+      courseName: coursesTable.title,
+      courseId: coursesTable.id,
+      studentId: usersTable.id,
+      firstName: usersTable.firstName,
+      lastName: usersTable.lastName,
+      email: usersTable.email,
+      image: usersTable.image,
+      interviewStatus: joiningRequestsTable.interviewStatus,
+      joiningStatus: joiningRequestsTable.joiningStatus,
+    })
+    .from(joiningRequestsTable)
+    .leftJoin(coursesTable, eq(joiningRequestsTable.courseId, coursesTable.id))
+    .leftJoin(
+      studentsTable,
+      eq(joiningRequestsTable.studentId, studentsTable.id)
+    )
+    .leftJoin(usersTable, eq(studentsTable.userId, usersTable.id))
+    .where(and(...whereConditions))
+    .limit(pageSize)
+    .offset(offset)
+    .all();
+  return {
+    totalPages,
+    JoiningOrders: results.map((result) => ({
+      id: result.id,
+      courseId: result.courseId,
+      studentId: result.studentId,
+      courseName: result.courseName ?? "Unknown Course",
+      firstName: result.firstName ?? "Unknown",
+      lastName: result.lastName,
+      email: result.email,
+      image: result.image,
+      interviewStatus: result.interviewStatus,
+      joiningStatus: result.joiningStatus,
+    })),
+  };
+}
 export async function getSubmissionsByCourse(
   courseId: number
 ): Promise<Submission[] | null> {
@@ -765,73 +1073,11 @@ export async function getAllAttachments(): Promise<Attachment[]> {
 }
 
 export async function getAllAttendances(): Promise<Attendance[]> {
-  return await db.select().from(attendancesTable).all();
+  return await db.select().from(attendanceRecordsTable).all();
 }
 
 export async function getAllJoiningRequests(): Promise<JoiningRequest[]> {
   return await db.select().from(joiningRequestsTable).all();
-}
-
-export async function getAllJoiningRequestsWithDetails(
-  monitorId: number,
-  courseId: number | undefined,
-  page: number = 1,
-  pageSize: number = 10
-): Promise<JoiningOrder[]> {
-  const offset = (page - 1) * pageSize;
-  const whereConditions = [eq(coursesTable.monitorId, monitorId)];
-  if (courseId !== undefined) {
-    whereConditions.push(eq(coursesTable.id, courseId));
-  }
-  const results = await db
-    .select({
-      id: joiningRequestsTable.id,
-      courseName: coursesTable.title,
-      courseId: coursesTable.id,
-      studentId: usersTable.id,
-      firstName: usersTable.firstName,
-      lastName: usersTable.lastName,
-      email: usersTable.email,
-      image: usersTable.image,
-      interviewStatus: joiningRequestsTable.interviewStatus,
-      joiningStatus: joiningRequestsTable.joiningStatus,
-    })
-    .from(joiningRequestsTable)
-    .leftJoin(coursesTable, eq(joiningRequestsTable.courseId, coursesTable.id))
-    .leftJoin(
-      studentsTable,
-      eq(joiningRequestsTable.studentId, studentsTable.id)
-    )
-    .leftJoin(usersTable, eq(studentsTable.userId, usersTable.id))
-    .where(and(...whereConditions))
-    .limit(pageSize)
-    .offset(offset)
-    .all();
-  return results.map(
-    (result: {
-      id: any;
-      courseId: any;
-      studentId: any;
-      courseName: any;
-      firstName: any;
-      lastName: any;
-      email: any;
-      image: any;
-      interviewStatus: any;
-      joiningStatus: any;
-    }) => ({
-      id: result.id,
-      courseId: result.courseId,
-      studentId: result.studentId,
-      courseName: result.courseName ?? "Unknown Course",
-      firstName: result.firstName ?? "Unknown",
-      lastName: result.lastName,
-      email: result.email,
-      image: result.image,
-      interviewStatus: result.interviewStatus,
-      joiningStatus: result.joiningStatus,
-    })
-  );
 }
 
 export async function updateJoiningRequest(
@@ -857,6 +1103,7 @@ export async function getSubmissionsAndNonSubmissionsForTask(
     .select({
       taskName: tasksTable.title,
       courseName: coursesTable.title,
+      points: tasksTable.points,
     })
     .from(tasksTable)
     .innerJoin(coursesTable, eq(tasksTable.courseId, coursesTable.id))
@@ -865,7 +1112,7 @@ export async function getSubmissionsAndNonSubmissionsForTask(
 
   const taskName = taskAndCourse[0]?.taskName || "Unknown Task";
   const courseName = taskAndCourse[0]?.courseName || "Unknown Course";
-
+  const point = taskAndCourse[0]?.points || 0;
   const submissions = await db
     .select({
       submissionId: submissionsTable.id,
@@ -879,6 +1126,7 @@ export async function getSubmissionsAndNonSubmissionsForTask(
       taskName: tasksTable.title,
       courseName: coursesTable.title,
       taskId: submissionsTable.taskId,
+      points: tasksTable.points,
     })
     .from(submissionsTable)
     .leftJoin(studentsTable, eq(submissionsTable.studentId, studentsTable.id))
@@ -928,6 +1176,7 @@ export async function getSubmissionsAndNonSubmissionsForTask(
       taskName: taskName,
       courseName: courseName,
       taskId: taskId,
+      points: point,
     }));
 
   const combinedResults = [...submissions, ...nonSubmissions];
@@ -935,7 +1184,7 @@ export async function getSubmissionsAndNonSubmissionsForTask(
   const paginatedResults = combinedResults.slice(offset, offset + pageSize);
 
   return {
-    submissions: paginatedResults as SubmissionsTask[], // Ensure type compatibility
+    submissions: paginatedResults as SubmissionsTask[],
     totalCount: combinedResults.length,
   };
 }
@@ -955,8 +1204,23 @@ export async function getLateSubmissionsCountByMonitor(monitorId: number) {
 
   return result[0]?.count ?? 0;
 }
+export async function getLateSubmissionsCountByCoMonitor(coMonitorId: number) {
+  const result = await db
+    .select({ count: count() })
+    .from(submissionsTable)
+    .innerJoin(tasksTable, eq(submissionsTable.taskId, tasksTable.id))
+    .innerJoin(coursesTable, eq(submissionsTable.courseId, coursesTable.id))
+    .where(
+      and(
+        eq(coursesTable.coMonitorId, coMonitorId),
+        gt(submissionsTable.createdAt, tasksTable.deadline)
+      )
+    );
 
-export async function getTaskById(taskId: number) {
+  return result[0]?.count ?? 0;
+}
+
+export async function getTaskById(taskId: number): Promise<Task> {
   const task = await db
     .select()
     .from(tasksTable)
@@ -968,26 +1232,28 @@ export async function getTaskById(taskId: number) {
 
 export async function getLimitCoursesByStudent(
   studentId: number,
-  limit: number = 10
+  limit?: number
 ): Promise<StudentCourseSmallCard[] | null> {
   const results = await db
     .selectDistinct({
       id: coursesTable.id,
       title: coursesTable.title,
       monitorName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
-      absence: attendancesTable.absence,
+      duration: coursesTable.duration,
+      startDate: coursesTable.courseStartDate,
+      endDate: coursesTable.courseEndDate,
     })
     .from(studentsCoursesTable)
     .innerJoin(coursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
     .innerJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
     .innerJoin(usersTable, eq(monitorsTable.userId, usersTable.id))
-    .innerJoin(attendancesTable, eq(coursesTable.id, attendancesTable.courseId))
     .where(eq(studentsCoursesTable.studentId, studentId))
     .groupBy(
       coursesTable.id,
       coursesTable.title,
       usersTable.firstName,
-      usersTable.lastName
+      usersTable.lastName,
+      coursesTable.duration
     )
     .limit(limit);
 
@@ -1002,12 +1268,12 @@ export async function getCoursesDataByStudent(
       id: coursesTable.id,
       title: coursesTable.title,
       monitorName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
-      absence: attendancesTable.absence,
       startDate: coursesTable.courseStartDate,
       endDate: coursesTable.courseEndDate,
-      status: sql<CourseStatus>`CASE 
-      WHEN ${coursesTable.courseStartDate} > CURRENT_DATE THEN 'Not Started'
-      WHEN ${coursesTable.courseEndDate} < CURRENT_DATE THEN 'Finished'
+      duration: coursesTable.duration,
+      status: sql<CourseStatus>`CASE
+      WHEN ${coursesTable.courseStartDate} > CAST(strftime('%s','now') AS INTEGER) THEN 'Not Started'
+      WHEN ${coursesTable.courseEndDate} < CAST(strftime('%s','now') AS INTEGER) THEN 'Finished'
       ELSE 'In Progress'
       END`,
       totalTasks: sql<number>`(SELECT COUNT(*) FROM ${tasksTable} WHERE course_id = ${coursesTable.id})`,
@@ -1017,7 +1283,6 @@ export async function getCoursesDataByStudent(
     .innerJoin(coursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
     .innerJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
     .innerJoin(usersTable, eq(monitorsTable.userId, usersTable.id))
-    .innerJoin(attendancesTable, eq(coursesTable.id, attendancesTable.courseId))
     .where(eq(studentsCoursesTable.studentId, studentId))
     .groupBy(
       coursesTable.id,
@@ -1033,18 +1298,26 @@ const monitorUsers = alias(usersTable, "monitor_users");
 const coMonitorsUsers = alias(usersTable, "co_monitor_users");
 export async function getCoursesById(
   courseId: number
-): Promise<StudentCourseDetails[] | null> {
+): Promise<StudentCourseDetails[]> {
   const results = await db
     .selectDistinct({
       id: coursesTable.id,
       title: coursesTable.title,
       monitor: sql<string>`${monitorUsers.firstName} || ' ' || ${monitorUsers.lastName}`,
       description: coursesTable.description,
-      absence: attendancesTable.absence,
       coMonitors: sql<string>`${coMonitorsUsers.firstName} || ' ' || ${coMonitorsUsers.lastName}`,
+      startDate: coursesTable.courseStartDate,
+      endDate: coursesTable.courseEndDate,
+      applyEndDate: coursesTable.applyEndDate,
+      details: coursesTable.details,
+      entryRequirements: coursesTable.entryRequirements,
+      duration: coursesTable.duration,
     })
-    .from(studentsCoursesTable)
-    .innerJoin(coursesTable, eq(coursesTable.id, studentsCoursesTable.courseId))
+    .from(coursesTable)
+    .innerJoin(
+      studentsCoursesTable,
+      eq(coursesTable.id, studentsCoursesTable.courseId)
+    )
     .innerJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
     .innerJoin(monitorUsers, eq(monitorsTable.userId, monitorUsers.id))
     .innerJoin(
@@ -1052,7 +1325,35 @@ export async function getCoursesById(
       eq(coursesTable.coMonitorId, coMonitorsTable.id)
     )
     .innerJoin(coMonitorsUsers, eq(coMonitorsTable.userId, coMonitorsUsers.id))
-    .innerJoin(attendancesTable, eq(coursesTable.id, attendancesTable.courseId))
+    .where(eq(coursesTable.id, courseId));
+
+  return results.length > 0 ? results : null;
+}
+export async function getCoursesByStudentId(
+  courseId: number
+): Promise<StudentCourseDetails[]> {
+  const results = await db
+    .selectDistinct({
+      id: coursesTable.id,
+      title: coursesTable.title,
+      monitor: sql<string>`${monitorUsers.firstName} || ' ' || ${monitorUsers.lastName}`,
+      description: coursesTable.description,
+      coMonitors: sql<string>`${coMonitorsUsers.firstName} || ' ' || ${coMonitorsUsers.lastName}`,
+      startDate: coursesTable.courseStartDate,
+      endDate: coursesTable.courseEndDate,
+      applyEndDate: coursesTable.applyEndDate,
+      details: coursesTable.details,
+      entryRequirements: coursesTable.entryRequirements,
+      duration: coursesTable.duration,
+    })
+    .from(coursesTable)
+    .innerJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
+    .innerJoin(monitorUsers, eq(monitorsTable.userId, monitorUsers.id))
+    .innerJoin(
+      coMonitorsTable,
+      eq(coursesTable.coMonitorId, coMonitorsTable.id)
+    )
+    .innerJoin(coMonitorsUsers, eq(coMonitorsTable.userId, coMonitorsUsers.id))
     .where(eq(coursesTable.id, courseId));
 
   return results.length > 0 ? results : null;
@@ -1063,19 +1364,922 @@ export async function getStudentAppointments(
 ): Promise<StudentAppointments[] | null> {
   const results = await db
     .selectDistinct({
-      id: appointmentsTable.id,
-      coMonitor: sql<string>`${coMonitorsUsers.firstName} || ' ' || ${coMonitorsUsers.lastName}`,
-      date: appointmentsTable.date,
-      status: appointmentsTable.status,
+      id: coMonitorAvailabilityTable.id,
+      coMonitor: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      date: coMonitorAvailabilityTable.date,
+      startTime: coMonitorAvailabilityTable.startTime,
+      courseTitle: coursesTable.title,
     })
-    .from(appointmentsTable)
-    .innerJoin(studentsTable, eq(studentsTable.id, appointmentsTable.studentId))
+    .from(coMonitorAvailabilityTable)
+    .innerJoin(
+      studentsTable,
+      eq(studentsTable.id, coMonitorAvailabilityTable.bookedByStudentId)
+    )
     .innerJoin(
       coMonitorsTable,
-      eq(coMonitorsTable.id, appointmentsTable.coMonitorId)
+      eq(coMonitorsTable.id, coMonitorAvailabilityTable.coMonitorId)
     )
-    .innerJoin(coMonitorsUsers, eq(coMonitorsTable.userId, coMonitorsUsers.id))
+    .innerJoin(usersTable, eq(coMonitorsTable.userId, usersTable.id))
+    .innerJoin(
+      coursesTable,
+      eq(coursesTable.id, coMonitorAvailabilityTable.courseId)
+    )
     .where(eq(studentsTable.id, studentId));
 
   return results.length > 0 ? results : null;
+}
+
+export async function getMonitorAnnouncements(
+  courseId: number | undefined,
+  courseIds?: number[],
+  page: number = 1,
+  pageSize: number = 10
+): Promise<{ announcements: Announcement[] | null; total: number }> {
+  let allResults: Announcement[];
+
+  if (courseId !== undefined) {
+    allResults = await db
+      .select()
+      .from(announcementsTable)
+      .where(eq(announcementsTable.courseId, courseId))
+      .all();
+  } else if (courseIds && courseIds.length > 0) {
+    allResults = await db
+      .select()
+      .from(announcementsTable)
+      .where(inArray(announcementsTable.courseId, courseIds))
+      .all();
+  } else {
+    return { announcements: null, total: 0 };
+  }
+
+  const total = allResults.length;
+
+  const offset = (page - 1) * pageSize;
+  const paginatedResults = allResults.slice(offset, offset + pageSize);
+
+  return {
+    announcements: paginatedResults.length > 0 ? paginatedResults : null,
+    total,
+  };
+}
+export async function getTasksByCourseId(
+  courseId: number
+): Promise<StudentCourseTasks[] | null> {
+  const results = await db
+    .selectDistinct({
+      taskId: tasksTable.id,
+      taskTitle: tasksTable.title,
+      deadline: tasksTable.deadline,
+      status: submissionsTable.status,
+      grade: submissionsTable.grade,
+      gradedAt: submissionsTable.gradedAt,
+      maxGrade: tasksTable.points,
+    })
+    .from(tasksTable)
+    .innerJoin(coursesTable, eq(coursesTable.id, tasksTable.courseId))
+    .innerJoin(submissionsTable, eq(tasksTable.id, submissionsTable.taskId))
+    .innerJoin(studentsTable, eq(studentsTable.id, submissionsTable.studentId))
+    .where(eq(coursesTable.id, courseId));
+
+  return results.length > 0 ? results : null;
+}
+
+export async function getUserById(
+  id: number
+): Promise<Omit<User, "password"> | null> {
+  const result = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.id, Number(id)))
+    .get();
+  return result || null;
+}
+
+export async function getTaskByTaskId(
+  taskId: number
+): Promise<StudentCourseTask[] | null> {
+  const results = await db
+    .selectDistinct({
+      courseTitle: coursesTable.title,
+      taskTitle: tasksTable.title,
+      creator: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      createdAt: tasksTable.createdAt,
+      updatedAt: tasksTable.updatedAt,
+      description: tasksTable.description,
+      deadline: tasksTable.deadline,
+    })
+    .from(tasksTable)
+    .innerJoin(coursesTable, eq(coursesTable.id, tasksTable.courseId))
+    .innerJoin(usersTable, eq(usersTable.id, tasksTable.creatorId))
+    .where(eq(tasksTable.id, taskId));
+
+  return results.length > 0 ? results : null;
+}
+
+export async function getCoMonitorByCourseId(
+  courseId: number
+): Promise<coMonitorName[] | null> {
+  const results = await db
+    .selectDistinct({
+      coMonitorId: coMonitorsTable.id,
+      coMonitorName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+    })
+    .from(coursesTable)
+    .innerJoin(
+      coMonitorsTable,
+      eq(coMonitorsTable.id, coursesTable.coMonitorId)
+    )
+    .innerJoin(usersTable, eq(usersTable.id, coMonitorsTable.userId))
+    .where(eq(coursesTable.id, courseId));
+
+  return results.length > 0 ? results : null;
+}
+export async function getStudentsByCourseId(
+  courseId: number
+): Promise<CourseStudentsList[]> {
+  const students = await db
+    .select({
+      id: studentsTable.id,
+      userId: studentsTable.userId,
+      firstName: usersTable.firstName,
+      lastName: usersTable.lastName,
+      email: usersTable.email,
+      image: usersTable.image,
+    })
+    .from(studentsCoursesTable)
+    .innerJoin(
+      studentsTable,
+      eq(studentsCoursesTable.studentId, studentsTable.id)
+    )
+    .innerJoin(usersTable, eq(studentsTable.userId, usersTable.id))
+    .where(eq(studentsCoursesTable.courseId, courseId))
+    .all();
+
+  return students;
+}
+
+export async function insertAttendanceRecord({
+  sessionId,
+  courseId,
+  studentId,
+  status,
+  recordedById,
+}: {
+  sessionId: number;
+  courseId: number;
+  studentId: number;
+  status: AttendanceRecordStatus;
+  recordedById: number;
+}) {
+  console.log(sessionId, courseId, studentId, status, recordedById);
+  const existing = await db
+    .select()
+    .from(attendanceRecordsTable)
+    .where(
+      and(
+        eq(attendanceRecordsTable.sessionId, sessionId),
+        eq(attendanceRecordsTable.studentId, studentId)
+      )
+    )
+    .get();
+
+  if (existing) {
+    return await db
+      .update(attendanceRecordsTable)
+      .set({
+        status,
+        recordedById,
+        updatedAt: sql`(current_timestamp)`, // Use SQL function for timestamp
+      })
+      .where(
+        and(
+          eq(attendanceRecordsTable.sessionId, sessionId),
+          eq(attendanceRecordsTable.studentId, studentId)
+        )
+      )
+      .returning()
+      .get();
+  }
+
+  return await db
+    .insert(attendanceRecordsTable)
+    .values({
+      sessionId,
+      courseId,
+      studentId,
+      status,
+      recordedById,
+      createdAt: sql`(current_timestamp)`,
+      updatedAt: sql`(current_timestamp)`,
+      deletedAt: sql`(current_timestamp)`,
+    })
+    .returning()
+    .get();
+}
+
+export async function getAllCoMonitorAppointments(
+  coMonitorId: number
+): Promise<CoMonitorAppointment[]> {
+  return await db
+    .select({
+      id: coMonitorAvailabilityTable.id,
+      date: coMonitorAvailabilityTable.date,
+      startTime: coMonitorAvailabilityTable.startTime,
+      endTime: coMonitorAvailabilityTable.endTime,
+      isBooked: coMonitorAvailabilityTable.isBooked,
+      course: {
+        id: coursesTable.id,
+        title: coursesTable.title,
+      },
+      student: {
+        id: studentsTable.id,
+        userId: studentsTable.userId,
+        firstName: usersTable.firstName,
+        lastName: usersTable.lastName,
+      },
+    })
+    .from(coMonitorAvailabilityTable)
+    .leftJoin(
+      coursesTable,
+      eq(coMonitorAvailabilityTable.courseId, coursesTable.id)
+    )
+    .leftJoin(
+      studentsTable,
+      eq(coMonitorAvailabilityTable.bookedByStudentId, studentsTable.id)
+    )
+    .leftJoin(
+      usersTable,
+      eq(studentsTable.userId, usersTable.id) // Join users table
+    )
+    .where(eq(coMonitorAvailabilityTable.coMonitorId, coMonitorId))
+    .all();
+}
+
+export async function getSubmissionById(submissionId: number): Promise<{
+  submission: SubmissionView | null;
+  attachments: SubmissionAttachment;
+}> {
+  const result = await db
+    .select({
+      id: submissionsTable.id,
+      taskId: submissionsTable.taskId,
+      studentId: submissionsTable.studentId,
+      courseId: submissionsTable.courseId,
+      grade: submissionsTable.grade,
+      feedback: submissionsTable.feedback,
+      gradedAt: submissionsTable.gradedAt,
+      status: submissionsTable.status,
+      createdAt: submissionsTable.createdAt,
+      updatedAt: submissionsTable.updatedAt,
+      deletedAt: submissionsTable.deletedAt,
+      StudentName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      StudentEmail: usersTable.email,
+      StudentImage: usersTable.image,
+      TaskTitle: tasksTable.title,
+      points: tasksTable.points,
+    })
+    .from(submissionsTable)
+    .leftJoin(studentsTable, eq(submissionsTable.studentId, studentsTable.id))
+    .leftJoin(usersTable, eq(studentsTable.userId, usersTable.id))
+    .leftJoin(tasksTable, eq(submissionsTable.taskId, tasksTable.id))
+    .where(eq(submissionsTable.id, submissionId))
+    .get();
+
+  if (!result) {
+    return {
+      submission: null,
+      attachments: {
+        attachmentId: 0,
+        attachmentPath: "",
+        attachmentType: undefined,
+      },
+    };
+  }
+
+  const submission: SubmissionView = {
+    ...result,
+    createdAt: new Date(result.createdAt),
+    updatedAt: new Date(result.updatedAt),
+    deletedAt: result.deletedAt ? new Date(result.deletedAt) : null,
+    gradedAt: result.gradedAt ? new Date(result.gradedAt) : null,
+  };
+
+  const attachmentsResult = await db
+    .select({
+      attachmentId: attachmentsTable.id,
+      attachmentPath: attachmentsTable.path,
+      attachmentType: attachmentsTable.type,
+    })
+    .from(attachmentsTable)
+    .innerJoin(
+      submissionsTable,
+      eq(attachmentsTable.id, submissionsTable.attachmentId)
+    )
+    .where(eq(submissionsTable.id, submissionId))
+    .all();
+
+  return {
+    submission,
+    attachments: attachmentsResult[0] || {
+      attachmentId: 0,
+      attachmentPath: "",
+      attachmentType: undefined,
+    },
+  };
+}
+export async function getPrivateCommentsBySubmission(
+  submissionId: number
+): Promise<PrivateComment[]> {
+  const submission = await db
+    .select({
+      studentId: submissionsTable.studentId,
+    })
+    .from(submissionsTable)
+    .where(eq(submissionsTable.id, submissionId))
+    .get();
+
+  if (!submission) {
+    throw new Error("Submission not found.");
+  }
+
+  const comments = await db
+    .select({
+      commentId: commentsTable.id,
+      commentText: commentsTable.content,
+      createdAt: commentsTable.createdAt,
+      createdBy: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      image: usersTable.image,
+    })
+    .from(commentsTable)
+    .innerJoin(usersTable, eq(commentsTable.studentId, usersTable.id))
+    .where(
+      and(
+        eq(commentsTable.submissionId, submissionId),
+        eq(commentsTable.studentId, submission.studentId),
+        eq(commentsTable.isPublic, false)
+      )
+    )
+    .orderBy(commentsTable.createdAt);
+
+  console.log("Comments: ", comments);
+  return comments.map((comment) => ({
+    ...comment,
+    createdAt: new Date(comment.createdAt),
+  }));
+}
+export async function getPrivateCommentsReplyBySubmission(
+  submissionId: number,
+  ComentorId: number
+): Promise<PrivateComment[]> {
+  const comments = await db
+    .select({
+      commentId: commentsTable.id,
+      commentText: commentsTable.content,
+      createdAt: commentsTable.createdAt,
+      createdBy: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      image: usersTable.image,
+    })
+    .from(commentsTable)
+    .innerJoin(usersTable, eq(commentsTable.coMonitorId, usersTable.id))
+    .where(
+      and(
+        eq(commentsTable.submissionId, submissionId),
+        eq(commentsTable.coMonitorId, ComentorId),
+        eq(commentsTable.isPublic, false)
+      )
+    )
+    .orderBy(commentsTable.createdAt);
+
+  return comments.map((comment) => ({
+    ...comment,
+    createdAt: new Date(comment.createdAt),
+  }));
+}
+
+export async function getAllCoursesWithMonitors(): Promise<Course[]> {
+  const results = await db
+    .select({
+      id: coursesTable.id,
+      title: coursesTable.title,
+      description: coursesTable.description,
+      image: coursesTable.image,
+      difficulty: coursesTable.difficulty,
+      duration: coursesTable.duration,
+      applyStartDate: coursesTable.applyStartDate,
+      applyEndDate: coursesTable.applyEndDate,
+      courseStartDate: coursesTable.courseStartDate,
+      courseEndDate: coursesTable.courseEndDate,
+      monitorId: coursesTable.monitorId,
+      coMonitorId: coursesTable.coMonitorId,
+      adminId: coursesTable.adminId,
+      details: coursesTable.details,
+      entryRequirements: coursesTable.entryRequirements,
+      createdAt: coursesTable.createdAt,
+      updatedAt: coursesTable.updatedAt,
+      deletedAt: coursesTable.deletedAt,
+
+      monitorUserId: monitorsTable.userId,
+      monitorFirstName: usersTable.firstName,
+      monitorLastName: usersTable.lastName,
+      monitorImage: usersTable.image,
+    })
+    .from(coursesTable)
+    .leftJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
+    .leftJoin(usersTable, eq(monitorsTable.userId, usersTable.id));
+
+  return results.map((course) => ({
+    ...course,
+    presenterName: course.monitorFirstName
+      ? `${course.monitorFirstName} ${course.monitorLastName}`
+      : "Unknown",
+    presenterImage: course.monitorImage || null,
+  }));
+}
+
+export async function getCourseWithMonitor(
+  id: number
+): Promise<CourseWithPresenter> {
+  const results = await db
+    .select({
+      id: coursesTable.id,
+      title: coursesTable.title,
+      description: coursesTable.description,
+      image: coursesTable.image,
+      difficulty: coursesTable.difficulty,
+      duration: coursesTable.duration,
+      applyStartDate: coursesTable.applyStartDate,
+      applyEndDate: coursesTable.applyEndDate,
+      courseStartDate: coursesTable.courseStartDate,
+      courseEndDate: coursesTable.courseEndDate,
+      monitorId: coursesTable.monitorId,
+      coMonitorId: coursesTable.coMonitorId,
+      adminId: coursesTable.adminId,
+      details: coursesTable.details,
+      entryRequirements: coursesTable.entryRequirements,
+      createdAt: coursesTable.createdAt,
+      updatedAt: coursesTable.updatedAt,
+      deletedAt: coursesTable.deletedAt,
+
+      monitorUserId: monitorsTable.userId,
+      monitorFirstName: usersTable.firstName,
+      monitorLastName: usersTable.lastName,
+      monitorImage: usersTable.image,
+    })
+    .from(coursesTable)
+    .leftJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
+    .leftJoin(usersTable, eq(monitorsTable.userId, usersTable.id))
+    .where(eq(coursesTable.id, id))
+    .get();
+
+  return {
+    ...results,
+    presenterName: results.monitorFirstName
+      ? `${results.monitorFirstName} ${results.monitorLastName}`
+      : "Unknown",
+    presenterImage: results.monitorImage || null,
+  };
+}
+
+export async function getStudentAttendanceById(
+  studentId: number,
+  courseId: number
+): Promise<number | null> {
+  const results: AttendanceRecordOne[] = await db
+    .select({
+      attendanceStatus: attendanceRecordsTable.status,
+    })
+    .from(attendanceRecordsTable)
+    .innerJoin(
+      courseSchedulesTable,
+      eq(courseSchedulesTable.id, attendanceRecordsTable.sessionId)
+    )
+    .innerJoin(
+      coursesTable,
+      eq(coursesTable.id, attendanceRecordsTable.courseId)
+    )
+    .innerJoin(
+      studentsTable,
+      eq(studentsTable.id, attendanceRecordsTable.studentId)
+    )
+    .where(and(eq(studentsTable.id, studentId), eq(coursesTable.id, courseId)));
+
+  if (results.length === 0) return null;
+
+  const presentCount = results.filter(
+    (item: AttendanceRecordOne) => item.attendanceStatus !== "ABSENT"
+  ).length;
+
+  return presentCount;
+}
+
+export async function getCommentsByTaskId(
+  courseId: number,
+  TaskId: number
+): Promise<Comments[]> {
+  const students = await db
+    .select({
+      id: commentsTable.id,
+      content: commentsTable.content,
+      userName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      isPublic: commentsTable.isPublic,
+      createdAt: commentsTable.createdAt,
+    })
+    .from(commentsTable)
+    .innerJoin(usersTable, eq(usersTable.id, commentsTable.privateRecipientId))
+    .innerJoin(coursesTable, eq(coursesTable.id, commentsTable.courseId))
+    .innerJoin(tasksTable, eq(tasksTable.id, commentsTable.taskId))
+    .where(and(eq(coursesTable.id, courseId), eq(tasksTable.id, TaskId)))
+    .all();
+
+  return students;
+}
+
+export async function getSubmissionIdByTaskId(
+  courseId: number,
+  TaskId: number
+): Promise<{ submissionId: number }[]> {
+  const SubmissionId = await db
+    .select({
+      submissionId: submissionsTable.id,
+    })
+    .from(submissionsTable)
+    .innerJoin(tasksTable, eq(tasksTable.id, submissionsTable.taskId))
+    .innerJoin(coursesTable, eq(coursesTable.id, tasksTable.courseId))
+    .where(and(eq(coursesTable.id, courseId), eq(tasksTable.id, TaskId)));
+
+  return SubmissionId;
+}
+
+export async function getStudentAnnouncementsById(
+  studentId: number
+): Promise<newAnnouncements[] | null> {
+  const results = await db
+    .select({
+      id: announcementsTable.id,
+      postedBy: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      courseId: coursesTable.id,
+      title: announcementsTable.title,
+      description: announcementsTable.description,
+      createdAt: announcementsTable.createdAt,
+      courseTitle: coursesTable.title,
+    })
+    .from(announcementsTable)
+    .innerJoin(usersTable, eq(usersTable.id, announcementsTable.postedBy))
+    .innerJoin(coursesTable, eq(coursesTable.id, announcementsTable.courseId))
+    .innerJoin(
+      studentsCoursesTable,
+      eq(coursesTable.id, studentsCoursesTable.courseId)
+    )
+    .where(eq(studentsCoursesTable.studentId, studentId));
+
+  return results.length > 0 ? results : null;
+}
+
+export async function getPublicCommentsByTaskId(
+  taskId: number
+): Promise<PublicComment[]> {
+  const publicComments = await db
+    .select({
+      commentId: commentsTable.id,
+      commentText: commentsTable.content,
+      createdAt: commentsTable.createdAt,
+      isPublic: commentsTable.isPublic,
+      userName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      userEmail: usersTable.email,
+      userImage: usersTable.image,
+      userType: sql<string>`CASE
+        WHEN ${commentsTable.studentId} IS NOT NULL THEN 'Student'
+        WHEN ${commentsTable.coMonitorId} IS NOT NULL THEN 'Co-Mentor'
+        WHEN ${commentsTable.monitorId} IS NOT NULL THEN 'Mentor'
+        ELSE 'Unknown'
+      END`,
+      userId: sql<number>`CASE
+        WHEN ${commentsTable.studentId} IS NOT NULL THEN ${studentsTable.userId}
+        WHEN ${commentsTable.coMonitorId} IS NOT NULL THEN ${coMonitorsTable.userId}
+        WHEN ${commentsTable.monitorId} IS NOT NULL THEN ${monitorsTable.userId}
+        ELSE NULL
+      END`,
+    })
+    .from(commentsTable)
+    .leftJoin(studentsTable, eq(commentsTable.studentId, studentsTable.id))
+    .leftJoin(
+      coMonitorsTable,
+      eq(commentsTable.coMonitorId, coMonitorsTable.id)
+    )
+    .leftJoin(monitorsTable, eq(commentsTable.monitorId, monitorsTable.id))
+    .innerJoin(
+      usersTable,
+      sql`
+      ${usersTable.id} = COALESCE(
+        ${studentsTable.userId},
+        ${coMonitorsTable.userId},
+        ${monitorsTable.userId}
+      )
+    `
+    )
+    .where(
+      and(eq(commentsTable.taskId, taskId), eq(commentsTable.isPublic, true))
+    )
+    .orderBy(asc(commentsTable.createdAt));
+
+  return publicComments;
+}
+
+export async function getAttachmentPathsByTaskId(
+  taskId: number,
+  courseId: number
+): Promise<StudentSubmission> {
+  const attachments = await db
+    .select({
+      path: attachmentsTable.path,
+      feedback: submissionsTable.feedback,
+    })
+    .from(attachmentsTable)
+    .innerJoin(
+      submissionsTable,
+      eq(attachmentsTable.id, submissionsTable.attachmentId)
+    )
+    .innerJoin(coursesTable, eq(coursesTable.id, submissionsTable.courseId))
+    .where(eq(attachmentsTable.taskId, taskId))
+    .execute();
+
+  return attachments;
+}
+
+export async function getStudentsListByCourseId(
+  courseId?: number,
+  page: number = 1,
+  itemsPerPage: number = 10,
+  monitorId?: number,
+  coMonitorId?: number
+): Promise<StudentsListResponse> {
+  console.log("courseId ", courseId);
+
+  try {
+    // Validate that either monitorId or coMonitorId is provided when no courseId is specified
+    if (!courseId && !monitorId && !coMonitorId) {
+      throw new Error(
+        "Either courseId or monitorId/coMonitorId must be provided"
+      );
+    }
+
+    // Base query for counting
+    let countQuery = db
+      .select({ count: count() })
+      .from(studentsCoursesTable)
+      .innerJoin(
+        studentsTable,
+        eq(studentsCoursesTable.studentId, studentsTable.id)
+      )
+      .innerJoin(usersTable, eq(studentsTable.userId, usersTable.id))
+      .innerJoin(
+        coursesTable,
+        eq(studentsCoursesTable.courseId, coursesTable.id)
+      );
+
+    let studentsQuery = db
+      .select({
+        id: studentsTable.id,
+        userId: studentsTable.userId,
+        firstName: usersTable.firstName,
+        lastName: usersTable.lastName,
+        email: usersTable.email,
+        image: usersTable.image,
+        courseId: coursesTable.id,
+        courseTitle: coursesTable.title,
+      })
+      .from(studentsCoursesTable)
+      .innerJoin(
+        studentsTable,
+        eq(studentsCoursesTable.studentId, studentsTable.id)
+      )
+      .innerJoin(usersTable, eq(studentsTable.userId, usersTable.id))
+      .innerJoin(
+        coursesTable,
+        eq(studentsCoursesTable.courseId, coursesTable.id)
+      )
+      .limit(itemsPerPage)
+      .offset((page - 1) * itemsPerPage);
+
+    if (courseId) {
+      countQuery = countQuery.where(
+        eq(studentsCoursesTable.courseId, courseId)
+      );
+      studentsQuery = studentsQuery.where(
+        eq(studentsCoursesTable.courseId, courseId)
+      );
+    } else {
+      if (monitorId) {
+        countQuery = countQuery.where(eq(coursesTable.monitorId, monitorId));
+        studentsQuery = studentsQuery.where(
+          eq(coursesTable.monitorId, monitorId)
+        );
+      } else if (coMonitorId) {
+        countQuery = countQuery.where(
+          eq(coursesTable.coMonitorId, coMonitorId)
+        );
+        studentsQuery = studentsQuery.where(
+          eq(coursesTable.coMonitorId, coMonitorId)
+        );
+      }
+    }
+
+    const totalStudentsResult = await countQuery;
+    const totalStudents = totalStudentsResult[0]?.count || 0;
+    const totalPages = Math.ceil(totalStudents / itemsPerPage);
+
+    const students = await studentsQuery;
+    console.log(students);
+    return {
+      students,
+      totalPages,
+    };
+  } catch (error) {
+    console.error("Error fetching students:", error);
+    throw error;
+  }
+}
+
+export async function getStudentsCountByMonitor(
+  monitorId: number
+): Promise<number> {
+  const result = await db
+    .select({ count: count() })
+    .from(studentsCoursesTable)
+    .innerJoin(coursesTable, eq(studentsCoursesTable.courseId, coursesTable.id))
+    .where(eq(coursesTable.monitorId, monitorId));
+
+  return result[0]?.count || 0;
+}
+
+export async function getCoursesCountByMonitor(
+  monitorId: number
+): Promise<number> {
+  const result = await db
+    .select({ count: count() })
+    .from(coursesTable)
+    .where(eq(coursesTable.monitorId, monitorId));
+
+  return result[0]?.count || 0;
+}
+export async function getCoursesWithStudentCounts(
+  monitorId: number
+): Promise<{ course: string; students: number }[]> {
+  const results = await db
+    .select({
+      course: coursesTable.title,
+      students: count(studentsCoursesTable.studentId),
+    })
+    .from(coursesTable)
+    .leftJoin(
+      studentsCoursesTable,
+      eq(coursesTable.id, studentsCoursesTable.courseId)
+    )
+    .where(eq(coursesTable.monitorId, monitorId))
+    .groupBy(coursesTable.id, coursesTable.title);
+
+  return results;
+}
+export async function getCoursesWithStudentCountsByCoMonitor(
+  coMonitorId: number
+): Promise<{ course: string; students: number }[]> {
+  const results = await db
+    .select({
+      course: coursesTable.title,
+      students: count(studentsCoursesTable.studentId),
+    })
+    .from(coursesTable)
+    .leftJoin(
+      studentsCoursesTable,
+      eq(coursesTable.id, studentsCoursesTable.courseId)
+    )
+    .where(eq(coursesTable.coMonitorId, coMonitorId))
+    .groupBy(coursesTable.id, coursesTable.title);
+
+  return results;
+}
+
+export async function getNotStartedCoursesNotRegisteredByStudent(
+  studentId: number
+): Promise<StudentCourseBigCard[] | null> {
+  const results = await db
+    .select({
+      id: coursesTable.id,
+      title: coursesTable.title,
+      monitorName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      startDate: coursesTable.courseStartDate,
+      endDate: coursesTable.courseEndDate,
+      duration: coursesTable.duration,
+      status: sql<CourseStatus>`'Not Started'`,
+      totalTasks: sql<number>`(SELECT COUNT(*) FROM ${tasksTable} WHERE course_id = ${coursesTable.id})`,
+      completedTasks: sql<number>`0`,
+      applyEndDate: coursesTable.applyEndDate,
+      description: coursesTable.description,
+      details: coursesTable.details,
+      entryRequirements: coursesTable.entryRequirements,
+    })
+    .from(coursesTable)
+    .leftJoin(
+      studentsCoursesTable,
+      and(
+        eq(studentsCoursesTable.courseId, coursesTable.id),
+        eq(studentsCoursesTable.studentId, studentId)
+      )
+    )
+    .innerJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
+    .innerJoin(usersTable, eq(monitorsTable.userId, usersTable.id))
+    .where(
+      and(
+        gt(
+          coursesTable.courseStartDate,
+          sql<number>`CAST(strftime('%s','now') AS INTEGER)`
+        ),
+        isNull(studentsCoursesTable.studentId)
+      )
+    );
+
+  return results.length > 0 ? results : null;
+}
+
+export async function getJoiningRequestStatus(
+  studentId: number,
+  courseId: number
+): Promise<Status | null> {
+  const results = await db
+    .select({
+      status: joiningRequestsTable.joiningStatus,
+    })
+    .from(joiningRequestsTable)
+    .innerJoin(
+      studentsTable,
+      eq(studentsTable.id, joiningRequestsTable.studentId)
+    )
+    .innerJoin(coursesTable, eq(coursesTable.id, joiningRequestsTable.courseId))
+    .where(
+      and(
+        eq(joiningRequestsTable.studentId, studentId),
+        eq(joiningRequestsTable.courseId, courseId)
+      )
+    );
+
+  return results.length > 0 ? results : null;
+}
+export async function getTotalStudentsByCoMonitor(
+  coMonitorId: number
+): Promise<number> {
+  const result = await db
+    .select({ totalStudents: count(studentsCoursesTable.studentId) })
+    .from(studentsCoursesTable)
+    .innerJoin(coursesTable, eq(studentsCoursesTable.courseId, coursesTable.id))
+    .where(eq(coursesTable.coMonitorId, coMonitorId))
+    .get();
+
+  return result?.totalStudents || 0;
+}
+export async function getTotalCoursesByCoMonitor(
+  coMonitorId: number
+): Promise<number> {
+  const result = await db
+    .select({ totalCourses: count(coursesTable.id) })
+    .from(coursesTable)
+    .where(eq(coursesTable.coMonitorId, coMonitorId))
+    .get();
+
+  return result?.totalCourses || 0;
+}
+export async function getTotalTasksByCoMonitor(
+  coMonitorId: number
+): Promise<number> {
+  const result = await db
+    .select({ totalTasks: count(tasksTable.id) })
+    .from(tasksTable)
+    .innerJoin(coursesTable, eq(tasksTable.courseId, coursesTable.id))
+    .where(eq(coursesTable.coMonitorId, coMonitorId))
+    .get();
+
+  return result?.totalTasks || 0;
+}
+export async function getCoMonitorUserDetails(
+  coMonitorId: number
+): Promise<User | null> {
+  const result = await db
+    .select({
+      id: usersTable.id,
+      firstName: usersTable.firstName,
+      lastName: usersTable.lastName,
+      email: usersTable.email,
+      dateOfBirth: usersTable.dateOfBirth,
+      image: usersTable.image,
+      role: usersTable.role,
+      city: usersTable.city,
+      createdAt: usersTable.createdAt,
+      updatedAt: usersTable.updatedAt,
+    })
+    .from(coMonitorsTable)
+    .innerJoin(usersTable, eq(coMonitorsTable.userId, usersTable.id))
+    .where(eq(coMonitorsTable.id, coMonitorId))
+    .get();
+
+  return result || null;
 }

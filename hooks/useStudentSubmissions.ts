@@ -20,7 +20,7 @@ export function useStudentSubmissions(taskId: number, searchQuery: string) {
         setSubmissions(submissionData.submissions || []);
         setTotalPages(Math.ceil(submissionData.totalCount / pageSize));
       } catch (error) {
-        console.error("Error fetching submissions:", error);
+        throw new Error("CODE:10004");
       }
       setLoading(false);
     };
@@ -42,7 +42,8 @@ export function useStudentSubmissions(taskId: number, searchQuery: string) {
   ).length;
 
   const pendingCount = submissions.filter(
-    (sub) => sub.status.toLowerCase() === AssignmentStatus.PENDING.toLowerCase()
+    (sub) =>
+      sub.status.toLowerCase() === AssignmentStatus.SUBMITTED.toLowerCase()
   ).length;
 
   const notSubmittedCount = submissions.filter(

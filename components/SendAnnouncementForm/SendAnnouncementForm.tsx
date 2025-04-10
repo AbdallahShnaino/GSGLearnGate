@@ -1,22 +1,36 @@
-"use client"
-import { submitAnnouncement, AnnouncementState } from "@/controllers/actions/sendAnnouncementAction";
+"use client";
+import {
+  submitAnnouncement,
+  AnnouncementState,
+} from "@/controllers/actions/sendAnnouncementAction";
 import { Course } from "@/types";
+import { useRouter } from "next/navigation";
 import { useActionState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-interface IProps{
-  courses: Course[]
+interface IProps {
+  courses:
+    | Course[]
+    | {
+        courseId: number;
+        courseName: string;
+      }[];
 }
-export default function SendAnnouncementForm({courses}:IProps) {
+
+export default function SendAnnouncementForm({ courses }: IProps) {
   const initialState: AnnouncementState = {
     success: false,
     error: "",
     message: "",
     announcementId: undefined,
   };
+  const router = useRouter();
+  const [formState, formAction, isPending] = useActionState(
+    submitAnnouncement,
+    initialState
+  );
 
-  const [formState, formAction, isPending] = useActionState(submitAnnouncement, initialState);
   useEffect(() => {
     if (formState.error) {
       toast.error(formState.message);
@@ -24,11 +38,30 @@ export default function SendAnnouncementForm({courses}:IProps) {
       toast.success("Announcement Send successfully!");
     }
   }, [formState]);
+
+  const getCourseOptions = () => {
+    return courses.map((course) => {
+      if ("id" in course && "title" in course) {
+        return (
+          <option key={course.id} value={course.id}>
+            {course.title}
+          </option>
+        );
+      } else {
+        return (
+          <option key={course.courseId} value={course.courseId}>
+            {course.courseName}
+          </option>
+        );
+      }
+    });
+  };
+
   return (
     <div className="w-full max-w-2xl mx-auto py-6 px-4">
-        <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="bg-white rounded-lg shadow-2xl overflow-hidden">
-        <div className="px-6 py-10"> 
+        <div className="px-6 py-10">
           <form action={formAction} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -47,7 +80,6 @@ export default function SendAnnouncementForm({courses}:IProps) {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
                 />
               </div>
-              {/* حيكون فيها الكورسيس الموجودين في الداتابيس ، في السيليكت بظهر اسم الكورس بس الي بنبعث في الفاليو هو الاي دي تبعه*/}
               <div className="space-y-2">
                 <label
                   htmlFor="courseId"
@@ -61,7 +93,7 @@ export default function SendAnnouncementForm({courses}:IProps) {
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
                 >
-                  {courses.map((course)=><option key={course.id} value={course.id}>{course.title}</option>)}
+                  {getCourseOptions()}
                 </select>
               </div>
             </div>
@@ -85,7 +117,7 @@ export default function SendAnnouncementForm({courses}:IProps) {
                 type="submit"
                 className="w-1/3 px-4 py-2 text-white bg-[#FFA41F] rounded-md shadow-sm text-sm font-medium hover:bg-orange-500 transition"
               >
-                {isPending? "Submitting": "Submit"}
+                {isPending ? "Submitting" : "Submit"}
               </button>
             </div>
           </form>

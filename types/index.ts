@@ -27,6 +27,7 @@ export enum AssignmentStatus {
   PENDING = "PENDING",
   GRADED = "GRADED",
   NOTSUBMITTED = "NOT SUBMITTED",
+  SUBMITTED = "SUBMITTED",
 }
 
 export enum Attachments {
@@ -135,22 +136,21 @@ export type CourseJoinStudent = {
   coMonitorId: number | null;
   coMonitorName: string | null;
   studentCount: number;
-
-}
+};
 export type SubmissionsTask = {
   submissionId: number;
   studentId: number;
   studentName: string;
   email: string;
   submissionDate: string;
-  status: AssignmentStatus
+  status: AssignmentStatus;
   grade: number | null;
   profilePicture: string;
   taskName: string;
   courseName: string;
   taskId: number;
+  points: number | null;
 } & Timestamps;
-
 
 export type Submission = {
   id: number;
@@ -161,6 +161,7 @@ export type Submission = {
   feedback: string;
   gradedAt: Date;
   status: AssignmentStatus;
+  attachmentId: number;
 } & Timestamps;
 
 export type Attachment = {
@@ -187,6 +188,10 @@ export type JoiningRequest = {
   joiningStatus: Status;
 } & Timestamps;
 
+export interface JoiningOrdersResponse {
+  totalPages: number;
+  JoiningOrders: JoiningOrder[];
+}
 export interface JoiningOrder {
   id: number;
   courseId: number | null;
@@ -206,15 +211,15 @@ export interface StudentCourseChart {
 
 export interface AppointmentWithStudent {
   id: number;
-  coMonitorId: number;
   studentId: number;
   studentName: string;
   studentEmail: string;
   profileImage: string;
   caption: string;
-  date: Date;
+  date: string;
   status: Status;
   createdAt: string;
+  courseName: string;
 }
 export interface ApproveModalProps {
   isOpen: boolean;
@@ -234,7 +239,6 @@ export type MonitorsJoinUsers = {
   role: Role | null;
   city: string | null;
 };
-
 
 export type UsersNames = {
   id: number;
@@ -263,13 +267,20 @@ export type CourseWithNames = {
   entryRequirements: string;
 } & Timestamps;
 
+enum AttendanceStatus {
+  PRESENT = "PRESENT", // حاضر
+  ABSENT = "ABSENT", // غائب
+  EXCUSED = "EXCUSED", // غياب بعذر
+  LATE = "LATE", // متأخر
+}
 export type StudentCourseSmallCard = {
   id: number | null;
   title: string | null;
   monitorName: string | null;
-  absence: number | null;
+  duration: number;
+  startDate: number;
+  endDate: number;
 };
-
 
 export enum CourseStatus {
   "NOT STARTED" = "Not Started",
@@ -282,17 +293,25 @@ export type StudentCourseBigCard = {
   endDate: Date;
   totalTasks: number;
   completedTasks: number;
+  applyEndDate: number;
+  description: string;
+  details: string;
+  entryRequirements: string;
 } & StudentCourseSmallCard;
 
 export type StudentCourseDetails = {
   id: number | null;
   title: string | null;
   monitor: string | null;
-  absence: number | null;
+  // status: AttendanceStatus;
   description: string | null;
-  // tasks: string[] | null;
-  // absence: number;
   coMonitors: string | null;
+  startDate: Date;
+  endDate: Date;
+  applyEndDate: number;
+  details: string;
+  entryRequirements: string;
+  duration: number;
 };
 
 export enum StudentAppointmentStatus {
@@ -303,11 +322,182 @@ export enum StudentAppointmentStatus {
 
 export type StudentAppointments = {
   id: number | null;
-  // courseTitle: string | null;
-  // monitor: string | null;
   coMonitor: string | null;
-  date: Date | null;
-  // time: string | null;
-  status: StudentAppointmentStatus | null;
+  date: Date;
+  startTime: string;
+  courseTitle: string;
 };
 
+export enum StudentTaskStatus {
+  "PENDING" = "PENDING",
+  "SUBMITTED" = "SUBMITTED",
+  "GRADED" = "GRADED",
+}
+export type StudentCourseTasks = {
+  taskId: number;
+  taskTitle: string;
+  deadline: Date;
+  status: StudentTaskStatus;
+  grade: number;
+  gradedAt: Date;
+  maxGrade: number;
+};
+export interface SubmissionView {
+  id: number;
+  taskId: number;
+  studentId: number;
+  courseId: number;
+  grade: number | null;
+  feedback: string | null;
+  gradedAt: Date | null;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+  StudentName: string;
+  StudentEmail: string | null;
+  StudentImage: string | null;
+  TaskTitle: string | null;
+  points: number | null;
+}
+
+export interface SubmissionAttachment {
+  attachmentId: number;
+  attachmentPath: string;
+  attachmentType?: Attachments;
+}
+
+export interface PrivateComment {
+  commentId: number;
+  commentText: string;
+  createdAt: Date;
+  createdBy: string;
+  image: string | null;
+}
+export type StudentCourseTaskDetails = {
+  grade: number;
+  gradedAt: Date;
+  maxGrade: number;
+};
+
+export type StudentCourseTask = {
+  courseTitle: string;
+  taskTitle: string;
+  creator: string;
+  createdAt: string;
+  updatedAt: string;
+  description: string;
+  deadline: Date;
+};
+
+export type coMonitorName = {
+  coMonitorId: number;
+  coMonitorName: string;
+};
+
+export type StudentBookingDate = {
+  id: number;
+  coMonitorId: number;
+  studentId: number;
+  courseId: number;
+  caption: string;
+  dateTime: Date;
+  status: Status;
+} & Timestamps;
+
+export type Comment = {
+  content: string;
+  studentId: number;
+  submissionId: number;
+  courseId: number;
+  isPublic: boolean;
+  privateRecipientId: number;
+};
+export type CourseSchedule = {
+  id: number;
+  courseId: number;
+  dayOfWeek: string | null;
+  startTime: string;
+  endTime: string;
+  isRecurring: boolean;
+  specificDate: Date | null;
+} & Timestamps;
+export type AvailabilitySlot = {
+  id: number;
+  coMonitorId: number;
+  courseId: number;
+  date: Date;
+  startTime: string;
+  endTime: string;
+  isBooked: boolean;
+  bookedByStudentId: number | null;
+  createdAt: string;
+  updatedAt: string;
+};
+export enum AttendanceRecordStatus {
+  PRESENT = "PRESENT",
+  ABSENT = "ABSENT",
+  LATE = "LATE",
+  EXCUSED = "EXCUSED",
+}
+export type AttendanceRecord = {
+  id: number;
+  courseId: number;
+  sessionId: number;
+  status: AttendanceRecordStatus;
+  recordedById: number;
+  studentId: number;
+};
+
+export type CourseWithPresenter = Course & {
+  presenterName?: string;
+  presenterImage?: string;
+};
+export type SoonLectures = {
+  courseTitle: string;
+  lectureDate: Date;
+  // courseStartTime: Date;
+  // weekDay: string;
+  // startTime: string;
+  // endTime: string;
+};
+
+export type AttendanceRecordOne = {
+  attendanceStatus: AttendanceRecordStatus;
+};
+
+export type Comments = {
+  id: number;
+  content: string;
+  userName: string;
+  isPublic: boolean;
+  createdAt: string;
+};
+
+export type SubmissionId = {
+  SubmissionId: number;
+};
+
+export type newComment = {
+  taskId: number;
+} & Comment;
+
+export type newAnnouncements = {
+  courseTitle: string;
+} & Announcement;
+
+export interface PublicComment {
+  commentId: number;
+  commentText: string;
+  createdAt: string;
+  isPublic: boolean;
+  userName: string;
+  userEmail: string | null;
+  userImage: string | null;
+  userType: string;
+}
+
+export type StudentSubmission = {
+  path: string;
+  feedback: string;
+};

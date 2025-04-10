@@ -8,6 +8,7 @@ import RejectJoiningModal from "../modals/RejectJoiningModal/RejectJoiningModal"
 import SelectCourse from "../Dropdowns/SelectCourse";
 import Loader from "../Shared/Loader";
 import useStudentRequests from "@/hooks/useStudentRequests";
+import TempPagination from "../Pagination/TempPagination";
 interface IProps {
   monitorCoursesList: { courseId: number; courseName: string }[] | null;
 }
@@ -28,7 +29,9 @@ export default function StudentRequestsTable({ monitorCoursesList }: IProps) {
     handleApprove,
     handleReject,
     handlePreviousPage,
+    onPageChange,
     handleNextPage,
+    totalPages,
   } = useStudentRequests();
 
   if (isLoading) {
@@ -135,30 +138,14 @@ export default function StudentRequestsTable({ monitorCoursesList }: IProps) {
         </div>
       </div>
 
-      <div className="flex justify-between items-center p-4">
-        <button
-          onClick={handlePreviousPage}
-          disabled={currentPage === 1}
-          className={`px-4 py-2 rounded-md ${
-            currentPage === 1
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-gray-800 text-white hover:bg-gray-700"
-          }`}
-        >
-          Previous
-        </button>
-        <span className="text-sm text-gray-700">Page {currentPage}</span>
-        <button
-          onClick={handleNextPage}
-          disabled={joiningOrders.length < pageSize}
-          className={`px-4 py-2 rounded-md ${
-            joiningOrders.length < pageSize
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-gray-800 text-white hover:bg-gray-700"
-          }`}
-        >
-          Next
-        </button>
+      <div className="mt-9">
+        <TempPagination
+          currentPage={currentPage}
+          handleNextPage={handleNextPage}
+          handlePreviousPage={handlePreviousPage}
+          onPageChange={onPageChange}
+          totalPages={totalPages}
+        />
       </div>
 
       {selectedOrder && (

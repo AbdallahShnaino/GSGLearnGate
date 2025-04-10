@@ -6,6 +6,7 @@ import {
   updateJoiningRequestStatus,
 } from "@/services/joiningRequest";
 import { addStudentToCourse, getMonitorCoursesNames } from "@/services/courses";
+import { STATIC_MONITOR_ID } from "@/context/keys";
 
 export default function useStudentRequests() {
   const searchParams = useSearchParams();
@@ -20,23 +21,27 @@ export default function useStudentRequests() {
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<JoiningOrder | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  const STATIC_MONITOR_ID = 13;
+  const [totalPages, setTotalPages] = useState<number>(0);
 
   const fetchRequests = async () => {
-    const requests = await getJoiningRequests(
+    const { JoiningOrders, totalPages } = await getJoiningRequests(
       STATIC_MONITOR_ID,
       courseId,
       currentPage,
       pageSize
     );
-    setJoiningOrders(requests);
+    setTotalPages(totalPages);
+    setJoiningOrders(JoiningOrders);
     setIsLoading(false);
   };
 
   useEffect(() => {
     setCourseId(Number(searchParams.get("courseId")) || undefined);
-    fetchRequests();
+    try {
+      fetchRequests();
+    } catch (error) {
+      throw new Error("CODE:10002");
+    }
   }, [currentPage, searchParams, courseId]);
 
   const handleOpenRejectModal: Function = (order: JoiningOrder) => {
@@ -76,14 +81,12 @@ export default function useStudentRequests() {
     await fetchRequests();
   };
 
-  const handlePreviousPage = () => {
-    setCurrentPage((prev) => Math.max(prev - 1, 1));
-  };
-
-
-  const handleNextPage = () => {
-    setCurrentPage((prev) => prev + 1);
-  };
+  const handleNextPage = () =>
+    setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev));
+  const handlePreviousPage = () =>
+    setCurrentPage((prev) => (prev > 1 ? prev - 1 : prev));
+  const onPageChange = (page: number) =>
+    setCurrentPage(page >= 1 && page <= totalPages ? page : currentPage);
 
   return {
     courseId,
@@ -102,6 +105,7 @@ export default function useStudentRequests() {
     handleReject,
     handlePreviousPage,
     handleNextPage,
-
+    onPageChange,
+    totalPages,
   };
 }

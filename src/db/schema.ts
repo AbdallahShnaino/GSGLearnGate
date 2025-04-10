@@ -118,8 +118,12 @@ export const appointmentsTable = sqliteTable("appointments", {
   studentId: int("student_id")
     .notNull()
     .references((): AnySQLiteColumn => studentsTable.id),
+
+  courseId: int("course_id")
+    .notNull()
+    .references((): AnySQLiteColumn => coursesTable.id),
   caption: text("caption").notNull(),
-  date: integer("date", { mode: "timestamp" }).notNull(),
+  dateTime: integer("date", { mode: "timestamp" }).notNull(),
 
   status: text("status", {
     enum: [Status.ACCEPTED, Status.PENDING, Status.REJECTED],
@@ -148,6 +152,11 @@ export const submissionsTable = sqliteTable("submissions", {
   courseId: int("course_id")
     .notNull()
     .references((): AnySQLiteColumn => coursesTable.id, {
+      onDelete: "cascade",
+    }),
+  attachmentId: int("attachment_id")
+    .notNull()
+    .references((): AnySQLiteColumn => attachmentsTable.id, {
       onDelete: "cascade",
     }),
   grade: int("grade"),
@@ -182,7 +191,7 @@ export const tasksTable = sqliteTable("tasks", {
       onDelete: "cascade",
     }),
   deadline: integer("deadline", { mode: "timestamp" }).notNull(),
-  points: int("grade"),
+  points: int("points"),
   ...timestamps,
 });
 
@@ -191,7 +200,7 @@ export const attachmentsTable = sqliteTable("attachments", {
   taskId: int("task_id")
     .notNull()
     .references((): AnySQLiteColumn => tasksTable.id),
-  creatorId: int("student_id")
+  creatorId: int("creatorId")
     .notNull()
     .references((): AnySQLiteColumn => studentsTable.id),
   courseId: int("course_id")
@@ -206,19 +215,6 @@ export const attachmentsTable = sqliteTable("attachments", {
   ...timestamps,
 });
 
-export const attendancesTable = sqliteTable("attendances", {
-  id: int().primaryKey({ autoIncrement: true }),
-  studentId: int("student_id")
-    .notNull()
-    .references((): AnySQLiteColumn => studentsTable.id),
-  courseId: int("course_id")
-    .notNull()
-    .references((): AnySQLiteColumn => coursesTable.id, {
-      onDelete: "cascade",
-    }),
-  absence: int("absence"),
-  ...timestamps,
-});
 export const joiningRequestsTable = sqliteTable("joining_requests", {
   id: int().primaryKey({ autoIncrement: true }),
   studentId: int("student_id")
@@ -237,6 +233,103 @@ export const joiningRequestsTable = sqliteTable("joining_requests", {
   }).notNull(),
   ...timestamps,
 });
+
+export const commentsTable = sqliteTable("comments", {
+  id: int().primaryKey({ autoIncrement: true }),
+  content: text("content").notNull(),
+  monitorId: int("monitor_id").references(
+    (): AnySQLiteColumn => monitorsTable.id
+  ),
+  coMonitorId: int("co_monitor_id").references(
+    (): AnySQLiteColumn => coMonitorsTable.id
+  ),
+  studentId: int("student_id").references(
+    (): AnySQLiteColumn => studentsTable.id
+  ),
+  courseId: int("course_id")
+    .notNull()
+    .references((): AnySQLiteColumn => coursesTable.id, {
+      onDelete: "cascade",
+    }),
+  submissionId: int("submission_id").references(
+    (): AnySQLiteColumn => submissionsTable.id,
+    {
+      onDelete: "cascade",
+    }
+  ),
+  taskId: int("task_id").references((): AnySQLiteColumn => tasksTable.id),
+  isPublic: int("is_public", { mode: "boolean" }).notNull().default(true),
+  privateRecipientId: int("private_recipient_id").references(
+    (): AnySQLiteColumn => usersTable.id
+  ),
+  ...timestamps,
+});
+
+export const coMonitorAvailabilityTable = sqliteTable(
+  "co_monitor_availability",
+  {
+    id: int().primaryKey({ autoIncrement: true }),
+    coMonitorId: int("co_monitor_id")
+      .notNull()
+      .references(() => coMonitorsTable.id, { onDelete: "cascade" }),
+    courseId: int("course_id")
+      .notNull()
+      .references(() => coursesTable.id, { onDelete: "cascade" }),
+    date: integer("date", { mode: "timestamp" }).notNull(),
+    startTime: text("start_time").notNull(),
+    endTime: text("end_time").notNull(),
+    isBooked: int("is_booked", { mode: "boolean" }).notNull().default(false),
+    bookedByStudentId: int("booked_by_student_id").references(
+      () => studentsTable.id
+    ),
+    ...timestamps,
+  }
+);
+
+export const courseSchedulesTable = sqliteTable("course_schedules", {
+  id: int().primaryKey({ autoIncrement: true }),
+  courseId: int("course_id")
+    .notNull()
+    .references(() => coursesTable.id, { onDelete: "cascade" }),
+  weekNumber: int("week_number").notNull(),
+  dayOfWeek: text("day_of_week").notNull(),
+  startTime: text("start_time").notNull(),
+  endTime: text("end_time").notNull(),
+  isRecurring: int("is_recurring", { mode: "boolean" }).notNull().default(true),
+  specificDate: integer("specific_date", { mode: "timestamp" }),
+  ...timestamps,
+});
+
+export const attendanceRecordsTable = sqliteTable("attendance_records", {
+  id: int().primaryKey({ autoIncrement: true }),
+  sessionId: int("session_id")
+    .notNull()
+    .references(() => courseSchedulesTable.id, { onDelete: "cascade" }),
+  courseId: int("course_id")
+    .notNull()
+    .references(() => coursesTable.id, { onDelete: "cascade" }),
+  studentId: int("student_id").references(() => studentsTable.id),
+  monitorId: int("monitor_id").references(() => monitorsTable.id),
+  coMonitorId: int("co_monitor_id").references(() => coMonitorsTable.id),
+
+  status: text("status", {
+    enum: ["PRESENT", "ABSENT", "LATE", "EXCUSED"],
+  }).notNull(),
+  recordedById: int("recorded_by").references(() => usersTable.id),
+  ...timestamps,
+});
+
+export type InsertAttendance = typeof attendanceRecordsTable.$inferInsert;
+export type SelectAttendance = typeof attendanceRecordsTable.$inferSelect;
+
+export type InsertAvailability = typeof coMonitorAvailabilityTable.$inferInsert;
+export type SelectAvailability = typeof coMonitorAvailabilityTable.$inferSelect;
+
+export type InsertCourseSchedule = typeof courseSchedulesTable.$inferInsert;
+export type SelectCourseSchedule = typeof courseSchedulesTable.$inferSelect;
+
+export type InsertComment = typeof commentsTable.$inferInsert;
+export type SelectComment = typeof commentsTable.$inferSelect;
 
 export type InsertUser = typeof usersTable.$inferInsert;
 export type SelectUsers = typeof usersTable.$inferSelect;
@@ -274,8 +367,8 @@ export type SelectTasks = typeof tasksTable.$inferSelect;
 export type InsertAttachment = typeof attachmentsTable.$inferInsert;
 export type SelectAttachments = typeof attachmentsTable.$inferSelect;
 
-export type InsertAttendance = typeof attendancesTable.$inferInsert;
-export type SelectAttendances = typeof attendancesTable.$inferSelect;
-
 export type InsertJoiningRequest = typeof joiningRequestsTable.$inferInsert;
 export type SelectJoiningRequests = typeof joiningRequestsTable.$inferSelect;
+
+export type InsertCommentsTable = typeof commentsTable.$inferInsert;
+export type SelectCommentsTable = typeof commentsTable.$inferSelect;

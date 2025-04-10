@@ -1,9 +1,7 @@
 "use server";
-import { randomUUID } from "crypto";
-import path from "path";
-import { promises as fs } from "fs";
 import { Difficulty } from "@/types";
 import { addCourse } from "@/services/courses";
+import { writeFile } from "@/utils/writeFile";
 
 export type CourseState =
   | { success: false; error: string; message: string; courseId: undefined }
@@ -43,21 +41,9 @@ export async function submitCourse(
     let publicFilePath: string = "";
 
     if (image) {
-      const fileExtension = path.extname(image.name);
 
-      const randomName = `${randomUUID()}${fileExtension}`;
-      const uploadDir = path.join(process.cwd(), "public", "coursesImages");
-
-      await fs.mkdir(uploadDir, { recursive: true });
-
-      const filePath = path.join(uploadDir, randomName);
-      const fileBuffer = Buffer.from(await image.arrayBuffer());
-
-      await fs.writeFile(filePath, fileBuffer);
-
-      publicFilePath = `/coursesImages/${randomName}`;
-
-      console.log("File uploaded at:", publicFilePath);
+      publicFilePath = await writeFile(image);
+;
     }
 
     const newCourse = await addCourse({

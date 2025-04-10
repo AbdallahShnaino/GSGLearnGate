@@ -1,169 +1,113 @@
-// "use client";
-// import {
-//   TrashSimple,
-//   PencilSimple,
-//   //   MagnifyingGlass,
-// } from "@phosphor-icons/react/dist/ssr";
-// import DeleteUserModal from "../DeleteUserModal/DeleteUserModal";
-// import { useUsersTable } from "@/hooks/useUsersTable";
-// import Loader from "../Shared/Loader";
-import { getStudentAppointments } from "@/src/db/queries/select";
-// import { CalendarCheck, CalendarX, Hourglass } from "@phosphor-icons/react";
-// import { useEffect } from "react";
-// import { StudentAppointments } from "@/types";
+"use client";
 
-// import { Role } from "@/types";
-// interface IProps {
-//   role: string;
-// }
-const StudentAppointmentsTable = async () => {
-  //   let appointments: StudentAppointments[];
-  //   useEffect(() => {
-  const appointments = await getStudentAppointments(1);
-  console.log(appointments);
-  //   }, []);
-  //   const {
-  //     // value,
-  //     // handleSearchChange,
-  //     // filteredUsers,
-  //     open,
-  //     setOpen,
-  //     selectedMonitor,
-  //     // handleDeleteClick,
-  //     confirmDelete,
-  //     isLoading,
-  //     handleNextPage,
-  //     handlePreviousPage,
-  //     currentPage,
-  //     totalPages,
-  //   } = useUsersTable(props.role);
-  //   if (isLoading) {
-  //     return <Loader />;
-  //   }
+import { Course, StudentAppointments } from "@/types";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-  const statusStyles = {
-    accepted: {
-      text: "Accepted",
-      color: "bg-[#FFA41F] text-white",
-    },
-    pending: {
-      text: "Pending",
-      color: "bg-[#E99375] text-white",
-    },
-    rejected: {
-      text: "Rejected",
-      color: "bg-gray-400 text-white",
-    },
+interface IProps {
+  appointments: StudentAppointments[] | null;
+  registeredCourses: Course[] | null;
+}
+const StudentAppointmentsTable = (props: IProps) => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const [filteredAppointments, setFilteredAppointments] = useState(
+    props.appointments
+  );
+  const [selectedCourse, setSelectedCourse] = useState("");
+
+  useEffect(() => {
+    const courseParam = searchParams.get("course") || "";
+    setSelectedCourse(courseParam);
+
+    if (!courseParam || !props.appointments) {
+      setFilteredAppointments(props.appointments);
+    } else {
+      const filtered = props.appointments.filter(
+        (appointment) => appointment.courseTitle === courseParam
+      );
+      setFilteredAppointments(filtered);
+    }
+  }, [searchParams, props.appointments]);
+
+  const handleCourseFilter = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+
+    const newParams = new URLSearchParams(searchParams);
+    if (value) {
+      newParams.set("course", value);
+    } else {
+      newParams.delete("course");
+    }
+    router.push(`${pathname}?${newParams.toString()}`);
   };
   return (
-    <div className="w-full max-w-4xl mx-auto p-4 space-y-4">
-      {/* <div className="relative">
-        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-          <MagnifyingGlass size={20} className="text-[#FFA41F]" />
+    <div className="w-full max-w-4xl mx-auto p-4 space-y-4 flex-grow">
+      <div className="space-y-2">
+        <div className="flex flex-col gap-3">
+          <label
+            htmlFor="course-filter"
+            className="text-sm font-medium text-gray-700"
+          >
+            Filter by Course
+          </label>
+          <select
+            id="course-filter"
+            onChange={handleCourseFilter}
+            className="px-3 py-2 border border-gray-300 rounded-md"
+          >
+            <option value="">All Courses</option>
+            {props.registeredCourses?.map((course) => (
+              <option key={course.id} value={course.title}>
+                {course.title}
+              </option>
+            ))}
+          </select>
         </div>
-        <input
-          type="text"
-          className="block w-64 p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-          placeholder={
-            props.role === Role.MONITOR
-              ? "Search for a monitor"
-              : props.role === Role.CO_MONITOR
-              ? "Search for a coMonitor"
-              : "Search for a student"
-          }
-          value={value}
-          onChange={handleSearchChange}
-        />
-      </div> */}
-      <div className="overflow-hidden border border-gray-200 shadow-sm rounded-xl">
-        <table className="w-full border-collapse bg-white text-sm">
+      </div>
+      <div className="overflow-x-auto overflow-hidden border border-gray-200 shadow-sm rounded-xl">
+        <table className="w-full max-w-full border-collapse bg-white text-sm">
           <thead className="text-left text-xs text-gray-700 uppercase bg-gray-100">
             <tr className="bg-gray-50">
               <th className="px-4 py-4 text-left">#</th>
               <th className="px-4 py-4 text-left">Course</th>
-              {/* <th className="px-4 py-4 text-left">Monitor</th> */}
               <th className="px-4 py-4 text-left">Co-Monitor</th>
               <th className="px-4 py-4 text-left">Date</th>
-              <th className="px-4 py-4 text-center">Time</th>
-              <th className="px-4 py-4 text-center">Status</th>
+              <th className="px-4 py-4 text-left">Time</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {appointments!.map((appointment, index) => (
-              <tr key={appointment.id} className="hover:bg-gray-50">
-                <td className="px-4 py-4 font-medium text-gray-900">
-                  {index + 1}
-                </td>
-                <td className="px-4 py-4 text-gray-700">Course Name</td>
-                <td className="px-4 py-4 text-gray-700">
-                  {appointment.coMonitor}
-                </td>
-                <td className="px-4 py-4 text-left text-gray-700">
-                  {appointment.date?.toLocaleDateString("en-GB")}
-                </td>
-                <td className="px-4 py-4 text-gray-700">
-                  {appointment.date!.toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </td>
-                <td
-                  className={`px-4 py-2 rounded-lg font-semibold ${
-                    statusStyles[appointment.status.toLowerCase()]?.color ||
-                    "bg-gray-200 text-black"
-                  }`}
-                >
-                  {statusStyles[appointment.status.toLowerCase()]?.text ||
-                    "Unknown"}
-                </td>
-                <td>
-                  <div className="flex justify-evenly">
-                    {/* <button onClick={() => handleDeleteClick(user.userId)}>
-                      <TrashSimple size={18} color="#ee1717" weight="fill" />
-                    </button> */}
-                    {/* <PencilSimple size={18} color="#1cc925" weight="fill" /> */}
-                  </div>
+            {filteredAppointments && filteredAppointments?.length >= 1 ? (
+              filteredAppointments.map((appointment, index) => (
+                <tr key={appointment.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-4 font-medium text-gray-900">
+                    {index + 1}
+                  </td>
+                  <td className="px-4 py-4 text-gray-700">
+                    {appointment.courseTitle}
+                  </td>
+                  <td className="px-4 py-4 text-gray-700">
+                    {appointment.coMonitor}
+                  </td>
+                  <td className="px-4 py-4 text-left text-gray-700">
+                    {appointment.date?.toLocaleDateString("en-GB")}
+                  </td>
+                  <td className="px-4 py-4 text-gray-700">
+                    {appointment.startTime}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5} className="px-4 py-4 text-center text-gray-500">
+                  No appointments available.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
-      {/* {open && selectedMonitor && ( */}
-      {/* <DeleteUserModal */}
-      {/* setOpen={setOpen} */}
-      {/* confirmDelete={confirmDelete} */}
-      {/* selectedUser={selectedMonitor.toString()} */}
-      {/* /> */}
-      {/* )} */}
-      {/** this pagination code will be replaced by pagination component in the next task(after merge)*/}
-      {/* <div className="flex justify-between mt-4">
-        <button
-          onClick={handlePreviousPage}
-          disabled={currentPage === 1}
-          className={`px-3 py-2 rounded-lg ${
-            currentPage === 1
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-[#FFA41F] text-white"
-          }`}
-        >
-          Previous
-        </button>
-        <span>
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          onClick={handleNextPage}
-          disabled={currentPage >= totalPages}
-          className={`px-3 py-2 rounded-lg ${
-            currentPage >= totalPages
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-[#FFA41F] text-white"
-          }`}
-        >
-          Next
-        </button>
-      </div> */}
     </div>
   );
 };

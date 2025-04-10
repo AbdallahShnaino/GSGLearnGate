@@ -1,7 +1,12 @@
 "use server";
 
 import { insertAttachment } from "@/src/db/queries/insert";
+import { getAttachmentPathsByTaskId } from "@/src/db/queries/select";
 import { Attachments } from "@/types";
+
+export async function getAttachmentForTask(taskId: number) {
+  return await getAttachmentPathsByTaskId(taskId);
+}
 
 export async function addAttachmentForTask(
   courseId: number,
