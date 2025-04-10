@@ -42,7 +42,7 @@ const StudentPrivateComments = (props: IProps) => {
             return (
               <div
                 key={comment.id}
-                className="bg-[#FFF5E8] p-4 rounded-lg shadow"
+                className="bg-[#FFF5E8] p-4 rounded-lg shadow mb-5"
               >
                 <p className="text-sm text-neutral-700">
                   <span className="font-medium text-[#E99375]">
