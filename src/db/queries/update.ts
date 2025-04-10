@@ -1,23 +1,11 @@
 import { db } from "..";
 import { eq } from "drizzle-orm";
 import {
-  appointmentsTable,
   coMonitorAvailabilityTable,
   coursesTable,
   usersTable,
 } from "../schema";
-import { AppointmentWithStudent, Course, User } from "@/types";
-
-export async function updateMeetingRequest(
-  id: number,
-  updates: Partial<AppointmentWithStudent>
-): Promise<AppointmentWithStudent[]> {
-  return await db
-    .update(appointmentsTable)
-    .set(updates)
-    .where(eq(appointmentsTable.id, id))
-    .returning();
-}
+import { Course, User } from "@/types";
 
 export async function updateCourse(
   id: number,

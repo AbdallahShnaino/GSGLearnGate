@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { logoutUser } from "@/controllers/actions/logoutUserAction";
 import Image from "next/image";
 import Link from "next/link";
@@ -22,12 +22,12 @@ const UserMenu: React.FC<UserMenuProps> = ({
 }) => {
   const router = useRouter();
   const handleLogout = async () => {
-      const result = await logoutUser();
-      if (result.success) {
-        router.push("/login");
-        router.refresh(); 
-      }
-    };
+    const result = await logoutUser();
+    if (result.success) {
+      router.push("/login");
+      router.refresh();
+    }
+  };
   return (
     <div className="relative flex items-center gap-3 z-50">
       <div className="w-[40] h-[40] rounded-full overflow-hidden cursor-pointer flex justify-center items-center">

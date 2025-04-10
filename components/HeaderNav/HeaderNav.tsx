@@ -1,5 +1,5 @@
 "use client";
-import React, {useState } from "react";
+import React, { useState } from "react";
 import UserMenu from "../UserMenu/UserMenu";
 import { List } from "@phosphor-icons/react/dist/ssr";
 import HeaderLogo from "../HeaderLogo/HeaderLogo";
@@ -13,7 +13,7 @@ interface positionProps {
 const HeaderNav = ({ position }: positionProps) => {
   const [showUserDetails, setShowUserDetails] = useState(false);
   const [showNav, setShowNav] = useState(false);
-  const{user, token} = useAuth();
+  const { user, token } = useAuth();
   return (
     <header
       className={`md:w-[750] lg:w-[970] xl:w-[1170] m-auto px-[15] flex items-center justify-between  z-50 py-2.5 ${
@@ -22,9 +22,9 @@ const HeaderNav = ({ position }: positionProps) => {
           : ""
       } `}
     >
-      <HeaderLogo position={position}/>
-      <NavLinks showNav={showNav} setShowNav={setShowNav} position={position}/>
-      {token !==null ? (
+      <HeaderLogo position={position} />
+      <NavLinks showNav={showNav} setShowNav={setShowNav} position={position} />
+      {token !== null ? (
         <UserMenu
           user={user}
           showUserDetails={showUserDetails}
