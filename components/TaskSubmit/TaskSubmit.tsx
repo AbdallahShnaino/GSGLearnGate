@@ -2,8 +2,8 @@
 
 import { insertAttachment, insertSubmission } from "@/src/db/queries/insert";
 import { getAttachmentPathsByTaskId } from "@/src/db/queries/select";
-import { AssignmentStatus, Attachments } from "@/types";
-import { useEffect, useState } from "react";
+import { AssignmentStatus, Attachments, StudentSubmission } from "@/types";
+import { useEffect, useRef, useState } from "react";
 
 interface IProps {
   taskId: string;
@@ -16,13 +16,15 @@ const TaskSubmit = (props: IProps) => {
   const [submissionType, setSubmissionType] = useState("");
   const [path, setPath] = useState<string>("");
   const [displayPath, setDisplayPath] = useState<string>("");
-  const [attachment, setAttachment] = useState<string | null>(null);
+  const [attachment, setAttachment] = useState<StudentSubmission | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const getAttachment = async () => {
     const studentAttachment = await getAttachmentPathsByTaskId(
-      Number(props.taskId)
+      Number(props.taskId),
+      Number(props.courseId)
     );
-    setAttachment(studentAttachment![0]);
+    setAttachment(studentAttachment);
   };
 
   const handleSubmissionType = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -33,6 +35,11 @@ const TaskSubmit = (props: IProps) => {
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    // const file = inputRef.current?.files?.[0];
+    // if (!file) return;
+    // const formData = new FormData();
+    // formData.append("file", file);
+    // submitStudentTaskFile(formData);
     try {
       const insertedAttachment = await insertAttachment({
         taskId: Number(props.taskId),
@@ -76,17 +83,21 @@ const TaskSubmit = (props: IProps) => {
   }, []);
   return (
     <>
-      {new Date(props.deadline) < new Date() && !attachment ? (
+      {new Date(props.deadline) < new Date() && !attachment?.path ? (
         <section className="bg-white p-6 rounded-xl shadow-md">
           <h2 className="text-xl font-semibold text-[#FFA41F] mb-4">
             Task Time Expired
           </h2>
         </section>
-      ) : attachment ? (
+      ) : attachment?.path ? (
         <section className="bg-white p-6 rounded-xl shadow-md">
           <h2 className="text-xl font-semibold text-[#FFA41F] mb-4">
             Your Submitted Attachment:{" "}
-            <span className="text-[#E99375]">{attachment}</span>
+            <span className="text-[#E99375]">{attachment.path}</span>
+          </h2>
+          <h2 className="text-xl font-semibold text-[#FFA41F] mb-4">
+            Co-Monitor Feedback:{" "}
+            <span className="text-[#E99375]">{attachment.feedback}</span>
           </h2>
         </section>
       ) : (
@@ -163,6 +174,8 @@ const TaskSubmit = (props: IProps) => {
                     type="file"
                     className="w-full p-3 border border-[#E99375] rounded-lg focus:ring-2 focus:ring-[#FFA41F] focus:outline-none"
                     onChange={handleFileChange}
+                    ref={inputRef}
+                    name="file"
                   />
                   <div className="mt-4 flex justify-end gap-2">
                     <button

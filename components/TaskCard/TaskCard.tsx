@@ -16,7 +16,7 @@ const TaskCard = (props: IProps) => {
 
   return (
     <Link
-      href={`/student/${props.studentId}/my-courses/${props.courseId}/tasks/${props.task.taskId}`}
+      href={`/${props.studentId}/my-courses/${props.courseId}/tasks/${props.task.taskId}`}
       className="block w-full"
     >
       <div className="w-full border rounded-2xl p-6 bg-white shadow-lg hover:shadow-xl transition-shadow duration-300">

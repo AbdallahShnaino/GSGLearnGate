@@ -82,6 +82,7 @@ import {
   Attachments,
   JoiningOrdersResponse,
   Status,
+  StudentSubmission,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorsTask, MonitorTasksResponse } from "@/types/tasks";
@@ -1958,15 +1959,24 @@ export async function getPublicCommentsByTaskId(
 }
 
 export async function getAttachmentPathsByTaskId(
-  taskId: number
-): Promise<string[]> {
+  taskId: number,
+  courseId: number
+): Promise<StudentSubmission> {
   const attachments = await db
-    .select({ path: attachmentsTable.path })
+    .select({
+      path: attachmentsTable.path,
+      feedback: submissionsTable.feedback,
+    })
     .from(attachmentsTable)
+    .innerJoin(
+      submissionsTable,
+      eq(attachmentsTable.id, submissionsTable.attachmentId)
+    )
+    .innerJoin(coursesTable, eq(coursesTable.id, submissionsTable.courseId))
     .where(eq(attachmentsTable.taskId, taskId))
     .execute();
 
-  return attachments.map((attachment: Attachment) => attachment.path);
+  return attachments;
 }
 
 export async function getStudentsListByCourseId(
