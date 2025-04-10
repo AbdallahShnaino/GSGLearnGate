@@ -13,7 +13,6 @@ import {
   lt,
   inArray,
   asc,
-  desc,
   isNull,
 } from "drizzle-orm";
 
@@ -25,7 +24,6 @@ import {
   studentsTable,
   coursesTable,
   announcementsTable,
-  appointmentsTable,
   studentsCoursesTable,
   submissionsTable,
   tasksTable,
@@ -39,20 +37,17 @@ import {
 import {
   Admin,
   Announcement,
-  Appointment,
   Attachment,
   Attendance,
   CoMonitor,
   Course,
   JoiningRequest,
-  JoiningOrder,
   Monitor,
   Student,
   StudentCourse,
   Submission,
   Task,
   User,
-  AppointmentWithStudent,
   MonitorsJoinUsers,
   CourseJoinStudent,
   SubmissionsTask,
@@ -67,26 +62,21 @@ import {
   StudentCourseTask,
   coMonitorName,
   UsersNames,
-  CourseSchedule,
   AttendanceRecordStatus,
   PrivateComment,
   SubmissionView,
   SubmissionAttachment,
   CourseWithPresenter,
-  SoonLectures,
   AttendanceRecordOne,
   Comments,
-  SubmissionId,
   newAnnouncements,
   PublicComment,
-  Attachments,
   JoiningOrdersResponse,
   Status,
   StudentSubmission,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorsTask, MonitorTasksResponse } from "@/types/tasks";
-import { MonitorsTasks } from "@/types/tasksOperations";
 import {
   CourseScheduleList,
   CourseStudentsList,
@@ -118,10 +108,9 @@ export async function getCourseSchedule(
     query = query.where(eq(courseSchedulesTable.courseId, courseId));
   }
 
-export async function getUserByEmail(email: string): Promise<User | null> {
-  const result = await query.all();
-  return result;
+  return query;
 }
+
 export async function getUserByEmail(
   email: string
 ): Promise<Omit<User, "password"> | null> {
@@ -477,101 +466,6 @@ export async function getAnnouncementsByCourse(
   return results.length > 0 ? results : null;
 }
 
-export async function getAllAppointments(): Promise<Appointment[]> {
-  return await db.select().from(appointmentsTable).all();
-}
-
-export async function getAppointmentsByStudent(
-  studentId: number
-): Promise<Appointment[] | null> {
-  const results = await db
-    .select({
-      id: appointmentsTable.id,
-      studentId: appointmentsTable.studentId,
-      date: appointmentsTable.date,
-      caption: appointmentsTable.caption,
-      coMonitorId: appointmentsTable.coMonitorId,
-      status: appointmentsTable.status,
-      createdAt: appointmentsTable.createdAt,
-    })
-    .from(appointmentsTable)
-    .where(eq(appointmentsTable.studentId, studentId));
-
-  return results.length > 0 ? results : null;
-}
-
-export async function getAppointmentsByCoMonitor(
-  coMonitorId: number
-): Promise<Appointment[] | null> {
-  const results = await db
-    .select({
-      id: appointmentsTable.id,
-      studentId: appointmentsTable.studentId,
-      date: appointmentsTable.date,
-      caption: appointmentsTable.caption,
-      coMonitorId: appointmentsTable.coMonitorId,
-      status: appointmentsTable.status,
-      createdAt: appointmentsTable.createdAt,
-    })
-    .from(appointmentsTable)
-    .where(eq(appointmentsTable.coMonitorId, coMonitorId));
-
-  return results.length > 0 ? results : null;
-}
-
-export async function getCoMonitorAppointments(
-  coMonitorId: number,
-  courseId?: number,
-  page: number = 1,
-  pageSize: number = 10
-): Promise<{
-  appointments: AppointmentWithStudent[];
-  totalCount: number;
-}> {
-  const offset = (page - 1) * pageSize;
-
-  const whereConditions = [eq(appointmentsTable.coMonitorId, coMonitorId)];
-
-  if (courseId !== undefined) {
-    whereConditions.push(eq(appointmentsTable.courseId, courseId));
-  }
-
-  const results = await db
-    .select({
-      id: appointmentsTable.id,
-      studentId: appointmentsTable.studentId,
-      date: appointmentsTable.dateTime,
-      caption: appointmentsTable.caption,
-      status: appointmentsTable.status,
-      createdAt: appointmentsTable.createdAt,
-      profileImage: usersTable.image,
-      studentName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
-      studentEmail: usersTable.email,
-      courseName: coursesTable.title,
-    })
-    .from(appointmentsTable)
-    .innerJoin(studentsTable, eq(appointmentsTable.studentId, studentsTable.id))
-    .innerJoin(usersTable, eq(studentsTable.userId, usersTable.id))
-    .innerJoin(coursesTable, eq(appointmentsTable.courseId, coursesTable.id))
-    .where(and(...whereConditions))
-    .orderBy(desc(appointmentsTable.createdAt))
-    .limit(pageSize)
-    .offset(offset);
-
-  const countResults = await db
-    .select({ count: sql<number>`count(*)` })
-    .from(appointmentsTable)
-    .innerJoin(studentsTable, eq(appointmentsTable.studentId, studentsTable.id))
-    .innerJoin(usersTable, eq(studentsTable.userId, usersTable.id))
-    .innerJoin(coursesTable, eq(appointmentsTable.courseId, coursesTable.id))
-    .where(and(...whereConditions));
-
-  return {
-    appointments: results,
-    totalCount: Number(countResults[0]?.count) || 0,
-  };
-}
-
 export async function getAllStudentsCourses(): Promise<StudentCourse[]> {
   return await db.select().from(studentsCoursesTable).all();
 }
@@ -736,7 +630,6 @@ export async function getTasksByMonitor(
   const offset = (page - 1) * pageSize;
   const now = new Date().toISOString().replace("T", " ").slice(0, 19);
 
-  // Type-safe where condition
   const whereCondition = and(
     eq(monitorsTable.userId, monitorId),
     status === TaskStatus.IN_PROGRESS
@@ -749,7 +642,6 @@ export async function getTasksByMonitor(
       : undefined
   );
 
-  // Type-safe count query
   const countQuery = await db
     .select({
       total: sql<number>`count(distinct ${tasksTable.id})`.as("total"),
@@ -795,7 +687,7 @@ export async function getTasksByMonitor(
     .offset(offset)
     .execute();
 
-  const tasks: MonitorsTask[] = rawTasks.map((task) => ({
+  const tasks: MonitorsTask[] = rawTasks.map((task: any) => ({
     ...task,
     startedAt: new Date(task.startedAt),
     deadline: new Date(task.deadline),
@@ -845,7 +737,8 @@ export async function getTaskSubmissionStats(
     submissionCount: submissionCountResult?.count ?? 0,
     studentCount: studentCountResult?.count ?? 0,
   };
-}export async function getTaskSubmissionStatsByCoMonitor(
+}
+export async function getTaskSubmissionStatsByCoMonitor(
   coMonitorId: number,
   taskId: number
 ): Promise<{
@@ -857,7 +750,9 @@ export async function getTaskSubmissionStats(
       courseId: tasksTable.courseId,
     })
     .from(tasksTable)
-    .where(and(eq(tasksTable.id, taskId), eq(tasksTable.creatorId, coMonitorId)))
+    .where(
+      and(eq(tasksTable.id, taskId), eq(tasksTable.creatorId, coMonitorId))
+    )
     .get();
 
   if (!task) {
@@ -891,9 +786,8 @@ export async function getTasksByCoMonitor(
   const offset = (page - 1) * pageSize;
   const now = new Date().toISOString().replace("T", " ").slice(0, 19);
 
-  // Type-safe where condition
   const whereCondition = and(
-    eq(coMonitorsTable.userId,coMonitorId),
+    eq(coMonitorsTable.userId, coMonitorId),
     status === TaskStatus.IN_PROGRESS
       ? and(
           lte(tasksTable.startedAt, now),
@@ -904,13 +798,15 @@ export async function getTasksByCoMonitor(
       : undefined
   );
 
-  // Type-safe count query
   const countQuery = await db
     .select({
       total: sql<number>`count(distinct ${tasksTable.id})`.as("total"),
     })
     .from(tasksTable)
-    .innerJoin(coMonitorsTable, eq(coMonitorsTable.userId, tasksTable.creatorId))
+    .innerJoin(
+      coMonitorsTable,
+      eq(coMonitorsTable.userId, tasksTable.creatorId)
+    )
     .where(whereCondition)
     .execute();
 
@@ -943,14 +839,17 @@ export async function getTasksByCoMonitor(
       `.as("student_count"),
     })
     .from(tasksTable)
-    .innerJoin(coMonitorsTable, eq(coMonitorsTable.userId, tasksTable.creatorId))
+    .innerJoin(
+      coMonitorsTable,
+      eq(coMonitorsTable.userId, tasksTable.creatorId)
+    )
     .leftJoin(coursesTable, eq(tasksTable.courseId, coursesTable.id))
     .where(whereCondition)
     .limit(pageSize)
     .offset(offset)
     .execute();
 
-  const tasks: MonitorsTask[] = rawTasks.map((task) => ({
+  const tasks: MonitorsTask[] = rawTasks.map((task: any) => ({
     ...task,
     startedAt: new Date(task.startedAt),
     deadline: new Date(task.deadline),
@@ -1031,7 +930,7 @@ export async function getAllJoiningRequestsWithDetails(
     .all();
   return {
     totalPages,
-    JoiningOrders: results.map((result) => ({
+    JoiningOrders: results.map((result: any) => ({
       id: result.id,
       courseId: result.courseId,
       studentId: result.studentId,
@@ -1160,11 +1059,11 @@ export async function getSubmissionsAndNonSubmissionsForTask(
     .all();
 
   const submittedStudentIds = submissions.map(
-    (submission) => submission.studentId
+    (submission: any) => submission.studentId
   );
   const nonSubmissions = allStudentsInCourse
-    .filter((student) => !submittedStudentIds.includes(student.studentId))
-    .map((student) => ({
+    .filter((student: any) => !submittedStudentIds.includes(student.studentId))
+    .map((student: any) => ({
       submissionId: `non-${student.studentId}`,
       studentId: student.studentId,
       studentName: student.studentName,
@@ -1327,7 +1226,7 @@ export async function getCoursesById(
     .innerJoin(coMonitorsUsers, eq(coMonitorsTable.userId, coMonitorsUsers.id))
     .where(eq(coursesTable.id, courseId));
 
-  return results.length > 0 ? results : null;
+  return results;
 }
 export async function getCoursesByStudentId(
   courseId: number
@@ -1356,7 +1255,7 @@ export async function getCoursesByStudentId(
     .innerJoin(coMonitorsUsers, eq(coMonitorsTable.userId, coMonitorsUsers.id))
     .where(eq(coursesTable.id, courseId));
 
-  return results.length > 0 ? results : null;
+  return results;
 }
 
 export async function getStudentAppointments(
@@ -1550,7 +1449,7 @@ export async function insertAttendanceRecord({
       .set({
         status,
         recordedById,
-        updatedAt: sql`(current_timestamp)`, // Use SQL function for timestamp
+        updatedAt: sql`(current_timestamp)`,
       })
       .where(
         and(
@@ -1608,10 +1507,7 @@ export async function getAllCoMonitorAppointments(
       studentsTable,
       eq(coMonitorAvailabilityTable.bookedByStudentId, studentsTable.id)
     )
-    .leftJoin(
-      usersTable,
-      eq(studentsTable.userId, usersTable.id) // Join users table
-    )
+    .leftJoin(usersTable, eq(studentsTable.userId, usersTable.id))
     .where(eq(coMonitorAvailabilityTable.coMonitorId, coMonitorId))
     .all();
 }
@@ -1700,7 +1596,7 @@ export async function getPrivateCommentsBySubmission(
     .get();
 
   if (!submission) {
-    throw new Error("Submission not found.");
+    throw new Error("CODE:700");
   }
 
   const comments = await db
@@ -1723,7 +1619,7 @@ export async function getPrivateCommentsBySubmission(
     .orderBy(commentsTable.createdAt);
 
   console.log("Comments: ", comments);
-  return comments.map((comment) => ({
+  return comments.map((comment: any) => ({
     ...comment,
     createdAt: new Date(comment.createdAt),
   }));
@@ -1751,7 +1647,7 @@ export async function getPrivateCommentsReplyBySubmission(
     )
     .orderBy(commentsTable.createdAt);
 
-  return comments.map((comment) => ({
+  return comments.map((comment: any) => ({
     ...comment,
     createdAt: new Date(comment.createdAt),
   }));
@@ -1788,7 +1684,7 @@ export async function getAllCoursesWithMonitors(): Promise<Course[]> {
     .leftJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
     .leftJoin(usersTable, eq(monitorsTable.userId, usersTable.id));
 
-  return results.map((course) => ({
+  return results.map((course: any) => ({
     ...course,
     presenterName: course.monitorFirstName
       ? `${course.monitorFirstName} ${course.monitorLastName}`
@@ -2017,14 +1913,10 @@ export async function getStudentsListByCourseId(
   console.log("courseId ", courseId);
 
   try {
-    // Validate that either monitorId or coMonitorId is provided when no courseId is specified
     if (!courseId && !monitorId && !coMonitorId) {
-      throw new Error(
-        "Either courseId or monitorId/coMonitorId must be provided"
-      );
+      throw new Error("CODE:701");
     }
 
-    // Base query for counting
     let countQuery = db
       .select({ count: count() })
       .from(studentsCoursesTable)
@@ -2096,8 +1988,7 @@ export async function getStudentsListByCourseId(
       totalPages,
     };
   } catch (error) {
-    console.error("Error fetching students:", error);
-    throw error;
+    throw new Error("CODE:702");
   }
 }
 
