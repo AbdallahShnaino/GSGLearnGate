@@ -45,7 +45,7 @@ const StudentCoursesAnnouncements = (props: IProps) => {
   return (
     <div className="flex flex-col gap-6">
       <div className="space-y-2">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col justify-between gap-3">
           <label
             htmlFor="course-filter"
             className="text-sm font-medium text-gray-700"
