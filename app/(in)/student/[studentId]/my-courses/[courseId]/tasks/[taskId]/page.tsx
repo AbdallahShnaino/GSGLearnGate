@@ -20,7 +20,7 @@ const Task = async (props: IProps) => {
   );
 
   return (
-    <div className="min-h-screen bg-[#FFF5E8] p-6">
+    <div className="min-h-screen bg-[#FFF5E8] p-6 w-full">
       <header className="mb-8">
         <h1 className="text-2xl font-bold text-[#FFA41F]">
           {taskDetails![0].courseTitle}
