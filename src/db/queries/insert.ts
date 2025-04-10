@@ -28,7 +28,6 @@ import {
   Attachment,
   Attachments,
   Role,
-  StudentBookingDate,
   CourseSchedule,
   AvailabilitySlot,
   newComment,
@@ -152,7 +151,6 @@ export async function insertCourseSchedule(
     .insert(courseSchedulesTable)
     .values(data)
     .returning();
-
   return inserted as CourseSchedule;
 }
 

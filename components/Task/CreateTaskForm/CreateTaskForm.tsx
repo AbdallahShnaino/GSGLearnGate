@@ -6,6 +6,7 @@ import Submit from "./Submit";
 import SelectCourse from "@/components/Dropdowns/SelectCourse";
 import { AttachmentSelector } from "../AttachmentSelector/AttachmentSelector";
 import { useActionState } from "react";
+import { useAuth } from "@/context/user";
 
 type AttachmentType = "none" | "link" | "file";
 
@@ -18,8 +19,7 @@ export default function CreateTaskForm({ coursesList }: IProps) {
     type: "link" | "file" | null;
     value: string | File | null;
   }>({ type: null, value: null });
-
-  const STATIC_MONITOR_ID = 13;
+  const { userId } = useAuth();
 
   const initialState: TaskState = {
     success: false,
@@ -76,7 +76,7 @@ export default function CreateTaskForm({ coursesList }: IProps) {
           >
             Task Title
           </label>
-          <input type="hidden" name="monitorId" value={STATIC_MONITOR_ID} />
+          <input type="hidden" name="monitorId" value={userId ?? -1} />
           <input
             type="text"
             name="title"
