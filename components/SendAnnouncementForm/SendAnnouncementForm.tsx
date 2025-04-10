@@ -125,7 +125,7 @@ export default function SendAnnouncementForm({ courses }: IProps) {
             <input
                 id="postedBy"
                 name="postedBy"
-                defaultValue={user.userId!}
+                defaultValue={user.id!}
                 type="text"
                 placeholder="e.g., Online/Offline course details"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
