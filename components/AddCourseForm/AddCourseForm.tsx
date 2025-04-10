@@ -1,4 +1,5 @@
 "use client";
+import { useAuth } from "@/context/user";
 import {
   CourseState,
   submitCourse,
@@ -15,6 +16,8 @@ interface IProps {
   coMonitors: UsersNames[];
 }
 const AddCourseForm = ({ monitors, coMonitors }: IProps) => {
+  const {userId} = useAuth();
+  console.log(userId)
   const initialState: CourseState = {
     success: false,
     error: "",
@@ -217,7 +220,7 @@ const AddCourseForm = ({ monitors, coMonitors }: IProps) => {
               <input
                 id="adminId"
                 name="adminId"
-                defaultValue={1}
+                defaultValue={userId!}
                 type="text"
                 placeholder="e.g., Online/Offline course details"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"

@@ -6,7 +6,6 @@ export async function authenticateUser(email: string, password: string) {
   try {
     // البحث عن المستخدم باستخدام البريد الإلكتروني
     const user = await getUserByEmail(email);
-
     // التحقق من وجود المستخدم
     if (user === null) {
       return {
@@ -38,7 +37,7 @@ export async function authenticateUser(email: string, password: string) {
         success: true,
         message: "Login successful",
         error: undefined,
-        userId: user.id,
+        userId: user.roleId,
         role: user.role as Role
       };
     }

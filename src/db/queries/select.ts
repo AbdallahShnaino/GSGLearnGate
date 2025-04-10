@@ -74,6 +74,7 @@ import {
   JoiningOrdersResponse,
   Status,
   StudentSubmission,
+  Role,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorsTask, MonitorTasksResponse } from "@/types/tasks";
@@ -113,15 +114,63 @@ export async function getCourseSchedule(
 
 export async function getUserByEmail(
   email: string
-): Promise<Omit<User, "password"> | null> {
-  const result = await db
+): Promise<(User & { roleId: number }) | null> {
+  const userResult = await db
     .select()
     .from(usersTable)
     .where(eq(usersTable.email, email))
     .limit(1);
-  return result.length > 0 ? result[0] : null;
-}
 
+  if (userResult.length === 0) {
+    return null;
+  }
+
+  const user = userResult[0];
+  const { role, id: userId } = user;
+
+  let roleIdQuery;
+
+  switch (role) {
+    case Role.ADMIN:
+      roleIdQuery = db
+        .select({ id: adminsTable.id })
+        .from(adminsTable)
+        .where(eq(adminsTable.userId, userId));
+      break;
+
+    case Role.MONITOR:
+      roleIdQuery = db
+        .select({ id: monitorsTable.id })
+        .from(monitorsTable)
+        .where(eq(monitorsTable.userId, userId));
+      break;
+
+    case Role.CO_MONITOR:
+      roleIdQuery = db
+        .select({ id: coMonitorsTable.id })
+        .from(coMonitorsTable)
+        .where(eq(coMonitorsTable.userId, userId));
+      break;
+
+    case Role.STUDENT:
+      roleIdQuery = db
+        .select({ id: studentsTable.id })
+        .from(studentsTable)
+        .where(eq(studentsTable.userId, userId));
+      break;
+
+    default:
+      throw new Error(`Unknown role: ${role}`);
+  }
+
+  const roleIdResult = await roleIdQuery.limit(1);
+  const roleId = roleIdResult[0]?.id;
+
+  if (!roleId) {
+    throw new Error(`User with role ${role} not found in corresponding table`);
+  }
+  return { ...user, roleId };
+}
 export async function getAllAdmins(): Promise<Admin[]> {
   return await db.select().from(adminsTable).all();
 }
