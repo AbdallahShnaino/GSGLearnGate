@@ -10,7 +10,7 @@ const ITEMS_PER_PAGE = 10;
 export function useMonitorTasks() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user } = useAuth();
+  const { userId } = useAuth();
   const taskStatus =
     (searchParams.get("taskStatus") as TaskStatus) || TaskStatus.ALL;
   const page = Number(searchParams.get("page")) || 1;
@@ -25,7 +25,7 @@ export function useMonitorTasks() {
       setLoading(true);
       try {
         const { tasks, total } = await getTasksWithSubmissions(
-          user.userId,
+          userId ?? -1,
           taskStatus,
           page,
           ITEMS_PER_PAGE

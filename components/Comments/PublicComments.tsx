@@ -26,9 +26,9 @@ const PublicComments = ({ taskId, roles }: Props) => {
     if (roles === Role.MONITOR) {
       setCreateById(userId ?? -1);
     } else if ((roles = Role.CO_MONITOR)) {
-      setCreateById(STATIC_COMONITOR_ID);
+      setCreateById(userId ?? -1);
     } else {
-      setCreateById(STATIC_STUDENT_ID);
+      setCreateById(userId ?? -1);
     }
   }, [roles]);
   useEffect(() => {

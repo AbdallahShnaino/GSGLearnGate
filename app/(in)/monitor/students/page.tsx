@@ -7,14 +7,14 @@ import {
 import { Role } from "@/types";
 
 export default async function StudentsPage() {
-  const { user } = useAuth();
+  const { userId, user } = useAuth();
   const role = user.role as Role;
 
   let coursesList: { courseId: number; courseName: string }[] | null = [];
   if (role == Role.MONITOR) {
-    coursesList = await getMonitorCoursesNames(user.userId);
+    coursesList = await getMonitorCoursesNames(userId ?? -1);
   } else {
-    coursesList = await getCoMonitorCoursesNames(user.userId);
+    coursesList = await getCoMonitorCoursesNames(userId ?? -1);
   }
 
   return (

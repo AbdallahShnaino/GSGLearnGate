@@ -9,7 +9,7 @@ import { addStudentToCourse, getMonitorCoursesNames } from "@/services/courses";
 import { useAuth } from "@/context/user";
 
 export default function useStudentRequests() {
-  const { user } = useAuth();
+  const { userId } = useAuth();
   const searchParams = useSearchParams();
   const [courseId, setCourseId] = useState<number | undefined>(
     Number(searchParams.get("courseId")) || undefined
@@ -26,7 +26,7 @@ export default function useStudentRequests() {
 
   const fetchRequests = async () => {
     const { JoiningOrders, totalPages } = await getJoiningRequests(
-      user.userId,
+      userId ?? -1,
       courseId,
       currentPage,
       pageSize

@@ -7,14 +7,14 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const { user } = useAuth();
+  const { userId } = useAuth();
 
   try {
     const status = (searchParams.get("status") as TaskStatus) || TaskStatus.ALL;
     const page = Number(searchParams.get("page")) || 1;
     const limit = Number(searchParams.get("limit")) || 2;
     const data = await getTasksWithSubmissions(
-      user.userId,
+      userId ?? -1,
       status,
       page,
       limit

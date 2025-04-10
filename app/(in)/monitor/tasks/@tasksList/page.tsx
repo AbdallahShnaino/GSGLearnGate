@@ -11,13 +11,13 @@ export default async function MonitorTasksPage({
   searchParams: Promise<{ taskStatus?: TaskStatus; page?: string }>;
 }) {
   const params = await searchParams;
-  const { user } = useAuth();
+  const { userId } = useAuth();
 
   const taskStatus = params.taskStatus || TaskStatus.ALL;
   const page = Number(params.page) || 1;
 
   const { tasks, total } = await getTasksWithSubmissions(
-    user.userId,
+    userId ?? -1,
     taskStatus,
     page,
     ITEMS_PER_PAGE

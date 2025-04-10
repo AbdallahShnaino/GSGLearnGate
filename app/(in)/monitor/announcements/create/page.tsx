@@ -4,13 +4,14 @@ import { getMonitorCoursesNames } from "@/services/courses";
 import { useAuth } from "@/context/user";
 
 const SendAnnouncementPage = async () => {
-  const { user } = useAuth();
+  const { userId } = useAuth();
+
   const courses:
     | {
         courseId: number;
         courseName: string;
       }[]
-    | null = await getMonitorCoursesNames(user.userId);
+    | null = await getMonitorCoursesNames(userId ?? -1);
 
   return courses == null ? (
     <h1 className="text-xl font-semibold">

@@ -19,7 +19,7 @@ export default function CreateTaskForm({ coursesList }: IProps) {
     type: "link" | "file" | null;
     value: string | File | null;
   }>({ type: null, value: null });
-  const { user } = useAuth();
+  const { userId } = useAuth();
 
   const initialState: TaskState = {
     success: false,
@@ -76,7 +76,7 @@ export default function CreateTaskForm({ coursesList }: IProps) {
           >
             Task Title
           </label>
-          <input type="hidden" name="monitorId" value={user.userId} />
+          <input type="hidden" name="monitorId" value={userId ?? -1} />
           <input
             type="text"
             name="title"
