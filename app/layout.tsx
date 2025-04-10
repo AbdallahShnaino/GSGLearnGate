@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Oxygen } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/context/user";
 
 const oxygen = Oxygen({
   variable: "--font-oxygen",
@@ -61,7 +62,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${oxygen.className} antialiased`}>{children}</body>
+      <body className={`${oxygen.className} antialiased`}>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </body>
     </html>
   );
 }

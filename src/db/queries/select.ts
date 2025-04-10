@@ -118,6 +118,7 @@ export async function getCourseSchedule(
     query = query.where(eq(courseSchedulesTable.courseId, courseId));
   }
 
+export async function getUserByEmail(email: string): Promise<User | null> {
   const result = await query.all();
   return result;
 }

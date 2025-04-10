@@ -2,9 +2,10 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { SidebarLink } from "@/types/user";
 import { SignOut, List } from "@phosphor-icons/react/dist/ssr";
+import { logoutUser } from "@/controllers/actions/logoutUserAction";
 
 interface IProps {
   links: SidebarLink[];
@@ -13,6 +14,15 @@ interface IProps {
 export default function Sidebar({ links }: IProps) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    const result = await logoutUser();
+    if (result.success) {
+      router.push("/login");
+      router.refresh(); 
+    }
+  };
 
   return (
     <>
@@ -72,7 +82,7 @@ export default function Sidebar({ links }: IProps) {
         <div className="mt-auto pt-4 border-t border-[#4A4F57]">
           <div className="flex items-center gap-2 p-2 cursor-pointer rounded-lg hover:bg-red-100 hover:text-white">
             <SignOut size={24} />
-            <p className=" text-red-400 font-bold text-[14px]">Log Out</p>
+            <button onClick={handleLogout} className=" text-red-400 font-bold text-[14px]">Log Out</button>
           </div>
         </div>
       </aside>
