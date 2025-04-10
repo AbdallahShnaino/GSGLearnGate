@@ -82,8 +82,6 @@ import {
   CourseStudentsList,
 } from "@/types/attendanceOperations";
 import { CoMonitorAppointment } from "@/types/appointments";
-import { addDays, getDay, isAfter, setHours, setMinutes } from "date-fns";
-import { boolean } from "drizzle-orm/gel-core";
 import { StudentsListResponse } from "@/types/students";
 
 export async function getAllUsers(): Promise<User[]> {
@@ -408,7 +406,6 @@ export async function getCoursesNamesByCoMonitor(
       courseName: course.title,
     }));
   } catch (e) {
-    console.log(e);
     return null;
   }
 }
@@ -1431,7 +1428,6 @@ export async function insertAttendanceRecord({
   status: AttendanceRecordStatus;
   recordedById: number;
 }) {
-  console.log(sessionId, courseId, studentId, status, recordedById);
   const existing = await db
     .select()
     .from(attendanceRecordsTable)
@@ -1618,7 +1614,6 @@ export async function getPrivateCommentsBySubmission(
     )
     .orderBy(commentsTable.createdAt);
 
-  console.log("Comments: ", comments);
   return comments.map((comment: any) => ({
     ...comment,
     createdAt: new Date(comment.createdAt),
@@ -1910,8 +1905,6 @@ export async function getStudentsListByCourseId(
   monitorId?: number,
   coMonitorId?: number
 ): Promise<StudentsListResponse> {
-  console.log("courseId ", courseId);
-
   try {
     if (!courseId && !monitorId && !coMonitorId) {
       throw new Error("CODE:701");
@@ -1982,7 +1975,6 @@ export async function getStudentsListByCourseId(
     const totalPages = Math.ceil(totalStudents / itemsPerPage);
 
     const students = await studentsQuery;
-    console.log(students);
     return {
       students,
       totalPages,

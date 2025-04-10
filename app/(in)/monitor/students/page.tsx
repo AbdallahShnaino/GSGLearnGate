@@ -1,5 +1,5 @@
 import StudentsTable from "@/components/StudentsTable/StudentsTable";
-import { STATIC_COMONITOR_ID, STATIC_MONITOR_ID } from "@/context/keys";
+import { useAuth } from "@/context/user";
 import {
   getCoMonitorCoursesNames,
   getMonitorCoursesNames,
@@ -7,11 +7,15 @@ import {
 import { Role } from "@/types";
 
 export default async function StudentsPage() {
-  const role = Role.MONITOR;
+  const { user } = useAuth();
+  const role = user.role as Role;
+
   let coursesList: { courseId: number; courseName: string }[] | null = [];
-  role == Role.MONITOR
-    ? (coursesList = await getMonitorCoursesNames(STATIC_MONITOR_ID))
-    : (coursesList = await getCoMonitorCoursesNames(STATIC_COMONITOR_ID));
+  if (role == Role.MONITOR) {
+    coursesList = await getMonitorCoursesNames(user.userId);
+  } else {
+    coursesList = await getCoMonitorCoursesNames(user.userId);
+  }
 
   return (
     <div>

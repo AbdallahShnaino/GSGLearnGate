@@ -2,14 +2,11 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { fetchPublicCommentsByTaskId } from "@/services/co-mentor-func";
-import { PublicComment } from "@/types";
+import { PublicComment, Role } from "@/types";
 import Loader from "../Shared/Loader";
 import { insertPublicComment } from "@/controllers/actions/addPublicCommrnt";
-import {
-  STATIC_COMONITOR_ID,
-  STATIC_MONITOR_ID,
-  STATIC_STUDENT_ID,
-} from "@/context/keys";
+import { STATIC_COMONITOR_ID, STATIC_STUDENT_ID } from "@/context/keys";
+import { useAuth } from "@/context/user";
 
 interface Props {
   taskId: number;
@@ -17,16 +14,18 @@ interface Props {
 }
 
 const PublicComments = ({ taskId, roles }: Props) => {
+  const { userId } = useAuth();
   const [publicComments, setPublicComments] = useState<PublicComment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [replyText, setReplyText] = useState<string>("");
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [createById, setCreateById] = useState<number>(0);
+
   useEffect(() => {
-    if (roles === "monitor") {
-      setCreateById(STATIC_MONITOR_ID);
-    } else if (roles === "co-monitor") {
+    if (roles === Role.MONITOR) {
+      setCreateById(userId ?? -1);
+    } else if ((roles = Role.CO_MONITOR)) {
       setCreateById(STATIC_COMONITOR_ID);
     } else {
       setCreateById(STATIC_STUDENT_ID);

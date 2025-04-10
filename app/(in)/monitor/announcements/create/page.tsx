@@ -1,15 +1,16 @@
 import React from "react";
 import SendAnnouncementForm from "@/components/SendAnnouncementForm/SendAnnouncementForm";
 import { getMonitorCoursesNames } from "@/services/courses";
-import { STATIC_MONITOR_ID } from "@/context/keys";
+import { useAuth } from "@/context/user";
 
 const SendAnnouncementPage = async () => {
+  const { user } = useAuth();
   const courses:
     | {
         courseId: number;
         courseName: string;
       }[]
-    | null = await getMonitorCoursesNames(STATIC_MONITOR_ID);
+    | null = await getMonitorCoursesNames(user.userId);
 
   return courses == null ? (
     <h1 className="text-xl font-semibold">

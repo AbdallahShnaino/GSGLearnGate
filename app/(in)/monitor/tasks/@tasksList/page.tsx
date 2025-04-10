@@ -1,8 +1,7 @@
-// app/monitor/tasks/page.tsx
 import { TaskStatus } from "@/types";
 import { getTasksWithSubmissions } from "@/services/task";
-import { STATIC_MONITOR_ID } from "@/context/keys";
 import TaskListClient from "@/components/TasksList/TaskListCom";
+import { useAuth } from "@/context/user";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -12,12 +11,13 @@ export default async function MonitorTasksPage({
   searchParams: Promise<{ taskStatus?: TaskStatus; page?: string }>;
 }) {
   const params = await searchParams;
+  const { user } = useAuth();
 
   const taskStatus = params.taskStatus || TaskStatus.ALL;
   const page = Number(params.page) || 1;
 
   const { tasks, total } = await getTasksWithSubmissions(
-    STATIC_MONITOR_ID,
+    user.userId,
     taskStatus,
     page,
     ITEMS_PER_PAGE

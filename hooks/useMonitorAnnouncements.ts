@@ -1,4 +1,4 @@
-import { STATIC_MONITOR_ID } from "@/context/keys";
+import { useAuth } from "@/context/user";
 import { getAnnouncements } from "@/services/announcement";
 import { getMonitorCoursesNames } from "@/services/courses";
 import { Announcement } from "@/types";
@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from "react";
 export default function useMonitorAnnouncements() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { user } = useAuth();
 
   const courseId = Number(searchParams.get("courseId")) || undefined;
   const currentPage = Number(searchParams.get("page")) || 1;
@@ -23,7 +24,7 @@ export default function useMonitorAnnouncements() {
     async (courseId?: number, page: number = 1) => {
       setIsLoading(true);
       try {
-        const courseData = await getMonitorCoursesNames(STATIC_MONITOR_ID);
+        const courseData = await getMonitorCoursesNames(user.userId);
         const courseIds = courseData
           ? courseData.map((course) => course.courseId)
           : undefined;

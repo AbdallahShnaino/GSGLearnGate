@@ -1,9 +1,11 @@
 import CreateTaskForm from "@/components/Task/CreateTaskForm/CreateTaskForm";
-import { STATIC_MONITOR_ID } from "@/context/keys";
+import { useAuth } from "@/context/user";
 import { getMonitorCoursesNames } from "@/services/courses";
 
 export default async function CreateTaskPage() {
-  const coursesList = await getMonitorCoursesNames(STATIC_MONITOR_ID);
+  const { user } = useAuth();
+
+  const coursesList = await getMonitorCoursesNames(user.userId);
 
   return <CreateTaskForm coursesList={coursesList} />;
 }

@@ -1,19 +1,20 @@
 import { NextResponse } from "next/server";
 import { getTasksWithSubmissions } from "@/services/task";
-import { STATIC_MONITOR_ID } from "@/context/keys";
 import { TaskStatus } from "@/types";
+import { useAuth } from "@/context/user";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
+  const { user } = useAuth();
 
   try {
     const status = (searchParams.get("status") as TaskStatus) || TaskStatus.ALL;
     const page = Number(searchParams.get("page")) || 1;
     const limit = Number(searchParams.get("limit")) || 2;
     const data = await getTasksWithSubmissions(
-      STATIC_MONITOR_ID,
+      user.userId,
       status,
       page,
       limit

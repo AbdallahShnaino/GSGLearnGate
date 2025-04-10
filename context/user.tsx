@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 interface DecodedToken {
   email?: string;
   role?: string;
-  userId?: string;
+  userId?: number;
 }
 
 interface AuthContextType {
@@ -13,20 +13,20 @@ interface AuthContextType {
   user: {
     email: string;
     role: string;
-    userId: string;
+    userId: number;
   };
-  userId: string | null;
+  userId: number | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
   const [user, setUser] = useState({
     email: "",
     role: "",
-    userId: "",
+    userId: -1,
   });
   useEffect(() => {
     function getCookie(name: string) {
@@ -47,9 +47,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser({
             email: decodedToken.email || "",
             role: decodedToken.role || "",
-            userId: decodedToken.userId || "",
+            userId: Number(decodedToken.userId) || -1,
           });
-          setUserId(decodedToken.userId || "");
+          setUserId(decodedToken.userId || -1);
         }
       } catch (error) {
         console.error("Error decoding token:", error);
