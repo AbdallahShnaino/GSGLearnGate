@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 GSGLearnGate – Learning Management System for Gaza Sky Geeks
 
-## Getting Started
+**GSGLearnGate** is a full-stack hybrid classroom platform built with **Next.js** to empower learning at **Gaza Sky Geeks (GSG)**. It combines essential educational tools into a single system to enhance communication, collaboration, and academic progress tracking.
 
-First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+![image](https://github.com/user-attachments/assets/be998a8a-3a80-4d57-acd8-6595f2cb0441)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🧠 Overview
 
-## Learn More
+GSGLearnGate supports multiple user roles with defined permissions, streamlining the entire learning lifecycle from course creation to certification. The system facilitates:
 
-To learn more about Next.js, take a look at the following resources:
+- Course Management  
+- Student Engagement  
+- Task Assignments & Grading  
+- Attendance Tracking  
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🎯 Key Features
 
-## Deploy on Vercel
+### 🔐 User Roles & Permissions
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Role          | Capabilities                                                                 |
+|---------------|------------------------------------------------------------------------------|
+| **Admin**     | Manage courses, users, and sending course announcement                      |
+| **Monitor**   | Add tasks, announcements, grade students, track attendance                  |
+| **Co-Monitor**| Assist in grading, manage attendance alerts and student interviews          |
+| **Student**   | Submit tasks, request appointments, post comments, receive grades           |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 🔄 System Workflow
+
+1. **📢 Course Announcement & Registration**  
+   Admins post courses → Students apply 
+
+2. **📝 Application & Interview**  
+   Admins/monitors review applications → Accepted students schedule interviews
+
+3. **📚 Course Enrollment & Activities**  
+   Monitors post announcements/tasks → Students submit and discuss assignments
+
+4. **📊 Attendance**  
+   Track students attendance
+
+---
+
+## 🧭 Pages & Functionalities
+
+- **Admin Dashboard**: Manage users/courses, send announcements
+- **Monitor Dashboard**: Grade assignments, post tasks, record attendance
+- **Student Dashboard**: View courses, submit work, check grades
+
+---
+
+## ⚙️ Tech Stack
+
+- **Framework**: [Next.js](https://nextjs.org/) (v15)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS, NextUI
+- **Database**: SQLite (via Drizzle ORM)
+- **Email**: EmailJS 
+- **Icons**: Phosphor Icons
+- **Charts**: Recharts
+- **Animations**: Framer Motion
+
+---
+
+## 🛠️ Setup & Installation
+```git clone https://github.com/AbdallahShnaino/GSGLearnGate.git ```
+
+``` npm install ``` 
+## 🤝 Acknowledgments
+GSGLearnGate is developed for Gaza Sky Geeks to support a future of seamless, collaborative, and empowering education.

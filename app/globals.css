@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+:root {
   --background: #ffffff;
   --foreground: #171717;
   --font-oxygen: "Oxygen", sans-serif;
@@ -20,6 +21,7 @@
     --background: #0a0a0a;
     --foreground: #ededed;
   }
+}
 }
 
 */
