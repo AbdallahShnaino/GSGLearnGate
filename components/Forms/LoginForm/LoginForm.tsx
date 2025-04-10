@@ -1,17 +1,61 @@
+"use client";
+import {
+  loginUser,
+  LoginUserStatus,
+} from "@/controllers/actions/loginUserAction";
 import Link from "next/link";
-import React from "react";
+import React, { useActionState, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Role } from "@/types";
+
+const initialState: LoginUserStatus = {
+  success: false,
+  message: "",
+  error: "",
+  userId: undefined,
+  role: undefined,
+};
 
 const LoginForm = () => {
+  const [formState, action] = useActionState(loginUser, initialState);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (formState.success) {
+      setLoading(true)
+      switch (formState.role) {
+        case Role.ADMIN:
+          router.push("/admin");
+          break;
+        case Role.MONITOR:
+          router.push("/monitor");
+          break;
+        case Role.CO_MONITOR:
+          router.push("/co-mentor");
+          break;
+        case Role.STUDENT:
+          router.push("/student");
+          break;
+        default:
+          router.push("");
+      }
+    }
+  }, [formState.success, formState.role, router]);
+
   return (
-    <form className="p-5 w-[90%] sm:w-96 flex flex-col gap-5 bg-[#EEEEEE] rounded-lg shadow-lg">
+    <form
+      action={action}
+      className="p-5 w-[90%] sm:w-96 flex flex-col gap-5 bg-[#EEEEEE] rounded-lg shadow-lg"
+    >
       <div className="flex flex-col gap-1.5">
         <label htmlFor="email">Email address</label>
         <input
           type="email"
           name="email"
           id="email"
+          className="border-1 border-gray-300 px-1.5 py-1 rounded focus:outline-blue-500 bg-white"
           required
-          className="border-1 border-gray-300 px-1.5 py-1 rounded focus:outline-blue-500 bg-white "
         />
       </div>
 
@@ -29,13 +73,18 @@ const LoginForm = () => {
           type="password"
           name="password"
           id="password"
-          required
           className="border-1 border-gray-300 px-1.5 py-1 rounded focus:outline-blue-500 bg-white"
+          required
         />
       </div>
+      
+      {formState.error && (
+        <p className="text-red-500 text-sm">{formState.error}</p>
+      )}
       <input
+        disabled={loading}
         type="submit"
-        value="Sign in"
+        value={loading ? "Loading..." : "Sign in"}
         className="mt-1.5 bg-[#222831] hover:bg-[#393E46] rounded p-2 text-white cursor-pointer"
       />
     </form>
