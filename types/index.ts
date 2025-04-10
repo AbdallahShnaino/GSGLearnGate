@@ -268,10 +268,10 @@ export type CourseWithNames = {
 } & Timestamps;
 
 enum AttendanceStatus {
-  PRESENT = "PRESENT", // حاضر
-  ABSENT = "ABSENT", // غائب
-  EXCUSED = "EXCUSED", // غياب بعذر
-  LATE = "LATE", // متأخر
+  PRESENT = "PRESENT",
+  ABSENT = "ABSENT",
+  EXCUSED = "EXCUSED",
+  LATE = "LATE",
 }
 export type StudentCourseSmallCard = {
   id: number | null;
@@ -303,7 +303,6 @@ export type StudentCourseDetails = {
   id: number | null;
   title: string | null;
   monitor: string | null;
-  // status: AttendanceStatus;
   description: string | null;
   coMonitors: string | null;
   startDate: Date;
@@ -452,14 +451,6 @@ export type AttendanceRecord = {
 export type CourseWithPresenter = Course & {
   presenterName?: string;
   presenterImage?: string;
-};
-export type SoonLectures = {
-  courseTitle: string;
-  lectureDate: Date;
-  // courseStartTime: Date;
-  // weekDay: string;
-  // startTime: string;
-  // endTime: string;
 };
 
 export type AttendanceRecordOne = {
