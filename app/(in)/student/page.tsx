@@ -13,10 +13,10 @@ const Dashboard = async () => {
   const totalCourses = await getLimitCoursesByStudent(Number(studentId));
 
   return (
-    <div className="px-6 py-3 w-full min-h-screen">
+    <div className="px-6 w-full min-h-screen mb-10">
       <h1 className="text-4xl font-bold text-gray-800 my-4">My Courses</h1>
       {courses && courses.length >= 1 ? (
-        <div className="flex flex-wrap gap-4 justify-center sm:justify-between items-center w-full">
+        <div className="flex flex-col flex-wrap gap-4 justify-center sm:justify-between w-full">
           {courses?.map((course) => (
             <CourseCard
               key={course.id}
@@ -24,8 +24,11 @@ const Dashboard = async () => {
               studentId={studentId!}
             />
           ))}
-          <Link href={`/student/my-courses`}>
-            <button className="px-10 py-2 bg-[#FFA41F] text-white rounded-lg hover:bg-[#FF8C00] transition cursor-pointer">
+          <Link
+            className="self-end max-sm:self-center max-sm:w-full"
+            href={`/student/my-courses`}
+          >
+            <button className="px-10 py-2 bg-[#FFA41F] text-white rounded-lg hover:bg-[#FF8C00] transition cursor-pointer max-sm:w-full">
               Show All
             </button>
           </Link>
