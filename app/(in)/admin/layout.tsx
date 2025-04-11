@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const links: SidebarLink[] = [
+const links: SidebarLink[] = [
   {
     href: "/admin",
     label: "Dashboard",

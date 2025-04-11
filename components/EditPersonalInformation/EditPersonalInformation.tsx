@@ -3,13 +3,11 @@ import React, { useState } from "react";
 import EditProfileModal from "../modals/EditProfileModal/EditProfileModal";
 
 const EditPersonalInformation = () => {
-  //================{For Test}======================
   const user = {
     firstName: "Mohammed",
     lastName: "Qashqesh",
     dateOfBirth: "2003-12-18",
   };
-  //================{For Test}======================
 
   const [openModal, setOpenModal] = useState(false);
 

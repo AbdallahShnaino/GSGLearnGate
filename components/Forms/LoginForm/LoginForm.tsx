@@ -13,6 +13,7 @@ const initialState: LoginUserStatus = {
   message: "",
   error: "",
   userId: undefined,
+  id: undefined,
   role: undefined,
 };
 

@@ -8,7 +8,6 @@ interface IProps {
 const EditProfileModal = ({ onClose, typeOfEdit }: IProps) => {
   return (
     <div className="fixed top-0 left-0 right-0 bottom-0 bg-[rgba(0,0,0,0.7)] flex justify-center items-center">
-      {/* Edit Profile Image */}
       {typeOfEdit === "editImage" && (
         <form className="bg-white py-5 rounded-md w-[80%] sm:w-96">
           <p className="mx-5 text-lg font-bold">Edit Profile Image</p>
@@ -38,9 +37,7 @@ const EditProfileModal = ({ onClose, typeOfEdit }: IProps) => {
           </div>
         </form>
       )}
-      {/* Edit Profile Image */}
 
-      {/* Edit Personal Information */}
       {typeOfEdit === "editPersonalInformation" && (
         <form className="bg-white py-5 rounded-md w-[80%] sm:w-96">
           <p className="mx-5 text-lg font-bold">Edit Personal Information</p>
@@ -92,9 +89,7 @@ const EditProfileModal = ({ onClose, typeOfEdit }: IProps) => {
           </div>
         </form>
       )}
-      {/* Edit Personal Information */}
 
-      {/* Edit Email Address */}
       {typeOfEdit === "editEmailAddress" && (
         <form className="bg-white py-5 rounded-md w-[80%] sm:w-96">
           <p className="mx-5 text-lg font-bold">Edit Email Address</p>
@@ -126,9 +121,7 @@ const EditProfileModal = ({ onClose, typeOfEdit }: IProps) => {
           </div>
         </form>
       )}
-      {/* Edit Email Address */}
 
-      {/* Edit Password */}
       {typeOfEdit === "editPassword" && (
         <form className="bg-white py-5 rounded-md w-[80%] sm:w-96">
           <p className="mx-5 text-lg font-bold">Edit Password</p>
@@ -158,7 +151,6 @@ const EditProfileModal = ({ onClose, typeOfEdit }: IProps) => {
               className="bg-[#222831] hover:bg-[#393E46] text-white rounded py-0.5 px-2.5 cursor-pointer"
             />
           </div>
-          {/* Edit Password */}
         </form>
       )}
     </div>

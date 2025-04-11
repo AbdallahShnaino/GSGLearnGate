@@ -1,4 +1,3 @@
-import { STATIC_MONITOR_ID } from "@/context/keys";
 import { getAnnouncements } from "@/services/announcement";
 import { getMonitorCoursesNames } from "@/services/courses";
 import { Announcement } from "@/types";
@@ -8,7 +7,7 @@ import { useCallback, useEffect, useState } from "react";
 export default function useMonitorAnnouncements() {
   const searchParams = useSearchParams();
   const router = useRouter();
-
+  const HELLO = 1;
   const courseId = Number(searchParams.get("courseId")) || undefined;
   const currentPage = Number(searchParams.get("page")) || 1;
 
@@ -23,7 +22,7 @@ export default function useMonitorAnnouncements() {
     async (courseId?: number, page: number = 1) => {
       setIsLoading(true);
       try {
-        const courseData = await getMonitorCoursesNames(STATIC_MONITOR_ID);
+        const courseData = await getMonitorCoursesNames(HELLO);
         const courseIds = courseData
           ? courseData.map((course) => course.courseId)
           : undefined;
@@ -37,7 +36,6 @@ export default function useMonitorAnnouncements() {
         requests && setTotalPages(Math.ceil(requests.total / pageSize));
         setAnnouncements(requests.announcements);
       } catch (error) {
-        console.error("Failed to fetch announcements:", error);
         setAnnouncements(null);
       } finally {
         setIsLoading(false);

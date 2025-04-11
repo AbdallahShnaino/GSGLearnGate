@@ -1,13 +1,10 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getStudentsWithMonitorCorse } from "@/services/courses";
-import { STATIC_MONITOR_ID, STATIC_COMONITOR_ID } from "@/context/keys";
 import { StudentItem, StudentsListResponse } from "@/types/students";
-import { Role } from "@/types";
-interface IProps {
-  role: Role;
-}
-export default function useStudentsList({ role }: IProps) {
+
+export default function useStudentsList() {
+  const HELLO = 1;
   const searchParams = useSearchParams();
   const [students, setStudents] = useState<StudentItem[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -20,11 +17,10 @@ export default function useStudentsList({ role }: IProps) {
   const fetchRequests = async () => {
     setIsLoading(true);
     try {
-      const id = role == Role.MONITOR ? STATIC_MONITOR_ID : STATIC_COMONITOR_ID;
       const { students, totalPages }: StudentsListResponse =
         await getStudentsWithMonitorCorse(
           currentPage,
-          id,
+          HELLO ?? -1,
           undefined,
           pageSize,
           courseId

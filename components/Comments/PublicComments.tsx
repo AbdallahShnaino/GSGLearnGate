@@ -2,14 +2,10 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { fetchPublicCommentsByTaskId } from "@/services/co-mentor-func";
-import { PublicComment } from "@/types";
+import { PublicComment, Role } from "@/types";
 import Loader from "../Shared/Loader";
 import { insertPublicComment } from "@/controllers/actions/addPublicCommrnt";
-import {
-  STATIC_COMONITOR_ID,
-  STATIC_MONITOR_ID,
-  STATIC_STUDENT_ID,
-} from "@/context/keys";
+import { useAuth } from "@/context/user";
 
 interface Props {
   taskId: number;
@@ -17,29 +13,29 @@ interface Props {
 }
 
 const PublicComments = ({ taskId, roles }: Props) => {
+  const { user } = useAuth();
+
   const [publicComments, setPublicComments] = useState<PublicComment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [replyText, setReplyText] = useState<string>("");
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [createById, setCreateById] = useState<number>(0);
+
   useEffect(() => {
-    if (roles === "monitor") {
-      setCreateById(STATIC_MONITOR_ID);
-    } else if (roles === "co-monitor") {
-      setCreateById(STATIC_COMONITOR_ID);
+    if (roles === Role.MONITOR || roles === Role.CO_MONITOR) {
+      setCreateById(user.userId ?? -1);
     } else {
-      setCreateById(STATIC_STUDENT_ID);
+      setCreateById(user.userId ?? -1);
     }
-  }, [roles]);
+  }, [roles, user.userId]);
   useEffect(() => {
     const fetchComments = async () => {
       try {
         setLoading(true);
         const comments = await fetchPublicCommentsByTaskId(taskId);
         setPublicComments(comments);
-      } catch (err) {
-        console.error("Error fetching public comments:", err);
+      } catch {
         setError("Failed to load public comments.");
       } finally {
         setLoading(false);
@@ -69,8 +65,7 @@ const PublicComments = ({ taskId, roles }: Props) => {
       setPublicComments(updatedComments);
 
       setReplyText("");
-    } catch (error) {
-      console.error("Error adding comment:", error);
+    } catch {
       alert("Failed to add comment. Please try again.");
     } finally {
       setIsSaving(false);

@@ -14,7 +14,6 @@ export async function insertCommentByCoMentor({
   text: string;
 }) {
   try {
-   
     const submission = await db
       .select({
         studentId: submissionsTable.studentId,
@@ -29,7 +28,6 @@ export async function insertCommentByCoMentor({
       throw new Error("Submission not found.");
     }
 
-   
     const [insertedComment] = await db
       .insert(commentsTable)
       .values({
@@ -40,13 +38,11 @@ export async function insertCommentByCoMentor({
         taskId: submission.taskId,
         isPublic: false,
         privateRecipientId: submission.studentId,
-       
       })
       .returning();
 
     return insertedComment;
-  } catch (error) {
-    console.error("Error inserting comment:", error);
-    throw new Error("Failed to insert comment.");
+  } catch {
+    throw new Error("CODE:3012");
   }
 }

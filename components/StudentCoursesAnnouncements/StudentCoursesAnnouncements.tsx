@@ -14,7 +14,7 @@ const StudentCoursesAnnouncements = (props: IProps) => {
   const [filteredAnnouncements, setFilteredAnnouncements] = useState(
     props.announcements
   );
-  const [selectedCourse, setSelectedCourse] = useState("");
+  const [, setSelectedCourse] = useState("");
 
   useEffect(() => {
     const courseParam = searchParams.get("course") || "";

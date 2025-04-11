@@ -67,12 +67,11 @@ export async function submitCourseSchedule(
       message: `Successfully created ${createdCount} schedule records`,
       scheduleId: lastInsertedId || 0,
     };
-  } catch (error) {
-    console.error("Error creating schedules:", error);
+  } catch {
     return {
       success: false,
       error: "Server Error",
-      message: error instanceof Error ? error.message : "Failed to create schedules",
+      message: "Failed to create schedules",
       scheduleId: undefined,
     };
   }

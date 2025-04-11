@@ -1,4 +1,4 @@
-import { db } from "./../index";
+import { db } from "..";
 import {
   usersTable,
   adminsTable,
@@ -28,7 +28,6 @@ import {
   Attachment,
   Attachments,
   Role,
-  StudentBookingDate,
   CourseSchedule,
   AvailabilitySlot,
   newComment,
@@ -140,7 +139,7 @@ export async function insertComment(
     const [inserted] = await db.insert(commentsTable).values(data).returning();
 
     return inserted as SelectCommentsTable;
-  } catch (error) {
+  } catch {
     throw new Error("CODE:802");
   }
 }
@@ -152,7 +151,6 @@ export async function insertCourseSchedule(
     .insert(courseSchedulesTable)
     .values(data)
     .returning();
-
   return inserted as CourseSchedule;
 }
 
@@ -169,7 +167,7 @@ export async function insertCoMonitorAvailability(
       .returning();
 
     return newAvailability;
-  } catch (error) {
+  } catch {
     throw new Error("CODE:805");
   }
 }

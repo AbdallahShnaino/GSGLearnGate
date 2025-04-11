@@ -1,6 +1,5 @@
 "use server";
 
-import { db } from "./../index";
 import {
   eq,
   sql,
@@ -74,6 +73,7 @@ import {
   JoiningOrdersResponse,
   Status,
   StudentSubmission,
+  Role,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorsTask, MonitorTasksResponse } from "@/types/tasks";
@@ -82,9 +82,8 @@ import {
   CourseStudentsList,
 } from "@/types/attendanceOperations";
 import { CoMonitorAppointment } from "@/types/appointments";
-import { addDays, getDay, isAfter, setHours, setMinutes } from "date-fns";
-import { boolean } from "drizzle-orm/gel-core";
 import { StudentsListResponse } from "@/types/students";
+import { db } from "..";
 
 export async function getAllUsers(): Promise<User[]> {
   return await db.select().from(usersTable).all();
@@ -111,17 +110,66 @@ export async function getCourseSchedule(
   return query;
 }
 
+
 export async function getUserByEmail(
   email: string
-): Promise<Omit<User, "password"> | null> {
-  const result = await db
+): Promise<(User & { roleId: number }) | null> {
+  const userResult = await db
     .select()
     .from(usersTable)
     .where(eq(usersTable.email, email))
     .limit(1);
-  return result.length > 0 ? result[0] : null;
-}
 
+  if (userResult.length === 0) {
+    return null;
+  }
+
+  const user = userResult[0];
+  const { role, id: userId } = user;
+
+  let roleIdQuery;
+
+  switch (role) {
+    case Role.ADMIN:
+      roleIdQuery = db
+        .select({ id: adminsTable.id })
+        .from(adminsTable)
+        .where(eq(adminsTable.userId, userId));
+      break;
+
+    case Role.MONITOR:
+      roleIdQuery = db
+        .select({ id: monitorsTable.id })
+        .from(monitorsTable)
+        .where(eq(monitorsTable.userId, userId));
+      break;
+
+    case Role.CO_MONITOR:
+      roleIdQuery = db
+        .select({ id: coMonitorsTable.id })
+        .from(coMonitorsTable)
+        .where(eq(coMonitorsTable.userId, userId));
+      break;
+
+    case Role.STUDENT:
+      roleIdQuery = db
+        .select({ id: studentsTable.id })
+        .from(studentsTable)
+        .where(eq(studentsTable.userId, userId));
+      break;
+
+    default:
+      throw new Error(`Unknown role: ${role}`);
+  }
+
+  const roleIdResult = await roleIdQuery.limit(1);
+  const roleId = roleIdResult[0]?.id;
+
+  if (!roleId) {
+    throw new Error(`User with role ${role} not found in corresponding table`);
+  }
+  return { ...user, roleId };
+}
 export async function getAllAdmins(): Promise<Admin[]> {
   return await db.select().from(adminsTable).all();
 }
@@ -383,12 +431,12 @@ export async function getCoursesNamesByMonitor(
     .from(coursesTable)
     .where(eq(coursesTable.monitorId, monitorId));
   try {
-    return results.map((course: { id: any; title: any }) => ({
+    return results.map((course: { id: number; title: string }) => ({
       courseId: course.id,
       courseName: course.title,
     }));
-  } catch (e) {
-    return null;
+  } catch {
+    throw new Error("CODE:711");
   }
 }
 
@@ -403,13 +451,12 @@ export async function getCoursesNamesByCoMonitor(
     .from(coursesTable)
     .where(eq(coursesTable.coMonitorId, coMonitorId));
   try {
-    return results.map((course: { id: any; title: any }) => ({
+    return results.map((course: { id: number; title: string }) => ({
       courseId: course.id,
       courseName: course.title,
     }));
-  } catch (e) {
-    console.log(e);
-    return null;
+  } catch {
+    throw new Error("CODE:709");
   }
 }
 
@@ -687,15 +734,30 @@ export async function getTasksByMonitor(
     .offset(offset)
     .execute();
 
-  const tasks: MonitorsTask[] = rawTasks.map((task: any) => ({
-    ...task,
-    startedAt: new Date(task.startedAt),
-    deadline: new Date(task.deadline),
-    createdAt: new Date(task.createdAt),
-    updatedAt: new Date(task.updatedAt),
-    courseTitle: task.courseTitle ?? null,
-    description: task.description ?? null,
-  }));
+  const tasks: MonitorsTask[] = rawTasks.map(
+    (task: {
+      id: number;
+      title: string;
+      description: string | null;
+      courseId: number;
+      startedAt: string;
+      deadline: string;
+      points: number;
+      createdAt: string;
+      updatedAt: string;
+      courseTitle: string | null;
+      submissionCount: number;
+      studentCount: number;
+    }) => ({
+      ...task,
+      startedAt: new Date(task.startedAt),
+      deadline: new Date(task.deadline),
+      createdAt: new Date(task.createdAt),
+      updatedAt: new Date(task.updatedAt),
+      courseTitle: task.courseTitle ?? null,
+      description: task.description ?? null,
+    })
+  );
 
   return {
     tasks,
@@ -849,15 +911,30 @@ export async function getTasksByCoMonitor(
     .offset(offset)
     .execute();
 
-  const tasks: MonitorsTask[] = rawTasks.map((task: any) => ({
-    ...task,
-    startedAt: new Date(task.startedAt),
-    deadline: new Date(task.deadline),
-    createdAt: new Date(task.createdAt),
-    updatedAt: new Date(task.updatedAt),
-    courseTitle: task.courseTitle ?? null,
-    description: task.description ?? null,
-  }));
+  const tasks: MonitorsTask[] = rawTasks.map(
+    (task: {
+      id: number;
+      title: string;
+      description: string | null;
+      courseId: number;
+      startedAt: string;
+      deadline: string;
+      points: number;
+      createdAt: string;
+      updatedAt: string;
+      courseTitle: string | null;
+      submissionCount: number;
+      studentCount: number;
+    }) => ({
+      ...task,
+      startedAt: new Date(task.startedAt),
+      deadline: new Date(task.deadline),
+      createdAt: new Date(task.createdAt),
+      updatedAt: new Date(task.updatedAt),
+      courseTitle: task.courseTitle ?? null,
+      description: task.description ?? null,
+    })
+  );
 
   return {
     tasks,
@@ -1059,24 +1136,34 @@ export async function getSubmissionsAndNonSubmissionsForTask(
     .all();
 
   const submittedStudentIds = submissions.map(
-    (submission: any) => submission.studentId
+    (submission: { studentId: number }) => submission.studentId
   );
   const nonSubmissions = allStudentsInCourse
-    .filter((student: any) => !submittedStudentIds.includes(student.studentId))
-    .map((student: any) => ({
-      submissionId: `non-${student.studentId}`,
-      studentId: student.studentId,
-      studentName: student.studentName,
-      email: student.email ?? "",
-      submissionDate: "__",
-      status: "NOT SUBMITTED",
-      grade: 0,
-      profilePicture: student.profilePicture ?? "",
-      taskName: taskName,
-      courseName: courseName,
-      taskId: taskId,
-      points: point,
-    }));
+    .filter(
+      (student: { studentId: number }) =>
+        !submittedStudentIds.includes(student.studentId)
+    )
+    .map(
+      (student: {
+        studentId: number;
+        studentName: string;
+        email: string | null;
+        profilePicture: string | null;
+      }) => ({
+        submissionId: `non-${student.studentId}`,
+        studentId: student.studentId,
+        studentName: student.studentName,
+        email: student.email ?? "",
+        submissionDate: "__",
+        status: "NOT SUBMITTED",
+        grade: 0,
+        profilePicture: student.profilePicture ?? "",
+        taskName: taskName,
+        courseName: courseName,
+        taskId: taskId,
+        points: point,
+      })
+    );
 
   const combinedResults = [...submissions, ...nonSubmissions];
 
@@ -1431,7 +1518,6 @@ export async function insertAttendanceRecord({
   status: AttendanceRecordStatus;
   recordedById: number;
 }) {
-  console.log(sessionId, courseId, studentId, status, recordedById);
   const existing = await db
     .select()
     .from(attendanceRecordsTable)
@@ -1618,11 +1704,18 @@ export async function getPrivateCommentsBySubmission(
     )
     .orderBy(commentsTable.createdAt);
 
-  console.log("Comments: ", comments);
-  return comments.map((comment: any) => ({
-    ...comment,
-    createdAt: new Date(comment.createdAt),
-  }));
+  return comments.map(
+    (comment: {
+      commentId: number;
+      commentText: string;
+      createdAt: string;
+      createdBy: string;
+      image: string | null;
+    }) => ({
+      ...comment,
+      createdAt: new Date(comment.createdAt),
+    })
+  );
 }
 export async function getPrivateCommentsReplyBySubmission(
   submissionId: number,
@@ -1647,10 +1740,18 @@ export async function getPrivateCommentsReplyBySubmission(
     )
     .orderBy(commentsTable.createdAt);
 
-  return comments.map((comment: any) => ({
-    ...comment,
-    createdAt: new Date(comment.createdAt),
-  }));
+  return comments.map(
+    (comment: {
+      commentId: number;
+      commentText: string;
+      createdAt: string;
+      createdBy: string;
+      image: string | null;
+    }) => ({
+      ...comment,
+      createdAt: new Date(comment.createdAt),
+    })
+  );
 }
 
 export async function getAllCoursesWithMonitors(): Promise<Course[]> {
@@ -1883,8 +1984,7 @@ export async function getPublicCommentsByTaskId(
 }
 
 export async function getAttachmentPathsByTaskId(
-  taskId: number,
-  courseId: number
+  taskId: number
 ): Promise<StudentSubmission> {
   const attachments = await db
     .select({
@@ -1910,8 +2010,6 @@ export async function getStudentsListByCourseId(
   monitorId?: number,
   coMonitorId?: number
 ): Promise<StudentsListResponse> {
-  console.log("courseId ", courseId);
-
   try {
     if (!courseId && !monitorId && !coMonitorId) {
       throw new Error("CODE:701");
@@ -1982,12 +2080,11 @@ export async function getStudentsListByCourseId(
     const totalPages = Math.ceil(totalStudents / itemsPerPage);
 
     const students = await studentsQuery;
-    console.log(students);
     return {
       students,
       totalPages,
     };
-  } catch (error) {
+  } catch {
     throw new Error("CODE:702");
   }
 }

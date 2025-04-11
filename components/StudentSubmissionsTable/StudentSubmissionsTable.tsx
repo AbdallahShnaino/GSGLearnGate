@@ -10,6 +10,7 @@ import TempPagination from "../Pagination/TempPagination";
 import Loader from "../Shared/Loader";
 import SearchBar from "../SearchBar/SearchBar";
 import { useSearch } from "@/hooks/useSearch";
+import { Role } from "@/types";
 
 interface IdTaskIprops {
   taskId: number;
@@ -36,12 +37,11 @@ export default function StudentSubmissionsTable({
     onPageChange,
     loading,
   } = useStudentSubmissions(taskId, searchQuery);
-  console.log("Submissions:", submissions);
   if (loading) {
     return <Loader message="Loading data..." />;
   }
   let hidden: boolean = true;
-  if (role === "monitor") {
+  if (role === Role.MONITOR) {
     hidden = false;
   }
   return (
@@ -143,17 +143,17 @@ export default function StudentSubmissionsTable({
                     >
                       <td className="flex items-center px-6 py-3">
                         <Image
-                          className="rounded-full border border-gray-300"
+                          className="rounded-full border border-gray-300 w-6 h-6"
                           src={submission.profilePicture}
                           alt="User"
-                          width={30}
-                          height={30}
+                          width={24}
+                          height={24}
                         />
-                        <div className="ml-3">
-                          <div className="text-s font-semibold">
+                        <div className="ml-2">
+                          <div className="font-medium truncate max-w-[120px]">
                             {submission.studentName}
                           </div>
-                          <div className="text-gray-500 text-xs">
+                          <div className="text-gray-500 text-xs truncate max-w-[120px]">
                             {submission.email}
                           </div>
                         </div>

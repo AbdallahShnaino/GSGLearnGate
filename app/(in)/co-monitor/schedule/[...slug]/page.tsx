@@ -55,8 +55,7 @@ export default function AttendanceEvaluationPage() {
         setLoading(true);
         const data = await listStudentInCourse(courseId);
         setStudents(data);
-      } catch (error) {
-        console.error("Failed to load students:", error);
+      } catch {
         toast.error("Failed to load student data");
       } finally {
         setLoading(false);
@@ -126,7 +125,11 @@ export default function AttendanceEvaluationPage() {
                               name="courseId"
                               value={courseId}
                             />
-                            <input type="hidden" name="monitorId" value={STATIC_COMONITOR_ID} />
+                            <input
+                              type="hidden"
+                              name="monitorId"
+                              value={STATIC_COMONITOR_ID}
+                            />
                             <input
                               type="hidden"
                               name="sessionId"

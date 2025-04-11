@@ -1,9 +1,8 @@
 import CreateTaskForm from "@/components/Task/CreateTaskForm/CreateTaskForm";
-import { STATIC_MONITOR_ID } from "@/context/keys";
 import { getMonitorCoursesNames } from "@/services/courses";
-
+const HELLO = 1;
 export default async function CreateTaskPage() {
-  const coursesList = await getMonitorCoursesNames(STATIC_MONITOR_ID);
+  const coursesList = await getMonitorCoursesNames(HELLO ?? -1);
 
   return <CreateTaskForm coursesList={coursesList} />;
 }

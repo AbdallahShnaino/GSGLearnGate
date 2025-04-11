@@ -1,4 +1,5 @@
-import ConditionalLayout from "../../../../components/Layouts/ConditionalLayout/ConditionalLayout";
+import ConditionalLayout from "@/components/Layouts/ConditionalLayout/ConditionalLayout";
+
 export default function Layout({
   children,
   activeTasksCard,
@@ -14,12 +15,13 @@ export default function Layout({
 }) {
   return (
     <ConditionalLayout
-      children={children}
       activeTasksCard={activeTasksCard}
       lateSubmissionsCard={lateSubmissionsCard}
       submissionsAwaitingReview={submissionsAwaitingReview}
       tasksList={tasksList}
-      role="monitor"
-    />
+      role="co-monitor"
+    >
+      {children}
+    </ConditionalLayout>
   );
 }

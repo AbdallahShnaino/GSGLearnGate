@@ -110,26 +110,6 @@ export const announcementsTable = sqliteTable("announcements", {
   ...timestamps,
 });
 
-export const appointmentsTable = sqliteTable("appointments", {
-  id: int().primaryKey({ autoIncrement: true }),
-  coMonitorId: int("co_monitor_id")
-    .notNull()
-    .references((): AnySQLiteColumn => coMonitorsTable.id),
-  studentId: int("student_id")
-    .notNull()
-    .references((): AnySQLiteColumn => studentsTable.id),
-
-  courseId: int("course_id")
-    .notNull()
-    .references((): AnySQLiteColumn => coursesTable.id),
-  caption: text("caption").notNull(),
-  dateTime: integer("date", { mode: "timestamp" }).notNull(),
-
-  status: text("status", {
-    enum: [Status.ACCEPTED, Status.PENDING, Status.REJECTED],
-  }).notNull(),
-  ...timestamps,
-});
 export const studentsCoursesTable = sqliteTable("students_courses", {
   id: int().primaryKey({ autoIncrement: true }),
   courseId: int("course_id")
@@ -351,9 +331,6 @@ export type SelectCourses = typeof coursesTable.$inferSelect;
 
 export type InsertAnnouncement = typeof announcementsTable.$inferInsert;
 export type SelectAnnouncements = typeof announcementsTable.$inferSelect;
-
-export type InsertAppointment = typeof appointmentsTable.$inferInsert;
-export type SelectAppointments = typeof appointmentsTable.$inferSelect;
 
 export type InsertStudentCourse = typeof studentsCoursesTable.$inferInsert;
 export type SelectStudentCourses = typeof studentsCoursesTable.$inferSelect;

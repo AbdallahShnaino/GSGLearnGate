@@ -10,8 +10,6 @@ interface IProps {
   requestStatus: Status | null;
 }
 const SoonCourseDetails = (props: IProps) => {
-  console.log(props.requestStatus);
-
   const handleRegister = async () => {
     try {
       await insertJoiningRequest({
@@ -21,8 +19,7 @@ const SoonCourseDetails = (props: IProps) => {
         joiningStatus: Status.PENDING,
       });
       alert("Joining Request Sent Successfully");
-    } catch (error) {
-      console.error("Register failed:", error);
+    } catch {
       alert("Something went wrong!! Please try again...");
     }
   };
