@@ -60,8 +60,7 @@ const SubmissonCom = ({ id, CoMentorId }: SubmissionIdProps) => {
         } else {
           alert(result.message || "Failed to save changes. Please try again.");
         }
-      } catch (error) {
-        console.error("Error saving submission data:", error);
+      } catch {
         alert("Failed to save changes. Please try again.");
       } finally {
         setIsSaving(false);
@@ -91,8 +90,7 @@ const SubmissonCom = ({ id, CoMentorId }: SubmissionIdProps) => {
       setPrivateComments(updatedComments);
 
       setReplyText("");
-    } catch (error) {
-      console.error("Error adding comment:", error);
+    } catch {
       alert("Failed to add comment. Please try again.");
     } finally {
       setIsLoading(false);

@@ -17,8 +17,7 @@ export function usePrivateComments(submissionId: number, CoMentorId: number) {
           CoMentorId
         );
         setPrivateComments(comments || []);
-      } catch (err) {
-        console.error("Error fetching private comments:", err);
+      } catch {
         setError("Failed to fetch private comments.");
       } finally {
         setLoading(false);

@@ -2,10 +2,9 @@
 
 interface IProps {
   error: Error;
-  reset: () => void;
 }
 
-const ErrorPage = ({ error, reset }: IProps) => {
+const ErrorPage = ({ error }: IProps) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-6">
       <div className="bg-white shadow-lg rounded-3xl p-8 max-w-xl w-full text-center border border-gray-200">

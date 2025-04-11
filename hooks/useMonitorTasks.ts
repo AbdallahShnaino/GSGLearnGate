@@ -3,14 +3,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { getTasksWithSubmissions } from "@/services/task";
 import { TaskStatus } from "@/types";
 import { MonitorsTask } from "@/types/tasks";
-import { useAuth } from "@/context/user";
 
 const ITEMS_PER_PAGE = 10;
 
 export function useMonitorTasks() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { userId } = useAuth();
+  const HELLO = 1;
   const taskStatus =
     (searchParams.get("taskStatus") as TaskStatus) || TaskStatus.ALL;
   const page = Number(searchParams.get("page")) || 1;
@@ -25,18 +24,15 @@ export function useMonitorTasks() {
       setLoading(true);
       try {
         const { tasks, total } = await getTasksWithSubmissions(
-          userId ?? -1,
+          HELLO ?? -1,
           taskStatus,
           page,
           ITEMS_PER_PAGE
         );
-
-        console.log(tasks);
-
         setTasks(tasks);
         setTotal(total);
         setError(null);
-      } catch (err) {
+      } catch {
         setError("Error loading tasks");
       } finally {
         setLoading(false);
@@ -44,7 +40,7 @@ export function useMonitorTasks() {
     }
     try {
       fetchTasks();
-    } catch (error) {
+    } catch {
       throw new Error("CODE:1000");
     }
   }, [taskStatus, page]);

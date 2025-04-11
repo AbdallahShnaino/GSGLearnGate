@@ -1,11 +1,12 @@
 import StudentSubmissionsTable from "@/components/StudentSubmissionsTable/StudentSubmissionsTable";
+import { Role } from "@/types";
 
 interface IProps {
-  searchParams: { [taskId: string]: string };
+  searchParams: Promise<{ [taskId: string]: string }>;
 }
 
 const page = async ({ searchParams }: IProps) => {
-  const { taskId } = searchParams;
+  const { taskId } = await searchParams;
 
   return (
     <div className="w-full px-4">
@@ -18,7 +19,10 @@ const page = async ({ searchParams }: IProps) => {
             Manage and track all student submissions
           </p>
         </div>
-        <StudentSubmissionsTable taskId={Number(taskId)} role="co-monitor" />
+        <StudentSubmissionsTable
+          taskId={Number(taskId)}
+          role={Role.CO_MONITOR}
+        />
       </div>
     </div>
   );

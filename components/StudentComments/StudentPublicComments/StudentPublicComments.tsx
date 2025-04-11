@@ -25,8 +25,7 @@ const StudentPublicComments = (props: IProps) => {
         privateRecipientId: 5,
       });
       setContent("");
-    } catch (error) {
-      console.error("Insert Comment failed:", error);
+    } catch {
       alert("Something went wrong!! Please try again...");
     }
   };

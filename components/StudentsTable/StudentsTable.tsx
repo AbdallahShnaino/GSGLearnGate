@@ -1,5 +1,4 @@
 "use client";
-import { Role } from "@/types";
 import PersonCard from "../PersonCard/PersonCard";
 import SelectCourse from "../Dropdowns/SelectCourse";
 import Loader from "../Shared/Loader";
@@ -7,9 +6,8 @@ import useStudentsList from "@/hooks/useStudentsList";
 import TempPagination from "../Pagination/TempPagination";
 interface IProps {
   coursesList: { courseId: number; courseName: string }[] | null;
-  role: Role;
 }
-export default function StudentRequestsTable({ coursesList, role }: IProps) {
+export default function StudentRequestsTable({ coursesList }: IProps) {
   const {
     students,
     currentPage,

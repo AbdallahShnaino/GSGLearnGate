@@ -10,6 +10,7 @@ import TempPagination from "../Pagination/TempPagination";
 import Loader from "../Shared/Loader";
 import SearchBar from "../SearchBar/SearchBar";
 import { useSearch } from "@/hooks/useSearch";
+import { Role } from "@/types";
 
 interface IdTaskIprops {
   taskId: number;
@@ -36,12 +37,11 @@ export default function StudentSubmissionsTable({
     onPageChange,
     loading,
   } = useStudentSubmissions(taskId, searchQuery);
-  console.log("Submissions:", submissions);
   if (loading) {
     return <Loader message="Loading data..." />;
   }
   let hidden: boolean = true;
-  if (role === "monitor") {
+  if (role === Role.MONITOR) {
     hidden = false;
   }
   return (

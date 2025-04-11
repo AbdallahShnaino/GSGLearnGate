@@ -1,4 +1,4 @@
-import { db } from "./../index";
+import { db } from "..";
 import {
   usersTable,
   adminsTable,
@@ -139,7 +139,7 @@ export async function insertComment(
     const [inserted] = await db.insert(commentsTable).values(data).returning();
 
     return inserted as SelectCommentsTable;
-  } catch (error) {
+  } catch {
     throw new Error("CODE:802");
   }
 }
@@ -167,7 +167,7 @@ export async function insertCoMonitorAvailability(
       .returning();
 
     return newAvailability;
-  } catch (error) {
+  } catch {
     throw new Error("CODE:805");
   }
 }

@@ -41,8 +41,7 @@ const ProfileCard = ({ coMonitorId }: { coMonitorId: number }) => {
         } else {
           setError("Co-Monitor not found.");
         }
-      } catch (err) {
-        console.error("Error fetching Co-Monitor details:", err);
+      } catch {
         setError("Failed to load Co-Monitor details.");
       } finally {
         setLoading(false);

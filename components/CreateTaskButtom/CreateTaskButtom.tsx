@@ -1,5 +1,4 @@
 import { Plus } from "@phosphor-icons/react/dist/ssr";
-import { label } from "framer-motion/client";
 import Link from "next/link";
 import React from "react";
 interface IProps {

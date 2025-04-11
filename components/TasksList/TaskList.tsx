@@ -18,13 +18,11 @@ export default function TaskList({
   initialTotal,
   initialPage,
   initialStatus,
-  role,
 }: {
   initialTasks: MonitorsTask[];
   initialTotal: number;
   initialPage: number;
   initialStatus: TaskStatus;
-  role: string;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -50,7 +48,7 @@ export default function TaskList({
         const { tasks, total } = await res.json();
         setTasks(tasks);
         setTotal(total);
-      } catch (error) {
+      } catch {
         throw new Error("CODE:1009");
       } finally {
         setLoading(false);
@@ -94,7 +92,7 @@ export default function TaskList({
             <div className="col-span-12 md:col-span-6 mb-2 md:mb-0">
               <div className="flex items-start">
                 <div className="flex-1">
-                  <Link href={`/${role}/tasks/${task.id}`}>
+                  <Link href={`/co-monitor/tasks/${task.id}`}>
                     <h3 className="font-medium text-[#FFA41F]">{task.title}</h3>
                   </Link>
                   <div className="flex items-center mt-1 text-sm text-gray-500 md:hidden">

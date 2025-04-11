@@ -1,15 +1,21 @@
 "use server";
 
-import { getCoMonitorUserDetails, getPrivateCommentsBySubmission, getPrivateCommentsReplyBySubmission, getPublicCommentsByTaskId, getSubmissionById, getSubmissionsAndNonSubmissionsForTask, getTotalCoursesByCoMonitor, getTotalStudentsByCoMonitor, getTotalTasksByCoMonitor } from "@/src/db/queries/select";
-import { updateMeetingRequest } from "@/src/db/queries/update";
+import {
+  getCoMonitorUserDetails,
+  getPrivateCommentsBySubmission,
+  getPrivateCommentsReplyBySubmission,
+  getPublicCommentsByTaskId,
+  getSubmissionById,
+  getSubmissionsAndNonSubmissionsForTask,
+  getTotalCoursesByCoMonitor,
+  getTotalStudentsByCoMonitor,
+  getTotalTasksByCoMonitor,
+} from "@/src/db/queries/select";
+
 import { Status, User } from "@/types";
 import { db } from "@/src/db";
-import {  submissionsTable, tasksTable } from "@/src/db/schema";
+import { submissionsTable, tasksTable } from "@/src/db/schema";
 import { eq } from "drizzle-orm";
-
-export async function updateMeetingRequestStatus(id: number, status: Status) {
-  return await updateMeetingRequest(id, { status });
-}
 
 export async function fetchSubmissions(
   taskId: number,
@@ -26,7 +32,7 @@ export async function fetchSubmissions(
       .all();
 
     if (!taskData || taskData.length === 0) {
-      throw new Error("Failed to fetch courseId for the given taskId.");
+      return [];
     }
 
     const courseId = taskData[0].courseId;
@@ -39,7 +45,7 @@ export async function fetchSubmissions(
     );
 
     if (!data) {
-      throw new Error("Failed to fetch submissions.");
+      throw new Error("CODE:600");
     }
 
     return {
@@ -48,46 +54,48 @@ export async function fetchSubmissions(
       currentPage: page,
       totalCount: data.totalCount,
     };
-  } catch (error) {
-    console.error("Error fetching submissions:", error);
-    throw error;
+  } catch {
+    throw new Error("CODE:601");
   }
 }
 export async function fetchSubmissionById(submissionId: number) {
   try {
     const data = await getSubmissionById(submissionId);
     if (!data) {
-      throw new Error("Submission not found.");
+      throw new Error("CODE:3022");
     }
     return data;
-  } catch (error) {
-    console.error("Error fetching submission:", error);
-    throw error;
+  } catch {
+    throw new Error("CODE:3023");
   }
 }
 
-export async function fetchCommentsBySubmissionId(submissionId: number, ComentorId: number) {
+export async function fetchCommentsBySubmissionId(
+  submissionId: number,
+  ComentorId: number
+) {
   try {
-    
     const studentComments = await getPrivateCommentsBySubmission(submissionId);
 
- 
-    const coMentorReplies = await getPrivateCommentsReplyBySubmission(submissionId, ComentorId); 
+    const coMentorReplies = await getPrivateCommentsReplyBySubmission(
+      submissionId,
+      ComentorId
+    );
 
-    
     const allComments = [...studentComments, ...coMentorReplies];
 
-   
-    allComments.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    allComments.sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
 
     if (!allComments || allComments.length === 0) {
-      return []; 
+      return [];
     }
 
     return allComments;
-  } catch (error) {
-    console.error("Error fetching comments:", error);
-    throw new Error("Failed to fetch comments.");
+  } catch {
+    throw new Error("CODE:3024");
   }
 }
 export async function saveSubmissionData({
@@ -100,12 +108,12 @@ export async function saveSubmissionData({
   feedback: string;
 }) {
   try {
-  
     if (!submissionId || grade === undefined || !feedback) {
-      throw new Error("Missing required fields: submissionId, grade, or feedback.");
+      throw new Error(
+        "Missing required fields: submissionId, grade, or feedback."
+      );
     }
 
-  
     await db
       .update(submissionsTable)
       .set({
@@ -116,13 +124,21 @@ export async function saveSubmissionData({
       })
       .where(eq(submissionsTable.id, submissionId));
 
-   
-    
-
     return { success: true, message: "Submission data saved successfully." };
   } catch (error) {
-    console.error("Error saving submission data:", error);
-    return { success: false, message: "Failed to save submission data.", error: error.message };
+    if (error instanceof Error) {
+      return {
+        success: false,
+        message: "Failed to save submission data.",
+        error: error.message,
+      };
+    }
+
+    return {
+      success: false,
+      message: "Failed to save submission data.",
+      error: "An unknown error occurred.",
+    };
   }
 }
 export async function fetchPublicCommentsByTaskId(taskId: number) {
@@ -130,55 +146,54 @@ export async function fetchPublicCommentsByTaskId(taskId: number) {
     const publicComments = await getPublicCommentsByTaskId(taskId);
 
     if (!publicComments || publicComments.length === 0) {
-      console.warn("No public comments found for the given task.");
       return [];
     }
 
     return publicComments;
-  } catch (error) {
-    console.error("Error fetching public comments:", error);
-    throw new Error("Failed to fetch public comments.");
+  } catch {
+    throw new Error("CODE:3025");
   }
 }
-export async function fetchTotalStudentsByCoMonitor(coMonitorId: number): Promise<number> {
+export async function fetchTotalStudentsByCoMonitor(
+  coMonitorId: number
+): Promise<number> {
   try {
     const totalStudents = await getTotalStudentsByCoMonitor(coMonitorId);
     return totalStudents;
-  } catch (error) {
-    console.error("Error fetching total students:", error);
-    throw new Error("Failed to fetch total students.");
+  } catch {
+    throw new Error("CODE:3026");
   }
 }
 
-
-export async function fetchTotalCoursesByCoMonitor(coMonitorId: number): Promise<number> {
+export async function fetchTotalCoursesByCoMonitor(
+  coMonitorId: number
+): Promise<number> {
   try {
     const totalCourses = await getTotalCoursesByCoMonitor(coMonitorId);
     return totalCourses;
-  } catch (error) {
-    console.error("Error fetching total courses:", error);
-    throw new Error("Failed to fetch total courses.");
+  } catch {
+    throw new Error("CODE:3027");
   }
 }
 
-
-export async function fetchTotalTasksByCoMonitor(coMonitorId: number): Promise<number> {
+export async function fetchTotalTasksByCoMonitor(
+  coMonitorId: number
+): Promise<number> {
   try {
     const totalTasks = await getTotalTasksByCoMonitor(coMonitorId);
     return totalTasks;
-  } catch (error) {
-    console.error("Error fetching total tasks:", error);
-    throw new Error("Failed to fetch total tasks.");
+  } catch {
+    throw new Error("CODE:3028");
   }
 }
 
-
-export async function fetchCoMonitorUserDetails(coMonitorId: number): Promise<User | null> {
+export async function fetchCoMonitorUserDetails(
+  coMonitorId: number
+): Promise<User | null> {
   try {
     const userDetails = await getCoMonitorUserDetails(coMonitorId);
     return userDetails;
   } catch (error) {
-    console.error("Error fetching Co-Mentor user details:", error);
-    throw new Error("Failed to fetch Co-Mentor user details.");
+    throw new Error("CODE:3030");
   }
 }

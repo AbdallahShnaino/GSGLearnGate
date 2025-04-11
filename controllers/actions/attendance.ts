@@ -33,8 +33,7 @@ export async function updateAttendanceAction(
       success: true,
       message: `Attendance marked as ${status}`,
     };
-  } catch (error) {
-    console.error("Error updating attendance:", error);
+  } catch {
     return {
       success: false,
       message: "Failed to update attendance",

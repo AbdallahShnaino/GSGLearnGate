@@ -2,13 +2,14 @@
 
 import { db } from "@/src/db";
 import { commentsTable,  tasksTable } from "@/src/db/schema";
+import { Role } from "@/types";
 import { eq } from "drizzle-orm";
 
 export async function insertPublicComment({
   TaskId,
   createById,
   text,
-  role
+  role,
 }: {
   TaskId: number;
   createById: number;
@@ -16,11 +17,9 @@ export async function insertPublicComment({
   role: string;
 }) {
   try {
-   
     const Task = await db
       .select({
-        courseId: tasksTable.courseId
-       
+        courseId: tasksTable.courseId,
       })
       .from(tasksTable)
       .where(eq(tasksTable.id, TaskId))
@@ -30,7 +29,7 @@ export async function insertPublicComment({
       throw new Error("Submission not found.");
     }
 
-   if(role === "co-monitor"){ 
+   if(role === Role.CO_MONITOR){ 
 
     const [insertedComment] = await db
       .insert(commentsTable)
@@ -46,9 +45,11 @@ export async function insertPublicComment({
       .returning();
 
     return insertedComment;}
-    else if(role === "monitor"){
+    else if(role === Role.MONITOR){
 
-        const [insertedComment] = await db
+      return insertedComment;
+    } else if (role === "monitor") {
+      const [insertedComment] = await db
         .insert(commentsTable)
         .values({
           content: text,
@@ -56,30 +57,25 @@ export async function insertPublicComment({
           courseId: Task.courseId,
           taskId: TaskId,
           isPublic: true,
-        
-         
         })
         .returning();
-  
-      return insertedComment;}
-      else{
-        const [insertedComment] = await db
-      .insert(commentsTable)
-      .values({
-        content: text,
-        studentId: createById,
-        courseId: Task.courseId,
-        taskId: TaskId,
-        isPublic: true,
-       
-       
-      })
-      .returning();
 
-    return insertedComment;
-      }
+      return insertedComment;
+    } else {
+      const [insertedComment] = await db
+        .insert(commentsTable)
+        .values({
+          content: text,
+          studentId: createById,
+          courseId: Task.courseId,
+          taskId: TaskId,
+          isPublic: true,
+        })
+        .returning();
+
+      return insertedComment;
     }
-   catch (error) {
-    console.error("Error inserting comment:", error);
-    throw new Error("Failed to insert comment.");
-  }}
+  } catch {
+    throw new Error("CODE:3015");
+  }
+}
