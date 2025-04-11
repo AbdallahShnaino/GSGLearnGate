@@ -11,6 +11,8 @@ interface IProps {
 const page = async (props: IProps) => {
   const data = await requireAuth();
   const studentId = data.userId;
+  console.log(data);
+
   const { soonCourseId } = await props.params;
   const courseData = await getCoursesByStudentId(Number(soonCourseId));
   const requestStatus = await getJoiningRequestStatus(

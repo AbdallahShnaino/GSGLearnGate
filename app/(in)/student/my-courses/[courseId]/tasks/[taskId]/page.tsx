@@ -18,10 +18,6 @@ const Task = async (props: IProps) => {
   const taskDetails = await getTaskByTaskId(Number(taskId));
   const comments = await getCommentsByTaskId(Number(courseId), Number(taskId));
   const studentName = await getStudentNameById(Number(studentId));
-  // const submissionId = await getSubmissionIdByTaskId(
-  //   Number(courseId),
-  //   Number(taskId)
-  // );
 
   return (
     <div className="min-h-screen bg-[#FFF5E8] p-6 w-full">
@@ -40,8 +36,13 @@ const Task = async (props: IProps) => {
             Created By: {taskDetails![0].creator}
           </p>
           <p className="text-sm text-neutral-700">
-            Created At: {taskDetails![0].createdAt.slice(0, 16)} (last update:{" "}
-            {taskDetails![0].updatedAt.slice(0, 16)})
+            Created At: {taskDetails![0].createdAt.slice(0, 16)}
+            {taskDetails![0].createdAt.slice(0, 16) !==
+              taskDetails![0].updatedAt.slice(0, 16) && (
+              <span className="text-sm text-neutral-700">
+                last update: {taskDetails![0].updatedAt.slice(0, 16)}
+              </span>
+            )}
           </p>
           <p className="text-sm text-neutral-700">
             Deadline: {taskDetails![0].deadline.toLocaleDateString("en-GB")}{" "}
@@ -86,7 +87,6 @@ const Task = async (props: IProps) => {
             courseId={courseId}
             taskId={taskId}
             studentName={studentName}
-            // submissionId={submissionId![0].submissionId}
           />
         </div>
 
@@ -104,7 +104,6 @@ const Task = async (props: IProps) => {
             courseId={courseId}
             taskId={taskId}
             studentName={studentName}
-            // submissionId={submissionId![0].submissionId}
           />
         </div>
       </div>

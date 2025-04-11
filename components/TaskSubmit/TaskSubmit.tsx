@@ -1,6 +1,5 @@
 "use client";
 
-import { setSubmissionId } from "@/app/lib/submissionStore";
 import { getAttachmentPathsByTaskId } from "@/src/db/queries/select";
 import { StudentSubmission } from "@/types";
 import { useEffect, useState } from "react";
@@ -86,8 +85,6 @@ const TaskSubmit = (props: IProps) => {
       const insertedData = await response.json();
       const newPath = insertedData.insertedAttachment.path;
       const feedback = insertedData.insertedSubmission.feedback;
-      const submissionId = insertedData.insertedSubmission.id;
-      setSubmissionId(submissionId);
       setAttachment((prev) => [...(prev || []), { path: newPath, feedback }]);
       toast.success("Attachment Added Successfully", { autoClose: 3000 });
     } catch {
@@ -117,7 +114,7 @@ const TaskSubmit = (props: IProps) => {
             Loading...
           </h2>
         </section>
-      ) : new Date(props.deadline) < new Date() && !attachment![0].path ? (
+      ) : new Date(props.deadline) < new Date() && !attachment![0]?.path ? (
         <section className="bg-white p-6 rounded-xl shadow-md">
           <h2 className="text-xl font-semibold text-[#FFA41F] mb-4">
             Task Time Expired
@@ -138,7 +135,7 @@ const TaskSubmit = (props: IProps) => {
               Download Submitted File
             </a>
           </h2>
-          {attachment![0].feedback && (
+          {attachment![0]?.feedback && (
             <h2 className="text-xl font-semibold text-[#FFA41F] mb-4">
               Co-Monitor Feedback:{" "}
               <span className="text-[#E99375]">{attachment![0].feedback}</span>
