@@ -72,7 +72,7 @@ export default function TaskListClient({
   if (loading) {
     return <Loader message="Loading data..." />;
   }
-  return (
+  return tasks.length > 0 ? (
     <div className="bg-white border border-[#FFA41F]/30 rounded-lg overflow-hidden mb-6 shadow-sm">
       <div className="grid grid-cols-12 bg-[#FFA41F]/10 p-4 border-b border-[#FFA41F]/20 font-medium text-[#FFA41F]">
         <div className="col-span-6">Task</div>
@@ -169,5 +169,7 @@ export default function TaskListClient({
         />
       </div>
     </div>
+  ) : (
+    <h1 className="text-center">there is no tasks to view </h1>
   );
 }
