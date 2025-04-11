@@ -5,6 +5,7 @@ import { comparePassword } from "@/utils/crypt";
 export async function authenticateUser(email: string, password: string) {
   try {
     const user = await getUserByEmail(email);
+
     if (user === null) {
       return {
         success: false,
@@ -29,8 +30,8 @@ export async function authenticateUser(email: string, password: string) {
         success: true,
         message: "Login successful",
         error: undefined,
-        userId: user.id,
-        role: user.role as Role,
+        userId: user.roleId,
+        role: user.role as Role
       };
     }
   } catch {

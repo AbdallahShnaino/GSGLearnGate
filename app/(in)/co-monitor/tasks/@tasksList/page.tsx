@@ -28,7 +28,6 @@ export default async function CoMonitorTasksPage({
       initialTotal={total}
       initialPage={page}
       initialStatus={taskStatus}
-      role="co-monitor"
     />
   );
 }

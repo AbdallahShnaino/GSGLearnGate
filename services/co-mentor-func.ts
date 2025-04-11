@@ -11,6 +11,7 @@ import {
   getTotalStudentsByCoMonitor,
   getTotalTasksByCoMonitor,
 } from "@/src/db/queries/select";
+
 import { Status, User } from "@/types";
 import { db } from "@/src/db";
 import { submissionsTable, tasksTable } from "@/src/db/schema";
@@ -31,7 +32,7 @@ export async function fetchSubmissions(
       .all();
 
     if (!taskData || taskData.length === 0) {
-      throw new Error("Failed to fetch courseId for the given taskId.");
+      return [];
     }
 
     const courseId = taskData[0].courseId;

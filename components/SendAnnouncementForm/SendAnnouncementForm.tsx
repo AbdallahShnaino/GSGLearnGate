@@ -1,4 +1,5 @@
 "use client";
+import { useAuth } from "@/context/user";
 import {
   submitAnnouncement,
   AnnouncementState,
@@ -18,6 +19,7 @@ interface IProps {
 }
 
 export default function SendAnnouncementForm({ courses }: IProps) {
+  const {userId} = useAuth();
   const initialState: AnnouncementState = {
     success: false,
     error: "",
@@ -118,6 +120,15 @@ export default function SendAnnouncementForm({ courses }: IProps) {
                 {isPending ? "Submitting" : "Submit"}
               </button>
             </div>
+            <input
+                id="adminId"
+                name="adminId"
+                defaultValue={userId!}
+                type="text"
+                placeholder="e.g., Online/Offline course details"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                hidden
+            />
           </form>
         </div>
       </div>
