@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import CreateTaskButton from "@/components/CreateTaskButtom/CreateTaskButtom";
-import SelectTaskStatus from "@/components/Dropdowns/SelectTaskStatus";
 
 export default function ConditionalLayout({
   children,
