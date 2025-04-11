@@ -4,7 +4,7 @@ import React from "react";
 
 interface IProps {
   course: StudentCourseBigCard;
-  studentId: string;
+  studentId: number;
 }
 const FullCourseCard = (props: IProps) => {
   const today = new Date();

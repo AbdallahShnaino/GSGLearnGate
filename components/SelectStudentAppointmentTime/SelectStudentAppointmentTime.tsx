@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 
 interface IProps {
   coMonitorId: number;
-  studentId: string;
+  studentId: number;
 }
 const SelectStudentAppointmentTime = (props: IProps) => {
   const [selectedDate, setSelectedDate] = useState("");
@@ -44,7 +44,6 @@ const SelectStudentAppointmentTime = (props: IProps) => {
       if (!response.ok) {
         throw new Error("Failed to book appointment");
       }
-      const result = await response.json();
       toast.success("Appointment booked successfully!", { autoClose: 3000 });
     } catch (err) {
       console.error("Booking failed:", err);

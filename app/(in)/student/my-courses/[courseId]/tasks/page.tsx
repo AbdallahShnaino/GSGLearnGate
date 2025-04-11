@@ -1,5 +1,5 @@
-import { getStudentIdFromCookie } from "@/app/lib/auth/getStudentIdFromCookie";
 import TaskCard from "@/components/TaskCard/TaskCard";
+import { requireAuth } from "@/context/auth";
 import { getTasksByCourseId } from "@/src/db/queries/select";
 
 interface IProps {
@@ -7,7 +7,8 @@ interface IProps {
 }
 const Tasks = async (props: IProps) => {
   const { courseId } = await props.params;
-  const studentId = await getStudentIdFromCookie();
+  const data = await requireAuth();
+  const studentId = data.userId;
   const courseTasks = await getTasksByCourseId(Number(courseId));
 
   return (
@@ -23,7 +24,7 @@ const Tasks = async (props: IProps) => {
               key={index}
               task={task}
               courseId={courseId}
-              studentId={studentId!}
+              studentId={studentId}
             />
           );
         })}

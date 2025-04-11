@@ -1,9 +1,10 @@
-import { getStudentIdFromCookie } from "@/app/lib/auth/getStudentIdFromCookie";
 import FullCourseCard from "@/components/FullCourseCard/FullCourseCard";
+import { requireAuth } from "@/context/auth";
 import { getCoursesDataByStudent } from "@/src/db/queries/select";
 
 const MyCourses = async () => {
-  const studentId = await getStudentIdFromCookie();
+  const data = await requireAuth();
+  const studentId = data.userId;
   const courses = await getCoursesDataByStudent(Number(studentId));
 
   return (
@@ -15,7 +16,7 @@ const MyCourses = async () => {
             <FullCourseCard
               key={course.id}
               course={course}
-              studentId={studentId!}
+              studentId={studentId}
             />
           ))
         ) : (

@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 
 interface IProps {
   comments: Comments[] | null;
-  studentId: string;
+  studentId: number;
   courseId: string;
   taskId: string;
   studentName: StudentName[];

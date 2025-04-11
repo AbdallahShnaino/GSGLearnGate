@@ -1,7 +1,7 @@
-import { getStudentIdFromCookie } from "@/app/lib/auth/getStudentIdFromCookie";
 import StudentPublicComments from "@/components/StudentComments/StudentPublicComments/StudentPublicComments";
 import StudentPrivateComments from "@/components/StudentComments/SudentPrivateComments/StudentPrivateComments";
 import TaskSubmit from "@/components/TaskSubmit/TaskSubmit";
+import { requireAuth } from "@/context/auth";
 import {
   getCommentsByTaskId,
   getStudentNameById,
@@ -12,7 +12,8 @@ interface IProps {
   params: Promise<{ courseId: string; taskId: string }>;
 }
 const Task = async (props: IProps) => {
-  const studentId = await getStudentIdFromCookie();
+  const data = await requireAuth();
+  const studentId = data.userId;
   const { courseId, taskId } = await props.params;
   const taskDetails = await getTaskByTaskId(Number(taskId));
   const comments = await getCommentsByTaskId(Number(courseId), Number(taskId));
@@ -81,7 +82,7 @@ const Task = async (props: IProps) => {
 
           <StudentPublicComments
             comments={comments}
-            studentId={studentId!}
+            studentId={studentId}
             courseId={courseId}
             taskId={taskId}
             studentName={studentName}
@@ -94,12 +95,12 @@ const Task = async (props: IProps) => {
             deadline={taskDetails![0].deadline}
             taskId={taskId}
             courseId={courseId}
-            studentId={studentId!}
+            studentId={studentId}
           />
 
           <StudentPrivateComments
             comments={comments}
-            studentId={studentId!}
+            studentId={studentId}
             courseId={courseId}
             taskId={taskId}
             studentName={studentName}

@@ -3,7 +3,7 @@ import Link from "next/link";
 
 interface IProps {
   course: StudentCourseSmallCard;
-  studentId: string;
+  studentId: number;
 }
 
 const CourseCard = async (props: IProps) => {

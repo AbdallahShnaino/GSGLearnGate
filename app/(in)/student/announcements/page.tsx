@@ -1,12 +1,13 @@
-import { getStudentIdFromCookie } from "@/app/lib/auth/getStudentIdFromCookie";
 import StudentCoursesAnnouncements from "@/components/StudentCoursesAnnouncements/StudentCoursesAnnouncements";
+import { requireAuth } from "@/context/auth";
 import {
   getCoursesByStudent,
   getStudentAnnouncementsById,
 } from "@/src/db/queries/select";
 
 const Announcements = async () => {
-  const studentId = await getStudentIdFromCookie();
+  const data = await requireAuth();
+  const studentId = data.userId;
   const announcements = await getStudentAnnouncementsById(Number(studentId));
   const courses = await getCoursesByStudent(Number(studentId));
 

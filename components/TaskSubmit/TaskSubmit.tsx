@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 interface IProps {
   taskId: string;
   courseId: string;
-  studentId: string;
+  studentId: number;
   deadline: Date;
 }
 const TaskSubmit = (props: IProps) => {
