@@ -39,7 +39,8 @@ export async function authenticateUser(email: string, password: string) {
         message: "Invalid email or password",
         error: "User not found",
         userId: undefined,
-        role: undefined,
+        id: undefined,
+        role: undefined
       };
     }
     const isPasswordValid = await comparePassword(password, user.password);
@@ -50,7 +51,8 @@ export async function authenticateUser(email: string, password: string) {
         message: "Invalid email or password",
         error: "Incorrect password",
         userId: undefined,
-        role: undefined,
+        id: undefined,
+        role: undefined
       };
     } else {
       return {
@@ -58,6 +60,7 @@ export async function authenticateUser(email: string, password: string) {
         message: "Login successful",
         error: undefined,
         userId: user.roleId,
+        id: user.id,
         role: user.role as Role
       };
     }
@@ -67,7 +70,8 @@ export async function authenticateUser(email: string, password: string) {
       message: "An error occurred during authentication",
       error: "Internal server error",
       userId: undefined,
-      role: undefined,
+      id: undefined,
+      role: undefined
     };
   }
 }

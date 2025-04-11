@@ -1,7 +1,5 @@
 import { sendAnnouncement } from "@/services/announcement";
 
-const postedBy = 1;
-
 export type AnnouncementState =
   | { success: false; error: string; message: string; announcementId: undefined }
   | { success: true; message: string; announcementId: number; error?: undefined };
@@ -14,6 +12,8 @@ export async function submitAnnouncement(
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
     const courseId = formData.get("courseId");
+    const postedBy = formData.get("postedBy");
+
 
     if (!title || !description || !courseId) {
       return {
@@ -35,7 +35,7 @@ export async function submitAnnouncement(
     }
 
     const newAnnouncement = await sendAnnouncement(
-      postedBy,
+      Number(postedBy),
       courseIdNumber,
       title,
       description

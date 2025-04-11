@@ -5,29 +5,33 @@ import jwt from "jsonwebtoken";
 interface DecodedToken {
   email?: string;
   role?: string;
+  id?: number;
   userId?: number;
+}
+
+interface User {
+  email: string;
+  role: string;
+  userId: number | null;
+  id: number | null;
 }
 
 interface AuthContextType {
   token: string | null;
-  user: {
-    email: string;
-    role: string;
-    userId: number;
-  };
-  userId: number | null;
+  user: User;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
-  const [userId, setUserId] = useState<number | null>(null);
-  const [user, setUser] = useState({
+  const [user, setUser] = useState<User>({
     email: "",
     role: "",
-    userId: -1,
+    userId: null,
+    id: null,
   });
+
   useEffect(() => {
     function getCookie(name: string) {
       const value = `; ${document.cookie}`;
@@ -39,17 +43,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     setToken(getCookie("token") || null);
   }, []);
+
   useEffect(() => {
     if (token) {
       try {
         const decodedToken = jwt.decode(token) as DecodedToken | null;
         if (decodedToken) {
-          setUser({
+          const newUser = {
             email: decodedToken.email || "",
             role: decodedToken.role || "",
-            userId: Number(decodedToken.userId) || -1,
-          });
-          setUserId(decodedToken.userId || -1);
+            userId: decodedToken.userId || null,
+            id: decodedToken.id || null,
+
+          };
+          setUser(newUser);
         }
       } catch (error) {
         throw new Error("CODE:3011");
@@ -58,7 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [token]);
 
   return (
-    <AuthContext.Provider value={{ token, user, userId }}>
+    <AuthContext.Provider value={{ token, user }}>
       {children}
     </AuthContext.Provider>
   );
@@ -70,6 +77,7 @@ export function useAuth() {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
+
 }
 
 interface DecodedToken {

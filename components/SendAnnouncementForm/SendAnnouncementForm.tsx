@@ -19,7 +19,7 @@ interface IProps {
 }
 
 export default function SendAnnouncementForm({ courses }: IProps) {
-  const {userId} = useAuth();
+  const {user} = useAuth();
   const initialState: AnnouncementState = {
     success: false,
     error: "",
@@ -121,9 +121,9 @@ export default function SendAnnouncementForm({ courses }: IProps) {
               </button>
             </div>
             <input
-                id="adminId"
-                name="adminId"
-                defaultValue={userId!}
+                id="postedBy"
+                name="postedBy"
+                defaultValue={user.id!}
                 type="text"
                 placeholder="e.g., Online/Offline course details"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
