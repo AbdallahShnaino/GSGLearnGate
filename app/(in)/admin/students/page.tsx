@@ -5,7 +5,7 @@ import React from 'react'
 
 const ViewStudentsPage = () => {
   return (
-    <div className="flex flex-col">
+    <div className="w-11/12 m-auto flex flex-col">
     <div className="flex items-center justify-between p-2">
       <h1 className="text-xl font-semibold">Students</h1>
       <div className="flex items-center gap-2">

@@ -1,5 +1,5 @@
 import SubmissonCom from "@/components/SubmissionCom/SubmissonCom";
-import { STATIC_COMONITOR_ID } from "@/context/keys";
+import { requireAuth } from "@/context/auth";
 
 import React from "react";
 interface Props {
@@ -7,9 +7,10 @@ interface Props {
 }
 export default async function page({ params }: Props) {
   const { subId } = await params;
+  const { userId } = await requireAuth();
   return (
     <div>
-      <SubmissonCom id={subId} CoMentorId={STATIC_COMONITOR_ID} />
+      <SubmissonCom id={subId} CoMentorId={userId} />
     </div>
   );
 }

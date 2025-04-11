@@ -1,6 +1,5 @@
 import { StudentCourseSmallCard } from "@/types";
 import Link from "next/link";
-import React from "react";
 
 interface IProps {
   course: StudentCourseSmallCard;
@@ -35,7 +34,7 @@ const CourseCard = async (props: IProps) => {
           <span className="font-medium">{props.course.monitorName}</span>
         </p>
         <Link
-          href={`/student/${props.studentId}/my-courses/${props.course.id}`}
+          href={`/student/my-courses/${props.course.id}`}
           className="mt-3 px-4 py-2 bg-[#FFA41F] text-white rounded-lg hover:bg-[#FF8C00] transition cursor-pointer"
         >
           More Details

@@ -21,12 +21,14 @@ const NavLinks: React.FC<ShowNavProps> = ({
       onClick={() => setShowNav(false)}
     >
       <ul className="flex items-center max-lg:z-50 max-lg:w-[70%] max-lg:h-dvh max-lg:flex-col max-lg:items-start max-lg:bg-white max-lg:relative ">
-        <li className="lg:text-white font-bold max-lg:absolute lg:hidden right-2.5 top-2.5">
+        <li className="lg:text-white font-bold max-lg:absolute lg:hidden right-2.5 top-2.5 cursor-pointer">
           <X size={25} onClick={() => setShowNav(false)} />
         </li>
         <li className="lg:text-white font-bold max-lg:mt-10 max-lg:w-full">
           <Link
-            className={`${position === "absolute" ?"lg:text-white" :"lg:text-black"} max-lg:text-lg py-2 px-4 hover:text-[var(--primary-color)]  max-lg:py-4 max-lg:w-full max-lg:block`}
+            className={`${
+              position === "absolute" ? "lg:text-white" : "lg:text-black"
+            } max-lg:text-lg py-2 px-4 hover:text-[#ffa41f]  max-lg:py-4 max-lg:w-full max-lg:block`}
             href={"/"}
           >
             Home
@@ -34,7 +36,9 @@ const NavLinks: React.FC<ShowNavProps> = ({
         </li>
         <li className="lg:text-white font-bold max-lg:w-full">
           <Link
-            className={`${position === "absolute" ?"lg:text-white" :"lg:text-black"} max-lg:text-lg py-2 px-4 hover:text-[var(--primary-color)]  max-lg:py-4 max-lg:w-full max-lg:block`}
+            className={`${
+              position === "absolute" ? "lg:text-white" : "lg:text-black"
+            } max-lg:text-lg py-2 px-4 hover:text-[#ffa41f]  max-lg:py-4 max-lg:w-full max-lg:block`}
             href={"/about-us"}
           >
             About Us
@@ -42,18 +46,12 @@ const NavLinks: React.FC<ShowNavProps> = ({
         </li>
         <li className="lg:text-white font-bold max-lg:w-full">
           <Link
-            className={`${position === "absolute" ?"lg:text-white" :"lg:text-black"} max-lg:text-lg py-2 px-4 hover:text-[var(--primary-color)]  max-lg:py-4 max-lg:w-full max-lg:block`}
+            className={`${
+              position === "absolute" ? "lg:text-white" : "lg:text-black"
+            } max-lg:text-lg py-2 px-4 hover:text-[#ffa41f]  max-lg:py-4 max-lg:w-full max-lg:block`}
             href={"/contact-us"}
           >
             Contact Us
-          </Link>
-        </li>
-        <li className="lg:text-white font-bold max-lg:w-full">
-          <Link
-            className={`${position === "absolute" ?"lg:text-white" :"lg:text-black"} max-lg:text-lg py-2 px-4 hover:text-[var(--primary-color)]  max-lg:py-4 max-lg:w-full max-lg:block`}
-            href={"/fq"}
-          >
-            FQ
           </Link>
         </li>
       </ul>

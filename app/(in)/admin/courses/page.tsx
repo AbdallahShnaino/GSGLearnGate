@@ -1,16 +1,16 @@
-import CoursesTable from '@/components/CoursesTable/CoursesTable';
-import { UserCircle } from '@phosphor-icons/react/dist/ssr';
-import Link from 'next/link';
-import React from 'react';
+import CoursesTable from "@/components/CoursesTable/CoursesTable";
+import { UserCircle } from "@phosphor-icons/react/dist/ssr";
+import Link from "next/link";
+import React from "react";
 
 const CoursesPage = () => {
   return (
-    <div className="flex flex-col">
-      <div className="flex flex-col items-center text-center p-4 sm:flex-row sm:justify-between sm:text-left">
+    <div className="w-11/12 m-auto flex flex-col">
+      <div className="flex items-center justify-between p-2">
         <h1 className="text-xl font-semibold">Courses</h1>
-        <div className="flex flex-col items-center gap-2 sm:flex-row">
-          <Link 
-            href="/admin/add-course" 
+        <div className="flex items-center gap-2">
+          <Link
+            href="/admin/add-course"
             className="bg-[#FFA41F] text-white px-4 py-2 rounded-md shadow-md hover:bg-[#ff9100] transition"
           >
             + Add Course

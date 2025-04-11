@@ -1,5 +1,5 @@
 import SelectCourse from "@/components/Dropdowns/SelectCourse";
-import { STATIC_COMONITOR_ID } from "@/context/keys";
+import { requireAuth } from "@/context/auth";
 import { getCourseLectures } from "@/services/attendance";
 import { getCoMonitorCoursesNames } from "@/services/courses";
 import { CourseScheduleList } from "@/types/attendanceOperations";
@@ -9,7 +9,8 @@ interface SchedulePageProps {
   searchParams: Promise<{ [courseId: string]: string }>;
 }
 const SchedulePage = async ({ searchParams }: SchedulePageProps) => {
-  const coursesList = await getCoMonitorCoursesNames(STATIC_COMONITOR_ID);
+  const { userId } = await requireAuth();
+  const coursesList = await getCoMonitorCoursesNames(userId);
   const params = await searchParams;
   const selectedCourseId = params.courseId
     ? Number(params.courseId)

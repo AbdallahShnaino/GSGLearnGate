@@ -6,7 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 const ContactPage = () => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div>
       {/* Toast Notifications Container */}
       <ToastContainer
         position="top-left"

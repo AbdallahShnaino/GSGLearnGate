@@ -3,15 +3,16 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { getCoMonitorTasks } from "@/services/task";
 import { TaskStatus } from "@/types";
 import { getStudentsCountPerCourse } from "@/services/courses";
-import { STATIC_COMONITOR_ID } from "@/context/keys";
+
 import { MonitorsTask } from "@/types/tasks";
+import { useAuth } from "@/context/user";
 
 const ITEMS_PER_PAGE = 10;
 
 export function useCoMonitorTasks() {
   const router = useRouter();
   const searchParams = useSearchParams();
-
+ const { user } = useAuth();
   const taskStatus =
     (searchParams.get("taskStatus") as TaskStatus) || TaskStatus.ALL;
   const page = Number(searchParams.get("page")) || 1;
@@ -29,7 +30,7 @@ export function useCoMonitorTasks() {
       setLoading(true);
       try {
         const { tasks, total } = await getCoMonitorTasks(
-          STATIC_COMONITOR_ID,
+          user.userId ?? -1,
           taskStatus,
           page,
           ITEMS_PER_PAGE
@@ -52,14 +53,18 @@ export function useCoMonitorTasks() {
         setTotal(total);
         setStudentCounts(tempCounts);
         setError(null);
-      } catch (err) {
+      } catch  {
         setError("Error loading tasks");
       } finally {
         setLoading(false);
       }
     }
 
-    fetchTasks();
+    try {
+      fetchTasks();
+    } catch {
+      throw new Error("CODE:1000");
+    }
   }, [taskStatus, page]);
 
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);

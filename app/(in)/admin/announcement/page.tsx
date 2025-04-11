@@ -7,7 +7,7 @@ import { fetchAllCourses } from "@/services/courses";
 const SendAnnouncementPage = async() => {
   const courses: Course[]= await fetchAllCourses();
   return (
-    <div className="flex flex-col">
+    <div className="w-11/12 m-auto flex flex-col">
       <div className="flex items-center justify-between p-2">
         <h1 className="text-xl font-semibold">Send Announcement</h1>
         <div className="flex items-center gap-2">
@@ -21,4 +21,3 @@ const SendAnnouncementPage = async() => {
 };
 
 export default SendAnnouncementPage;
-

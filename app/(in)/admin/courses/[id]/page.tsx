@@ -7,8 +7,8 @@ const Page = async() => {
     const monitors = await getMonitorsNames();
     const coMonitors = await getCoMonitorsNames();
   return (
-    <div className="flex flex-col">
-      <div className="flex flex-col items-center text-center p-4 sm:flex-row sm:justify-between sm:text-left">
+    <div className="w-11/12 m-auto flex flex-col">
+      <div className="flex items-center justify-between p-2">
         <h1 className="text-xl font-semibold">Update Course</h1>
         <div className="flex flex-col items-center gap-2 sm:flex-row">
           <div className="flex items-center gap-2">
