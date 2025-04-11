@@ -33,19 +33,19 @@ export default function CoursesTable() {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-4 space-y-4">
+    <div className="w-full mx-auto mt-4 mb-10 space-y-4">
       <div className="relative">
         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
           <MagnifyingGlass size={20} className="text-[#FFA41F]" />
         </div>
         <input
           type="text"
-          className="block w-64 p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+          className="block w-64 p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:outline-[#FFA41f]"
           placeholder="Search for course title..."
           onChange={handleSearchChange}
         />
       </div>
-      <div className="overflow-x-auto border border-gray-200 shadow-sm rounded-xl">
+      <div className="w-full overflow-x-auto border border-gray-200 shadow-sm rounded-xl">
         <table className="w-full border-collapse bg-white text-sm">
           <thead className="text-left text-xs text-gray-700 uppercase bg-gray-100">
             <tr className="bg-gray-50">
@@ -79,6 +79,7 @@ export default function CoursesTable() {
                     color="#ee1717"
                     weight="fill"
                     onClick={() => handleDeleteClick(course.id)}
+                    className="cursor-pointer"
                   />
                   <Link href={`/admin/courses/${course.id}`}>
                     <PencilSimple size={18} color="#1cc925" weight="fill" />
