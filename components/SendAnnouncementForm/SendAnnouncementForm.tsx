@@ -4,7 +4,6 @@ import {
   AnnouncementState,
 } from "@/controllers/actions/sendAnnouncementAction";
 import { Course } from "@/types";
-import { useRouter } from "next/navigation";
 import { useActionState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -25,7 +24,6 @@ export default function SendAnnouncementForm({ courses }: IProps) {
     message: "",
     announcementId: undefined,
   };
-  const router = useRouter();
   const [formState, formAction, isPending] = useActionState(
     submitAnnouncement,
     initialState

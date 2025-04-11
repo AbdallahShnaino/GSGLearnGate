@@ -19,7 +19,7 @@ export async function GET(request: Request) {
       limit
     );
     return NextResponse.json(data);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to fetch tasks" },
       { status: 500 }

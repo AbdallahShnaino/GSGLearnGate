@@ -11,8 +11,6 @@ export async function submitCourse(
   state: CourseState,
   formData: FormData
 ): Promise<CourseState> {
-  console.log("formData:", Object.fromEntries(formData));
-
   try {
     const courseId = formData.get("courseId") as string;
     const title = formData.get("title") as string;
@@ -73,7 +71,6 @@ export async function submitCourse(
       message: "Course updated successfully.",
     };
   } catch (error) {
-    console.error("Error in submitCourse:", error);
     return {
       success: false,
       error: "Something went wrong",

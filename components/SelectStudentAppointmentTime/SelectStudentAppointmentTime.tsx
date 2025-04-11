@@ -14,27 +14,25 @@ const SelectStudentAppointmentTime = (props: IProps) => {
   const [availability, setAvailability] = useState<CoMonitorAppointment[]>();
   const [time, setTime] = useState("");
 
-  const fetchData = async () => {
-    try {
-      const appointments = await getCoMonitorAppointmentsList(
-        props.coMonitorId
-      );
-      setAvailability(appointments);
-    } catch (error) {
-      console.error("Error loading data:", error);
-    }
-  };
-
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const appointments = await getCoMonitorAppointmentsList(
+          props.coMonitorId
+        );
+        setAvailability(appointments);
+      } catch {
+        throw new Error("CODE:3001");
+      }
+    };
     fetchData();
-  }, []);
+  }, [props.coMonitorId]);
 
   const handleBooking = async () => {
     try {
       await bookAppointment(selectedRecord!.id, Number(props.studentId));
       alert(`Appointment booked on ${selectedDate} at ${time}`);
-    } catch (error) {
-      console.error("Booking failed:", error);
+    } catch {
       alert("Something went wrong!! Please try again...");
     }
     setSelectedDate("");

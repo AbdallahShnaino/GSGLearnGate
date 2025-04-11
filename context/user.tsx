@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUserId(decodedToken.userId || -1);
         }
       } catch (error) {
-        console.error("Error decoding token:", error);
+        throw new Error("CODE:3011");
       }
     }
   }, [token]);
@@ -70,4 +70,28 @@ export function useAuth() {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
+}
+
+interface DecodedToken {
+  email?: string;
+  role?: string;
+  userId?: number;
+}
+
+export function getUserFromToken(token: string | null) {
+  if (!token) return null;
+
+  try {
+    const decodedToken = jwt.decode(token) as DecodedToken | null;
+    if (decodedToken) {
+      return {
+        email: decodedToken.email || "",
+        role: decodedToken.role || "",
+        userId: Number(decodedToken.userId) || -1,
+      };
+    }
+  } catch {
+    throw new Error("CODE:3011");
+  }
+  return null;
 }

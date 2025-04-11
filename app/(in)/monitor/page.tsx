@@ -1,17 +1,15 @@
 import CustomBarChart from "@/components/BarChart/CustomBarChart";
 import StatisticCard from "@/components/StatisticCard/StatisticCard";
-import { useAuth } from "@/context/user";
 import { getMonitorTeachingStats } from "@/services/courses";
 import { getMonitorCoursesNumber, getStudentsNumber } from "@/services/users";
-
 import { Notebook, Student, UserCircle } from "@phosphor-icons/react/dist/ssr";
 import React from "react";
-const { userId } = useAuth();
 const AdminDashboard = async () => {
+  const HELLO = 1;
   const [totalStudents, totalCourses, coursesWithStudent] = await Promise.all([
-    getStudentsNumber(userId ?? -1),
-    getMonitorCoursesNumber(userId ?? -1),
-    getMonitorTeachingStats(userId ?? -1),
+    getStudentsNumber(HELLO ?? -1),
+    getMonitorCoursesNumber(HELLO ?? -1),
+    getMonitorTeachingStats(HELLO ?? -1),
   ]);
 
   return (

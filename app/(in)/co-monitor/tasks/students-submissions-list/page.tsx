@@ -1,11 +1,11 @@
 import StudentSubmissionsTable from "@/components/StudentSubmissionsTable/StudentSubmissionsTable";
 
 interface IProps {
-  searchParams: { [taskId: string]: string };
+  searchParams: Promise<{ [taskId: string]: string }>;
 }
 
 const page = async ({ searchParams }: IProps) => {
-  const { taskId } = searchParams;
+  const { taskId } = await searchParams;
 
   return (
     <div className="w-full px-4">

@@ -8,7 +8,7 @@ import {
 import { SidebarLink } from "@/types/user";
 import { Metadata } from "next";
 
-export const links: SidebarLink[] = [
+const links: SidebarLink[] = [
   {
     href: "/monitor",
     label: "Dashboard",

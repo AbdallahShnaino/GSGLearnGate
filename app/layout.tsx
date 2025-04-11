@@ -40,19 +40,9 @@ export const metadata: Metadata = {
     ],
   },
 };
-
-export const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: "Gaza Sky Geeks",
-  description:
-    "Gaza Sky Geeks offers free online tech courses to empower individuals in Gaza to pursue careers in the tech industry.",
-  publisher: {
-    "@type": "Organization",
-    name: "Gaza Sky Geeks",
-    logo: "https://gsg-learn-gate.vercel.app/public/img/gsgLogo.png",
-  },
-  image: "https://gsg-learn-gate.vercel.app/public/img/gsgLogo.png",
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -63,9 +53,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${oxygen.className} antialiased`}>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

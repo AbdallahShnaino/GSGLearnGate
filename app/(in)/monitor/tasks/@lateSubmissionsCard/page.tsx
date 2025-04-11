@@ -1,11 +1,10 @@
-import { useAuth } from "@/context/user";
 import { getLateSubmissionsCount } from "@/services/submission";
 import { Warning } from "@phosphor-icons/react/dist/ssr";
 
 export default async function LateSubmissionsCard() {
-  const { userId } = useAuth();
+  const HELLO = 1;
 
-  const count = await getLateSubmissionsCount(userId ?? -1);
+  const count = await getLateSubmissionsCount(HELLO ?? -1);
   return (
     <div className="bg-white border border-[#FFA41F]/30 rounded-lg p-4 shadow-sm">
       <div className="flex items-center justify-between">

@@ -11,8 +11,6 @@ export async function submitCourse(
   state: CourseState,
   formData: FormData
 ): Promise<CourseState> {
-  console.log("formData:", Object.fromEntries(formData));
-
   try {
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
@@ -28,7 +26,14 @@ export async function submitCourse(
     const details = formData.get("details") as string;
     const entryRequirements = formData.get("entryRequirements") as string;
 
-    if (!title || !description || !applyStartDate || !applyEndDate || !courseStartDate || !courseEndDate) {
+    if (
+      !title ||
+      !description ||
+      !applyStartDate ||
+      !applyEndDate ||
+      !courseStartDate ||
+      !courseEndDate
+    ) {
       return {
         success: false,
         error: "Missing required fields",
@@ -41,9 +46,7 @@ export async function submitCourse(
     let publicFilePath: string = "";
 
     if (image) {
-
       publicFilePath = await writeFile(image);
-;
     }
 
     const newCourse = await addCourse({
@@ -68,8 +71,7 @@ export async function submitCourse(
       message: "Course creation successful.",
       courseId: newCourse.id,
     };
-  } catch (error) {
-    console.error("Error in submitCourse:", error);
+  } catch {
     return {
       success: false,
       error: "Something went wrong",

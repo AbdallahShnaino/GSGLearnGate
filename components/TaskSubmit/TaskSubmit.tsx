@@ -19,14 +19,6 @@ const TaskSubmit = (props: IProps) => {
   const [attachment, setAttachment] = useState<StudentSubmission | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const getAttachment = async () => {
-    const studentAttachment = await getAttachmentPathsByTaskId(
-      Number(props.taskId),
-      Number(props.courseId)
-    );
-    setAttachment(studentAttachment);
-  };
-
   const handleSubmissionType = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSubmissionType(e.target.value);
     setShowPopup(e.target.value);
@@ -35,11 +27,6 @@ const TaskSubmit = (props: IProps) => {
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // const file = inputRef.current?.files?.[0];
-    // if (!file) return;
-    // const formData = new FormData();
-    // formData.append("file", file);
-    // submitStudentTaskFile(formData);
     try {
       const insertedAttachment = await insertAttachment({
         taskId: Number(props.taskId),
@@ -59,15 +46,13 @@ const TaskSubmit = (props: IProps) => {
         attachmentId: insertedAttachment.id,
       });
       alert("Attachment Added Successfully");
-    } catch (error) {
-      console.error("Send Attachment failed:", error);
+    } catch {
       alert("Something went wrong!! Please try again...");
     }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      // setPath(URL.createObjectURL(e.target.files[0]));
       setPath(e.target.files[0].name);
       setDisplayPath(e.target.files[0].name);
     }
@@ -79,8 +64,15 @@ const TaskSubmit = (props: IProps) => {
   };
 
   useEffect(() => {
+    const getAttachment = async () => {
+      const studentAttachment = await getAttachmentPathsByTaskId(
+        Number(props.taskId)
+      );
+      setAttachment(studentAttachment);
+    };
+
     getAttachment();
-  }, []);
+  }, [props.taskId]);
   return (
     <>
       {new Date(props.deadline) < new Date() && !attachment?.path ? (
