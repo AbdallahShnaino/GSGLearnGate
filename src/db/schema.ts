@@ -112,12 +112,8 @@ export const announcementsTable = sqliteTable("announcements", {
 
 export const studentsCoursesTable = sqliteTable("students_courses", {
   id: int().primaryKey({ autoIncrement: true }),
-  courseId: int("course_id")
-    .notNull()
-    .references((): AnySQLiteColumn => coursesTable.id),
-  studentId: int("student_id")
-    .notNull()
-    .references((): AnySQLiteColumn => studentsTable.id),
+  courseId: int("course_id").notNull(),
+  studentId: int("student_id").notNull(),
   ...timestamps,
 });
 

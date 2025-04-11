@@ -43,6 +43,13 @@
       "when": 1744392747700,
       "tag": "0005_amazing_chamber",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1744395748333,
+      "tag": "0006_dusty_titania",
+      "breakpoints": true
     }
   ]
 }

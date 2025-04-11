@@ -40,7 +40,7 @@ export default function useStudentRequests() {
     setCourseId(Number(searchParams.get("courseId")) || undefined);
     try {
       fetchRequests();
-    } catch (error) {
+    } catch {
       throw new Error("CODE:10002");
     }
   }, [currentPage, searchParams, courseId]);
@@ -70,10 +70,15 @@ export default function useStudentRequests() {
     courseId: number,
     studentId: number
   ) => {
-    await addStudentToCourse(studentId, courseId);
-    await updateJoiningRequestStatus(id, Status.ACCEPTED);
-    await fetchRequests();
-    handleCloseApproveModal();
+    try {
+      await addStudentToCourse(studentId, courseId);
+      await updateJoiningRequestStatus(id, Status.ACCEPTED);
+      await fetchRequests();
+    } catch (error) {
+      console.error("Approval failed:", error);
+    } finally {
+      handleCloseApproveModal();
+    }
   };
 
   const handleReject = async (id: number) => {
