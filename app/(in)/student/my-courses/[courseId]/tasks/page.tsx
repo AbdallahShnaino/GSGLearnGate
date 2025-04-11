@@ -1,11 +1,13 @@
+import { getStudentIdFromCookie } from "@/app/lib/auth/getStudentIdFromCookie";
 import TaskCard from "@/components/TaskCard/TaskCard";
 import { getTasksByCourseId } from "@/src/db/queries/select";
 
 interface IProps {
-  params: Promise<{ studentId: string; courseId: string }>;
+  params: Promise<{ courseId: string }>;
 }
 const Tasks = async (props: IProps) => {
-  const { studentId, courseId } = await props.params;
+  const { courseId } = await props.params;
+  const studentId = await getStudentIdFromCookie();
   const courseTasks = await getTasksByCourseId(Number(courseId));
 
   return (
@@ -21,7 +23,7 @@ const Tasks = async (props: IProps) => {
               key={index}
               task={task}
               courseId={courseId}
-              studentId={studentId}
+              studentId={studentId!}
             />
           );
         })}

@@ -1,3 +1,4 @@
+import { getStudentIdFromCookie } from "@/app/lib/auth/getStudentIdFromCookie";
 import CourseTask from "@/components/CourseTask/CourseTask";
 import {
   getCoursesById,
@@ -8,10 +9,11 @@ import Link from "next/link";
 import React from "react";
 
 interface IProps {
-  params: Promise<{ studentId: string; courseId: string }>;
+  params: Promise<{ courseId: string }>;
 }
 const CourseDetails = async (props: IProps) => {
-  const { studentId, courseId } = await props.params;
+  const { courseId } = await props.params;
+  const studentId = await getStudentIdFromCookie();
   const courseData = await getCoursesById(Number(courseId));
   const courseTasks = await getTasksByCourseId(Number(courseId));
   const attendancesNumber = await getStudentAttendanceById(
@@ -80,7 +82,7 @@ const CourseDetails = async (props: IProps) => {
         </div>
         <div>
           <Link
-            href={`/student/${studentId}/my-courses/${courseId}/booking`}
+            href={`/student/my-courses/${courseId}/booking`}
             className="px-4 py-2 text-sm sm:text-base text-white bg-[#E99375] hover:bg-[#FF8700] rounded-lg font-semibold shadow-md transition-all duration-300 focus:ring-2 focus:ring-[#FFA41F] focus:ring-offset-2"
           >
             Book an interview
@@ -106,7 +108,7 @@ const CourseDetails = async (props: IProps) => {
                       task={task}
                       number={index + 1}
                       courseId={courseId}
-                      studentId={studentId}
+                      studentId={studentId!}
                     />
                   );
                 })
@@ -119,7 +121,7 @@ const CourseDetails = async (props: IProps) => {
             {courseTasks && (
               <div className="flex justify-center sm:justify-end  mt-4 mb-6">
                 <Link
-                  href={`/${studentId}/my-courses/${courseId}/tasks`}
+                  href={`/student/my-courses/${courseId}/tasks`}
                   className="px-4 py-2 text-sm sm:text-base text-white bg-[#FFA41F] hover:bg-[#FF8700] rounded-lg font-semibold shadow-md transition-all duration-300 focus:ring-2 focus:ring-[#FFA41F] focus:ring-offset-2"
                 >
                   Show Details
@@ -150,23 +152,25 @@ const CourseDetails = async (props: IProps) => {
             </div>
           </section>
 
-          <section id="attendance" className="mb-10">
-            <h2 className="text-2xl font-bold text-[#FFA41F]">Attendance</h2>
-            <div className="mt-4">
-              <div className="flex justify-between items-center">
-                <p className="text-gray-700">Attendance Rate</p>
-                <p className="text-gray-600">{Math.round(attendance)}%</p>
+          {completedHours !== 0 && (
+            <section id="attendance" className="mb-10">
+              <h2 className="text-2xl font-bold text-[#FFA41F]">Attendance</h2>
+              <div className="mt-4">
+                <div className="flex justify-between items-center">
+                  <p className="text-gray-700">Attendance Rate</p>
+                  <p className="text-gray-600">{Math.round(attendance)}%</p>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3 mt-2">
+                  <div
+                    className="h-full bg-[#E99375] rounded-full"
+                    style={{
+                      width: `${Math.round(attendance)}%`,
+                    }}
+                  ></div>
+                </div>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-3 mt-2">
-                <div
-                  className="h-full bg-[#E99375] rounded-full"
-                  style={{
-                    width: `${Math.round(attendance)}%`,
-                  }}
-                ></div>
-              </div>
-            </div>
-          </section>
+            </section>
+          )}
         </main>
       </div>
     </div>

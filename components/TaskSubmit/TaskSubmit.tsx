@@ -1,9 +1,8 @@
 "use client";
 
-import { insertAttachment, insertSubmission } from "@/src/db/queries/insert";
 import { getAttachmentPathsByTaskId } from "@/src/db/queries/select";
-import { AssignmentStatus, Attachments, StudentSubmission } from "@/types";
-import { useEffect, useRef, useState } from "react";
+import { StudentSubmission } from "@/types";
+import { useEffect, useState } from "react";
 
 interface IProps {
   taskId: string;
@@ -15,9 +14,24 @@ const TaskSubmit = (props: IProps) => {
   const [showPopup, setShowPopup] = useState<string | null>(null);
   const [submissionType, setSubmissionType] = useState("");
   const [path, setPath] = useState<string>("");
+  const [file, setFile] = useState<File | null>(null);
   const [displayPath, setDisplayPath] = useState<string>("");
-  const [attachment, setAttachment] = useState<StudentSubmission | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [attachment, setAttachment] = useState<StudentSubmission[] | null>(
+    null
+  );
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const getAttachment = async () => {
+      const studentAttachment = await getAttachmentPathsByTaskId(
+        Number(props.taskId),
+        Number(props.courseId)
+      );
+      setAttachment(studentAttachment);
+      setLoading(false);
+    };
+    getAttachment();
+  }, [props.courseId, props.taskId]);
 
   const handleSubmissionType = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSubmissionType(e.target.value);
@@ -28,23 +42,43 @@ const TaskSubmit = (props: IProps) => {
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const insertedAttachment = await insertAttachment({
-        taskId: Number(props.taskId),
-        creatorId: Number(props.studentId),
-        courseId: Number(props.courseId),
-        type: submissionType === "link" ? Attachments.LINK : Attachments.FILE,
-        path: path,
+      let finalPath = path;
+      if (submissionType === "file") {
+        if (!file) {
+          alert("Please choose a file to upload.");
+          return;
+        }
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const uploadRes = await fetch("/api/student/uploadAttachment", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!uploadRes.ok) throw new Error("File upload failed");
+
+        const uploadData = await uploadRes.json();
+        finalPath = uploadData.url;
+      }
+
+      const response = await fetch("/api/student/submitAttachment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          taskId: props.taskId,
+          studentId: props.studentId,
+          courseId: props.courseId,
+          submissionType,
+          path: finalPath,
+        }),
       });
-      await insertSubmission({
-        taskId: Number(props.taskId),
-        studentId: Number(props.studentId),
-        courseId: Number(props.courseId),
-        grade: null,
-        feedback: "",
-        gradedAt: new Date(),
-        status: AssignmentStatus.SUBMITTED,
-        attachmentId: insertedAttachment.id,
-      });
+
+      if (!response.ok) throw new Error("Failed");
+      const insertedData = await response.json();
+      const newPath = insertedData.insertedAttachment.path;
+      const feedback = insertedData.insertedSubmission.feedback;
+      setAttachment((prev) => [...(prev || []), { path: newPath, feedback }]);
       alert("Attachment Added Successfully");
     } catch {
       alert("Something went wrong!! Please try again...");
@@ -53,7 +87,7 @@ const TaskSubmit = (props: IProps) => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setPath(e.target.files[0].name);
+      setFile(e.target.files[0] || null);
       setDisplayPath(e.target.files[0].name);
     }
   };
@@ -63,34 +97,73 @@ const TaskSubmit = (props: IProps) => {
     setDisplayPath(e.target.value);
   };
 
-  useEffect(() => {
-    const getAttachment = async () => {
+const getAttachment = async () => {
       const studentAttachment = await getAttachmentPathsByTaskId(
-        Number(props.taskId)
+        Number(props.taskId),
+        Number(props.courseId)
       );
       setAttachment(studentAttachment);
+      setLoading(false);
     };
-
     getAttachment();
-  }, [props.taskId]);
+  }, [props.courseId, props.taskId]);
   return (
     <>
-      {new Date(props.deadline) < new Date() && !attachment?.path ? (
+      {loading ? (
+        <section className="bg-white p-6 rounded-xl shadow-md">
+          <h2 className="text-xl font-semibold text-[#FFA41F] mb-4">
+            Loading...
+          </h2>
+        </section>
+      ) : new Date(props.deadline) < new Date() && !attachment![0].path ? (
         <section className="bg-white p-6 rounded-xl shadow-md">
           <h2 className="text-xl font-semibold text-[#FFA41F] mb-4">
             Task Time Expired
           </h2>
         </section>
-      ) : attachment?.path ? (
+      ) : attachment &&
+        attachment.length >= 1 &&
+        attachment![0].path.startsWith("/uploads") ? (
         <section className="bg-white p-6 rounded-xl shadow-md">
           <h2 className="text-xl font-semibold text-[#FFA41F] mb-4">
             Your Submitted Attachment:{" "}
-            <span className="text-[#E99375]">{attachment.path}</span>
+            <a
+              href={attachment![0].path}
+              download
+              className="text-blue-600 underline hover:text-blue-800"
+              target="_blank"
+            >
+              Download Submitted File
+            </a>
           </h2>
+          {attachment![0].feedback && (
+            <h2 className="text-xl font-semibold text-[#FFA41F] mb-4">
+              Co-Monitor Feedback:{" "}
+              <span className="text-[#E99375]">{attachment![0].feedback}</span>
+            </h2>
+          )}
+        </section>
+      ) : attachment &&
+        attachment.length >= 1 &&
+        !attachment![0].path.startsWith("/uploads") ? (
+        <section className="bg-white p-6 rounded-xl shadow-md">
           <h2 className="text-xl font-semibold text-[#FFA41F] mb-4">
-            Co-Monitor Feedback:{" "}
-            <span className="text-[#E99375]">{attachment.feedback}</span>
+            Your Submitted Attachment:{" "}
+            <a
+              href={attachment![0].path}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 underline hover:text-blue-800"
+            >
+              Open Submitted Link
+            </a>
           </h2>
+          {attachment![0].feedback && (
+            <h2 className="text-xl font-semibold text-[#FFA41F] mb-4">
+              Co-Monitor Feedback:{" "}
+              <span className="text-[#E99375]">{attachment![0].feedback}</span>
+            </h2>
+          )}
         </section>
       ) : (
         <section className="bg-white p-6 rounded-xl shadow-md">
@@ -166,7 +239,6 @@ const TaskSubmit = (props: IProps) => {
                     type="file"
                     className="w-full p-3 border border-[#E99375] rounded-lg focus:ring-2 focus:ring-[#FFA41F] focus:outline-none"
                     onChange={handleFileChange}
-                    ref={inputRef}
                     name="file"
                   />
                   <div className="mt-4 flex justify-end gap-2">

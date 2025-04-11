@@ -1,4 +1,4 @@
-import { StudentCourseTasks } from "@/types";
+import { StudentCourseTasks, StudentTaskStatus } from "@/types";
 import Link from "next/link";
 import React from "react";
 
@@ -11,7 +11,7 @@ interface IProps {
 const CourseTask = (props: IProps) => {
   return (
     <Link
-      href={`/student/${props.studentId}/my-courses/${props.courseId}/tasks/${props.task.taskId}`}
+      href={`/student/my-courses/${props.courseId}/tasks/${props.task.taskId}`}
       className="p-4"
     >
       <div className="p-4 bg-white shadow rounded-lg">
@@ -24,7 +24,8 @@ const CourseTask = (props: IProps) => {
             hour: "2-digit",
             minute: "2-digit",
           })}{" "}
-          | Status: {props.task.status}
+          | Status:{" "}
+          {props.task.status ? props.task.status : StudentTaskStatus.PENDING}
         </p>
       </div>
     </Link>

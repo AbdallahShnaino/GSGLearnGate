@@ -1,4 +1,4 @@
-import { StudentCourseTasks } from "@/types";
+import { StudentCourseTasks, StudentTaskStatus } from "@/types";
 import Link from "next/link";
 
 interface IProps {
@@ -16,7 +16,7 @@ const TaskCard = (props: IProps) => {
 
   return (
     <Link
-      href={`/${props.studentId}/my-courses/${props.courseId}/tasks/${props.task.taskId}`}
+      href={`/student/my-courses/${props.courseId}/tasks/${props.task.taskId}`}
       className="block w-full"
     >
       <div className="w-full border rounded-2xl p-6 bg-white shadow-lg hover:shadow-xl transition-shadow duration-300">
@@ -36,10 +36,13 @@ const TaskCard = (props: IProps) => {
 
           <span
             className={`inline-block px-4 py-2 rounded-full text-sm font-medium ${
-              statusBg[props.task.status]
+              props.task.status
+                ? statusBg[props.task.status]
+                : statusBg[StudentTaskStatus.PENDING]
             }`}
           >
-            Status: {props.task.status}
+            Status:{" "}
+            {props.task.status ? props.task.status : StudentTaskStatus.PENDING}
           </span>
 
           <div className="flex flex-col sm:items-end text-sm">
@@ -59,7 +62,9 @@ const TaskCard = (props: IProps) => {
                   })
                 : ""}{" "}
             </p>
-            <p className="text-neutral-600">Graded By: Ali Ahmad</p>
+            <p className="text-neutral-600">
+              Graded By: {props.task.grade ? props.task.coMonitor : "_"}
+            </p>
           </div>
         </div>
       </div>
