@@ -1,5 +1,9 @@
 import { useSearch } from "@/hooks/useSearch";
-import { getAllCoMonitors, getAllMonitors, getAllStudents } from "@/services/users";
+import {
+  getAllCoMonitors,
+  getAllMonitors,
+  getAllStudents,
+} from "@/services/users";
 import { useState, useEffect } from "react";
 import { MonitorsJoinUsers } from "@/types";
 
@@ -31,7 +35,7 @@ export const useUsersTable = (role: string) => {
         setUsers(response.users);
       }
     } catch (error) {
-      console.error("Error fetching users:", error);
+      throw new Error("CODE:10005");
     } finally {
       setIsLoading(false);
     }
@@ -53,9 +57,6 @@ export const useUsersTable = (role: string) => {
   };
 
   const confirmDelete = () => {
-    if (selectedMonitor) {
-      console.log(`Deleting monitor with ID: ${selectedMonitor}`);
-    }
     setOpen(false);
   };
 
@@ -73,7 +74,9 @@ export const useUsersTable = (role: string) => {
 
   const filteredUsers: MonitorsJoinUsers[] = users
     ? users.filter((user) =>
-        `${user.firstName} ${user.lastName}`.toLowerCase().includes(value.toLowerCase())
+        `${user.firstName} ${user.lastName}`
+          .toLowerCase()
+          .includes(value.toLowerCase())
       )
     : [];
 

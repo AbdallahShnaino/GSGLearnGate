@@ -5,21 +5,19 @@ import React, { useState } from "react";
 import Submit from "./Submit";
 import SelectCourse from "@/components/Dropdowns/SelectCourse";
 import { AttachmentSelector } from "../AttachmentSelector/AttachmentSelector";
-import { useFormState } from "react-dom";
+import { useActionState } from "react";
 
 type AttachmentType = "none" | "link" | "file";
 
 interface IProps {
   coursesList: { courseId: number; courseName: string }[] | null;
 }
-
+const HELLO = 1;
 export default function CreateTaskForm({ coursesList }: IProps) {
   const [attachment, setAttachment] = useState<{
     type: "link" | "file" | null;
     value: string | File | null;
   }>({ type: null, value: null });
-
-  const STATIC_MONITOR_ID = 13;
 
   const initialState: TaskState = {
     success: false,
@@ -28,7 +26,7 @@ export default function CreateTaskForm({ coursesList }: IProps) {
     taskId: undefined,
   };
 
-  const [formState, formAction] = useFormState(submitTask, initialState);
+  const [formState, formAction] = useActionState(submitTask, initialState);
   const handleSubmit = (formData: FormData) => {
     if (attachment.type === "link" && attachment.value) {
       formData.set("url", attachment.value as string);
@@ -76,7 +74,7 @@ export default function CreateTaskForm({ coursesList }: IProps) {
           >
             Task Title
           </label>
-          <input type="hidden" name="monitorId" value={STATIC_MONITOR_ID} />
+          <input type="hidden" name="monitorId" value={HELLO ?? -1} />
           <input
             type="text"
             name="title"

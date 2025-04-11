@@ -3,11 +3,13 @@ import {
   TrashSimple,
   PencilSimple,
   MagnifyingGlass,
+  Plus,
 } from "@phosphor-icons/react/dist/ssr";
 import DeleteUserModal from "../DeleteUserModal/DeleteUserModal";
 import { useCoursesTable } from "@/hooks/useCourseTable";
 import Loader from "../Shared/Loader";
 import TempPagination from "../Pagination/TempPagination";
+import Link from "next/link";
 
 export default function CoursesTable() {
   const {
@@ -78,7 +80,12 @@ export default function CoursesTable() {
                     weight="fill"
                     onClick={() => handleDeleteClick(course.id)}
                   />
-                  <PencilSimple size={18} color="#1cc925" weight="fill" />
+                  <Link href={`/admin/courses/${course.id}`}>
+                    <PencilSimple size={18} color="#1cc925" weight="fill" />
+                  </Link>
+                  <Link href={`/admin/schedule-course/${course.id}`}>
+                    <Plus size={18} weight="bold" color="#1c72c9" />
+                  </Link>
                 </td>
               </tr>
             ))}

@@ -20,9 +20,16 @@ export interface MeetingRequest {
   profilePicture: string;
   caption: string;
 }
-export interface ApproveModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onApprove: (id: number) => void;
-  request: MeetingRequest;
-}
+export type StudentItem = {
+  id: number;
+  userId: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  image: string | null;
+};
+
+export type StudentsListResponse = {
+  students: StudentItem[];
+  totalPages: number;
+};

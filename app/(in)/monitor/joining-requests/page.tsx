@@ -2,8 +2,9 @@ import StudentRequestsTable from "@/components/StudentRequestsTable/StudentReque
 import { getMonitorCoursesNames } from "@/services/courses";
 
 export default async function joiningRequestsPage() {
-  const STATIC_MONITOR_ID = 13;
-  const coursesList = await getMonitorCoursesNames(STATIC_MONITOR_ID);
+  const HELLO = 1;
+
+  const coursesList = await getMonitorCoursesNames(HELLO ?? -1);
   return (
     <div>
       <h2 className="mx-8 mt-11 font-bold ">Students Joining Requests</h2>

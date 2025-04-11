@@ -1,0 +1,59 @@
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { getStudentsWithMonitorCorse } from "@/services/courses";
+import { StudentItem, StudentsListResponse } from "@/types/students";
+
+export default function useStudentsList() {
+  const HELLO = 1;
+  const searchParams = useSearchParams();
+  const [students, setStudents] = useState<StudentItem[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+  const [isLoading, setIsLoading] = useState(true);
+  const [totalPages, setTotalPages] = useState<number>(0);
+
+  const courseId = Number(searchParams.get("courseId")) || undefined;
+
+  const fetchRequests = async () => {
+    setIsLoading(true);
+    try {
+      const { students, totalPages }: StudentsListResponse =
+        await getStudentsWithMonitorCorse(
+          currentPage,
+          HELLO ?? -1,
+          undefined,
+          pageSize,
+          courseId
+        );
+      setTotalPages(totalPages);
+      setStudents(students);
+    } catch (error) {
+      throw new Error("CODE:10003");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRequests();
+  }, [currentPage, courseId]);
+
+  const handleNextPage = () =>
+    setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev));
+  const handlePreviousPage = () =>
+    setCurrentPage((prev) => (prev > 1 ? prev - 1 : prev));
+  const onPageChange = (page: number) =>
+    setCurrentPage(page >= 1 && page <= totalPages ? page : currentPage);
+
+  return {
+    courseId,
+    students,
+    currentPage,
+    pageSize,
+    isLoading,
+    handlePreviousPage,
+    handleNextPage,
+    onPageChange,
+    totalPages,
+  };
+}

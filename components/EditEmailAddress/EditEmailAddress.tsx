@@ -3,11 +3,9 @@ import React, { useState } from "react";
 import EditProfileModal from "../modals/EditProfileModal/EditProfileModal";
 
 const EditEmailAddress = () => {
-  //================{For Test}======================
   const user = {
     email: "mo.qashqesh@gmail.com",
   };
-  //================{For Test}======================
 
   const [openModal, setOpenModal] = useState(false);
 

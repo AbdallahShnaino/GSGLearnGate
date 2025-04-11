@@ -10,9 +10,7 @@ try {
   const authToken = process.env.TURSO_AUTH_TOKEN;
 
   if (!connectionUrl || !authToken) {
-    throw new Error(
-      "Missing required environment variables: TURSO_CONNECTION_URL or TURSO_AUTH_TOKEN"
-    );
+    throw new Error("CODE:999");
   }
 
   db = drizzle({
@@ -23,9 +21,9 @@ try {
   });
 } catch (error: unknown) {
   if (error instanceof Error) {
-    console.error("Error initializing database connection:", error.message);
+    throw new Error("CODE:998");
   } else {
-    console.error("An unknown error occurred during database initialization.");
+    throw new Error("CODE:997");
   }
 }
 
