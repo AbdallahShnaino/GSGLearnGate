@@ -4,9 +4,12 @@ import SoonLessonsTable from "@/components/SoonLessonsTable/SoonLessonsTable";
 import Link from "next/link";
 import { getLimitCoursesByStudent } from "@/src/db/queries/select";
 import { getStudentIdFromCookie } from "@/app/lib/auth/getStudentIdFromCookie";
+import { requireAuth } from "@/context/auth";
 
 const Dashboard = async () => {
   const studentId = await getStudentIdFromCookie();
+  const user = await requireAuth();
+  console.log(user);
 
   const courses = await getLimitCoursesByStudent(Number(studentId), 2);
 
