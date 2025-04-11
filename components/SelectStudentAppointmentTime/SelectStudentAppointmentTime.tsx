@@ -44,7 +44,6 @@ const SelectStudentAppointmentTime = (props: IProps) => {
         throw new Error("Failed to book appointment");
       }
 
-      const result = await response.json();
       alert("Appointment booked successfully!");
     } catch (err) {
       console.error("Booking failed:", err);

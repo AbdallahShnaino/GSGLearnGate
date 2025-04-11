@@ -186,4 +186,16 @@ Export encountered an error on /(in)/admin/page: /admin, exiting the build.
  ⨯ Next.js build worker exited with code: 1 and signal: null
 
 
+Monitor: zayd@gmail.com
+Password: 12345
+
+Co-monitor: saja@gmail.com
+12345
+
+Student: tasneemgazal5@gmail.com 
+Tasneem12345
+
+Admin: admin@gmail.com
+12345
+
 */

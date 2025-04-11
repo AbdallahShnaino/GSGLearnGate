@@ -5,7 +5,6 @@ import TaskSubmit from "@/components/TaskSubmit/TaskSubmit";
 import {
   getCommentsByTaskId,
   getStudentNameById,
-  getSubmissionIdByTaskId,
   getTaskByTaskId,
 } from "@/src/db/queries/select";
 
