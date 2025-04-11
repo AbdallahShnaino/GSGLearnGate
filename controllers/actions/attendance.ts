@@ -1,7 +1,7 @@
 "use server";
 
 import { assignAttendance } from "@/services/attendance";
-import { AttendanceRecordStatus } from "@/types";
+import { AttendanceRecordStatus } from "@/types/index";
 
 export async function updateAttendanceAction(
   prevState: any,

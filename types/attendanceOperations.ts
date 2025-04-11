@@ -1,3 +1,5 @@
+import { AttendanceRecordStatus } from ".";
+
 export type CourseScheduleList = {
   id: number;
   courseId: number;
@@ -7,7 +9,7 @@ export type CourseScheduleList = {
   endTime: string;
 };
 export type CourseStudentsList = {
-  status: import("/home/abdallah/projects/next/GSGLearnGate/types/index").AttendanceRecordStatus;
+  status: AttendanceRecordStatus;
   id: number;
   userId: number;
   firstName: string;
