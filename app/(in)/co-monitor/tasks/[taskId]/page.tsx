@@ -2,7 +2,7 @@ import React from "react";
 import CardFooter from "@/components/CardFooter/CardFooter";
 import TaskCardDetails from "@/components/TaskCardDetails/TaskCardDetails";
 import { getTask } from "@/services/task";
-import { StudentSubmission, Task } from "@/types";
+import { Task } from "@/types";
 import { getAttachmentForTask } from "@/services/attachment";
 import PublicComments from "@/components/Comments/PublicComments";
 interface IProps {

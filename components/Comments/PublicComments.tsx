@@ -13,7 +13,7 @@ interface Props {
 }
 
 const PublicComments = ({ taskId, roles }: Props) => {
-  const { userId } = useAuth();
+  const { user } = useAuth();
 
   const [publicComments, setPublicComments] = useState<PublicComment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -24,11 +24,11 @@ const PublicComments = ({ taskId, roles }: Props) => {
 
   useEffect(() => {
     if (roles === Role.MONITOR || roles === Role.CO_MONITOR) {
-      setCreateById(userId ?? -1);
+      setCreateById(user.userId ?? -1);
     } else {
-      setCreateById(userId ?? -1);
+      setCreateById(user.userId ?? -1);
     }
-  }, [roles, userId]);
+  }, [roles, user.userId]);
   useEffect(() => {
     const fetchComments = async () => {
       try {

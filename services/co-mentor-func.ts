@@ -12,7 +12,7 @@ import {
   getTotalTasksByCoMonitor,
 } from "@/src/db/queries/select";
 
-import { Status, User } from "@/types";
+import { Status, SubmissionsTask, User } from "@/types";
 import { db } from "@/src/db";
 import { submissionsTable, tasksTable } from "@/src/db/schema";
 import { eq } from "drizzle-orm";
@@ -21,7 +21,12 @@ export async function fetchSubmissions(
   taskId: number,
   page: number = 1,
   pageSize: number = 10
-) {
+): Promise<{
+  submissions: SubmissionsTask[];
+  totalPages: number;
+  currentPage: number;
+  totalCount: number;
+} | null> {
   try {
     const taskData = await db
       .select({
@@ -32,7 +37,7 @@ export async function fetchSubmissions(
       .all();
 
     if (!taskData || taskData.length === 0) {
-      return [];
+      return null;
     }
 
     const courseId = taskData[0].courseId;
