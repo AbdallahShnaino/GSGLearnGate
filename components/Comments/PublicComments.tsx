@@ -13,7 +13,8 @@ interface Props {
 }
 
 const PublicComments = ({ taskId, roles }: Props) => {
-  const { userId } = useAuth();
+  const { user } = useAuth();
+
   const [publicComments, setPublicComments] = useState<PublicComment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,22 +23,19 @@ const PublicComments = ({ taskId, roles }: Props) => {
   const [createById, setCreateById] = useState<number>(0);
 
   useEffect(() => {
-    if (roles === Role.MONITOR) {
-      setCreateById(userId ?? -1);
-    } else if ((roles = Role.CO_MONITOR)) {
-      setCreateById(userId ?? -1);
+    if (roles === Role.MONITOR || roles === Role.CO_MONITOR) {
+      setCreateById(user.userId ?? -1);
     } else {
-      setCreateById(userId ?? -1);
+      setCreateById(user.userId ?? -1);
     }
-  }, [roles]);
+  }, [roles, user.userId]);
   useEffect(() => {
     const fetchComments = async () => {
       try {
         setLoading(true);
         const comments = await fetchPublicCommentsByTaskId(taskId);
         setPublicComments(comments);
-      } catch (err) {
-        console.error("Error fetching public comments:", err);
+      } catch {
         setError("Failed to load public comments.");
       } finally {
         setLoading(false);
@@ -67,8 +65,7 @@ const PublicComments = ({ taskId, roles }: Props) => {
       setPublicComments(updatedComments);
 
       setReplyText("");
-    } catch (error) {
-      console.error("Error adding comment:", error);
+    } catch {
       alert("Failed to add comment. Please try again.");
     } finally {
       setIsSaving(false);

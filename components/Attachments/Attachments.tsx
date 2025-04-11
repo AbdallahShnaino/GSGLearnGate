@@ -71,13 +71,12 @@ const Attachments = ({ paths }: IProps) => {
         ...prev,
         [filePath]: { status: "success" },
       }));
-    } catch (error) {
-      console.error("Download error:", error);
+    } catch {
       setDownloadStates((prev) => ({
         ...prev,
         [filePath]: {
           status: "error",
-          message: error instanceof Error ? error.message : "Download failed",
+          message: "Download failed",
         },
       }));
 

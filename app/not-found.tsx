@@ -14,7 +14,7 @@ const NotFoundPage = () => {
           Page Not Found
         </h2>
         <p className="text-lg text-gray-700 mb-6">
-          The page you're looking for doesn't exist or has been moved.
+          The page you&apos;re looking for doesn&apos;t exist or has been moved.
         </p>
 
         <div className="flex flex-col gap-3 w-full">
@@ -35,8 +35,8 @@ const NotFoundPage = () => {
         <div className="bg-gray-50 border border-gray-200 p-4 rounded-md mt-6 text-sm text-gray-700 text-left">
           <strong className="text-gray-900">Tip:</strong>{" "}
           <span className="break-words">
-            Check the URL for typos or use the navigation to find what you're
-            looking for.
+            Check the URL for typos or use the navigation to find what
+            you&apos;re looking for.
           </span>
         </div>
       </div>

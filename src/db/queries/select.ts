@@ -1,6 +1,5 @@
 "use server";
 
-import { db } from "./../index";
 import {
   eq,
   sql,
@@ -87,6 +86,7 @@ import {
 } from "@/types/attendanceOperations";
 import { CoMonitorAppointment } from "@/types/appointments";
 import { StudentsListResponse } from "@/types/students";
+import { db } from "..";
 
 export async function getAllUsers(): Promise<User[]> {
   return await db.select().from(usersTable).all();
@@ -112,6 +112,7 @@ export async function getCourseSchedule(
 
   return query;
 }
+
 
 export async function getUserByEmail(
   email: string
@@ -433,12 +434,12 @@ export async function getCoursesNamesByMonitor(
     .from(coursesTable)
     .where(eq(coursesTable.monitorId, monitorId));
   try {
-    return results.map((course: { id: any; title: any }) => ({
+    return results.map((course: { id: number; title: string }) => ({
       courseId: course.id,
       courseName: course.title,
     }));
-  } catch (e) {
-    return null;
+  } catch {
+    throw new Error("CODE:711");
   }
 }
 
@@ -453,12 +454,12 @@ export async function getCoursesNamesByCoMonitor(
     .from(coursesTable)
     .where(eq(coursesTable.coMonitorId, coMonitorId));
   try {
-    return results.map((course: { id: any; title: any }) => ({
+    return results.map((course: { id: number; title: string }) => ({
       courseId: course.id,
       courseName: course.title,
     }));
-  } catch (e) {
-    return null;
+  } catch {
+    throw new Error("CODE:709");
   }
 }
 
@@ -736,15 +737,30 @@ export async function getTasksByMonitor(
     .offset(offset)
     .execute();
 
-  const tasks: MonitorsTask[] = rawTasks.map((task: any) => ({
-    ...task,
-    startedAt: new Date(task.startedAt),
-    deadline: new Date(task.deadline),
-    createdAt: new Date(task.createdAt),
-    updatedAt: new Date(task.updatedAt),
-    courseTitle: task.courseTitle ?? null,
-    description: task.description ?? null,
-  }));
+  const tasks: MonitorsTask[] = rawTasks.map(
+    (task: {
+      id: number;
+      title: string;
+      description: string | null;
+      courseId: number;
+      startedAt: string;
+      deadline: string;
+      points: number;
+      createdAt: string;
+      updatedAt: string;
+      courseTitle: string | null;
+      submissionCount: number;
+      studentCount: number;
+    }) => ({
+      ...task,
+      startedAt: new Date(task.startedAt),
+      deadline: new Date(task.deadline),
+      createdAt: new Date(task.createdAt),
+      updatedAt: new Date(task.updatedAt),
+      courseTitle: task.courseTitle ?? null,
+      description: task.description ?? null,
+    })
+  );
 
   return {
     tasks,
@@ -898,15 +914,30 @@ export async function getTasksByCoMonitor(
     .offset(offset)
     .execute();
 
-  const tasks: MonitorsTask[] = rawTasks.map((task: any) => ({
-    ...task,
-    startedAt: new Date(task.startedAt),
-    deadline: new Date(task.deadline),
-    createdAt: new Date(task.createdAt),
-    updatedAt: new Date(task.updatedAt),
-    courseTitle: task.courseTitle ?? null,
-    description: task.description ?? null,
-  }));
+  const tasks: MonitorsTask[] = rawTasks.map(
+    (task: {
+      id: number;
+      title: string;
+      description: string | null;
+      courseId: number;
+      startedAt: string;
+      deadline: string;
+      points: number;
+      createdAt: string;
+      updatedAt: string;
+      courseTitle: string | null;
+      submissionCount: number;
+      studentCount: number;
+    }) => ({
+      ...task,
+      startedAt: new Date(task.startedAt),
+      deadline: new Date(task.deadline),
+      createdAt: new Date(task.createdAt),
+      updatedAt: new Date(task.updatedAt),
+      courseTitle: task.courseTitle ?? null,
+      description: task.description ?? null,
+    })
+  );
 
   return {
     tasks,
@@ -1108,24 +1139,34 @@ export async function getSubmissionsAndNonSubmissionsForTask(
     .all();
 
   const submittedStudentIds = submissions.map(
-    (submission: any) => submission.studentId
+    (submission: { studentId: number }) => submission.studentId
   );
   const nonSubmissions = allStudentsInCourse
-    .filter((student: any) => !submittedStudentIds.includes(student.studentId))
-    .map((student: any) => ({
-      submissionId: `non-${student.studentId}`,
-      studentId: student.studentId,
-      studentName: student.studentName,
-      email: student.email ?? "",
-      submissionDate: "__",
-      status: "NOT SUBMITTED",
-      grade: 0,
-      profilePicture: student.profilePicture ?? "",
-      taskName: taskName,
-      courseName: courseName,
-      taskId: taskId,
-      points: point,
-    }));
+    .filter(
+      (student: { studentId: number }) =>
+        !submittedStudentIds.includes(student.studentId)
+    )
+    .map(
+      (student: {
+        studentId: number;
+        studentName: string;
+        email: string | null;
+        profilePicture: string | null;
+      }) => ({
+        submissionId: `non-${student.studentId}`,
+        studentId: student.studentId,
+        studentName: student.studentName,
+        email: student.email ?? "",
+        submissionDate: "__",
+        status: "NOT SUBMITTED",
+        grade: 0,
+        profilePicture: student.profilePicture ?? "",
+        taskName: taskName,
+        courseName: courseName,
+        taskId: taskId,
+        points: point,
+      })
+    );
 
   const combinedResults = [...submissions, ...nonSubmissions];
 
@@ -1669,10 +1710,18 @@ export async function getPrivateCommentsBySubmission(
     )
     .orderBy(commentsTable.createdAt);
 
-  return comments.map((comment: any) => ({
-    ...comment,
-    createdAt: new Date(comment.createdAt),
-  }));
+  return comments.map(
+    (comment: {
+      commentId: number;
+      commentText: string;
+      createdAt: string;
+      createdBy: string;
+      image: string | null;
+    }) => ({
+      ...comment,
+      createdAt: new Date(comment.createdAt),
+    })
+  );
 }
 export async function getPrivateCommentsReplyBySubmission(
   submissionId: number,
@@ -1697,10 +1746,18 @@ export async function getPrivateCommentsReplyBySubmission(
     )
     .orderBy(commentsTable.createdAt);
 
-  return comments.map((comment: any) => ({
-    ...comment,
-    createdAt: new Date(comment.createdAt),
-  }));
+  return comments.map(
+    (comment: {
+      commentId: number;
+      commentText: string;
+      createdAt: string;
+      createdBy: string;
+      image: string | null;
+    }) => ({
+      ...comment,
+      createdAt: new Date(comment.createdAt),
+    })
+  );
 }
 
 export async function getAllCoursesWithMonitors(): Promise<Course[]> {
@@ -2038,7 +2095,7 @@ export async function getStudentsListByCourseId(
       students,
       totalPages,
     };
-  } catch (error) {
+  } catch {
     throw new Error("CODE:702");
   }
 }

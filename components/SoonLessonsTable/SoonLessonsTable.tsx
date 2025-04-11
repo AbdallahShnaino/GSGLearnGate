@@ -15,7 +15,7 @@ const Table = async (props: IProps) => {
     let nextLecture = null;
 
     while (currentDate <= courseEndDate) {
-      const dayOfWeek = currentDate.getDay(); // 0 = Sunday, 1 = Monday, 3 = Wednesday
+      const dayOfWeek = currentDate.getDay();
 
       if ([0, 1, 3].includes(dayOfWeek) && currentDate >= courseStartDate) {
         const dateStr = currentDate.toLocaleDateString("en-GB");

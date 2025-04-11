@@ -5,7 +5,6 @@ import {
   AnnouncementState,
 } from "@/controllers/actions/sendAnnouncementAction";
 import { Course } from "@/types";
-import { useRouter } from "next/navigation";
 import { useActionState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -20,14 +19,13 @@ interface IProps {
 }
 
 export default function SendAnnouncementForm({ courses }: IProps) {
-  const {userId} = useAuth();
+  const {user} = useAuth();
   const initialState: AnnouncementState = {
     success: false,
     error: "",
     message: "",
     announcementId: undefined,
   };
-  const router = useRouter();
   const [formState, formAction, isPending] = useActionState(
     submitAnnouncement,
     initialState
@@ -123,9 +121,9 @@ export default function SendAnnouncementForm({ courses }: IProps) {
               </button>
             </div>
             <input
-                id="adminId"
-                name="adminId"
-                defaultValue={userId!}
+                id="postedBy"
+                name="postedBy"
+                defaultValue={user.id!}
                 type="text"
                 placeholder="e.g., Online/Offline course details"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"

@@ -3,7 +3,7 @@ import {
   getStudentsByCourseId,
   insertAttendanceRecord,
 } from "@/src/db/queries/select";
-import { AttendanceRecordStatus } from "@/types";
+import { AttendanceRecordStatus } from "@/types/index";
 import { CourseStudentsList } from "@/types/attendanceOperations";
 
 export async function getCourseLectures(courseId?: number) {

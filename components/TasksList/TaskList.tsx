@@ -48,7 +48,7 @@ export default function TaskList({
         const { tasks, total } = await res.json();
         setTasks(tasks);
         setTotal(total);
-      } catch (error) {
+      } catch {
         throw new Error("CODE:1009");
       } finally {
         setLoading(false);

@@ -1,7 +1,7 @@
 "use server";
 
 import { assignAttendance } from "@/services/attendance";
-import { AttendanceRecordStatus } from "@/types";
+import { AttendanceRecordStatus } from "@/types/index";
 
 export async function updateAttendanceAction(
   prevState: any,
@@ -33,8 +33,7 @@ export async function updateAttendanceAction(
       success: true,
       message: `Attendance marked as ${status}`,
     };
-  } catch (error) {
-    console.error("Error updating attendance:", error);
+  } catch {
     return {
       success: false,
       message: "Failed to update attendance",

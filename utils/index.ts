@@ -2,7 +2,7 @@ import { MonitorsTask } from "@/types/tasks";
 
 export function isTaskActive(task: MonitorsTask): boolean {
   const now = new Date();
-  return task.deadline < now;
+  return new Date(task.deadline) < now;
 }
 export function getTimeRemaining(createdAt: string | Date): string {
   const createdDate = new Date(createdAt);

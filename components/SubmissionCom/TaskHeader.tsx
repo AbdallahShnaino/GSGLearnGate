@@ -4,7 +4,7 @@ import React from "react";
 interface Props {
   title: string;
   points: number;
-  submittedAt: Date;
+  submittedAt?: Date;
 }
 
 const TaskHeader = ({ title, points, submittedAt }: Props) => {
@@ -17,9 +17,11 @@ const TaskHeader = ({ title, points, submittedAt }: Props) => {
         </h2>
         <span className="text-sm text-white">Points : {points}</span>
       </div>
-      <p className="text-sm opacity-90">
-        Submitted on {new Date(submittedAt).toLocaleString("en-US")}
-      </p>
+      {submittedAt && (
+        <p className="text-sm opacity-90">
+          Submitted on {new Date(submittedAt).toLocaleString("en-US")}
+        </p>
+      )}
     </div>
   );
 };

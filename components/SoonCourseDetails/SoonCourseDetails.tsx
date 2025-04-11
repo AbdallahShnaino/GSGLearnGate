@@ -30,8 +30,7 @@ const SoonCourseDetails = (props: IProps) => {
 
       const result = await response.json();
       alert("Joining Request Sent Successfully");
-    } catch (error) {
-      console.error("Register failed:", error);
+    } catch {
       alert("Something went wrong!! Please try again...");
     }
   };

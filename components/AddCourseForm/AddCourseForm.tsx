@@ -16,8 +16,7 @@ interface IProps {
   coMonitors: UsersNames[];
 }
 const AddCourseForm = ({ monitors, coMonitors }: IProps) => {
-  const {userId} = useAuth();
-  console.log(userId)
+  const { user } = useAuth();
   const initialState: CourseState = {
     success: false,
     error: "",
@@ -220,7 +219,7 @@ const AddCourseForm = ({ monitors, coMonitors }: IProps) => {
               <input
                 id="adminId"
                 name="adminId"
-                defaultValue={userId!}
+                defaultValue={user.userId!}
                 type="text"
                 placeholder="e.g., Online/Offline course details"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"

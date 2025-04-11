@@ -57,9 +57,6 @@ export const useUsersTable = (role: string) => {
   };
 
   const confirmDelete = () => {
-    if (selectedMonitor) {
-      console.log(`Deleting monitor with ID: ${selectedMonitor}`);
-    }
     setOpen(false);
   };
 

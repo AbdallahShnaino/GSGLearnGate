@@ -23,7 +23,7 @@ export default function CreateAppointmentPage() {
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("17:00");
 
-  const [formState, formAction, _] = useActionState(saveAvailability, {
+  const [formState, formAction] = useActionState(saveAvailability, {
     success: false,
     message: "",
     errors: null,
@@ -34,8 +34,8 @@ export default function CreateAppointmentPage() {
       setLoading(true);
       const courses = await getCoMonitorCoursesNames(CO_MONITOR_ID);
       setCoursesList(courses);
-    } catch (error) {
-      console.error("Error loading data:", error);
+    } catch {
+      throw new Error("CODE:602");
     } finally {
       setLoading(false);
     }
@@ -46,9 +46,11 @@ export default function CreateAppointmentPage() {
 
   useEffect(() => {
     if (formState?.message) {
-      formState.success
-        ? toast.success(formState.message, { autoClose: 3000 })
-        : toast.error(formState.message, { autoClose: 3000 });
+      if (formState.success) {
+        toast.success(formState.message, { autoClose: 3000 });
+      } else {
+        toast.error(formState.message, { autoClose: 3000 });
+      }
     }
     fetchData();
   }, [formState]);

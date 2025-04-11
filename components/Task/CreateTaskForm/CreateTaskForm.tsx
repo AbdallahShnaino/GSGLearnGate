@@ -13,13 +13,12 @@ type AttachmentType = "none" | "link" | "file";
 interface IProps {
   coursesList: { courseId: number; courseName: string }[] | null;
 }
-
 export default function CreateTaskForm({ coursesList }: IProps) {
+  const { user } = useAuth();
   const [attachment, setAttachment] = useState<{
     type: "link" | "file" | null;
     value: string | File | null;
   }>({ type: null, value: null });
-  const { userId } = useAuth();
 
   const initialState: TaskState = {
     success: false,
@@ -76,7 +75,11 @@ export default function CreateTaskForm({ coursesList }: IProps) {
           >
             Task Title
           </label>
-          <input type="hidden" name="monitorId" value={userId ?? -1} />
+          <input
+            type="hidden"
+            name="monitorId"
+            value={user.userId?.toString()}
+          />
           <input
             type="text"
             name="title"

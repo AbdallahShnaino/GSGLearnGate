@@ -80,8 +80,7 @@ const TaskSubmit = (props: IProps) => {
       const feedback = insertedData.insertedSubmission.feedback;
       setAttachment((prev) => [...(prev || []), { path: newPath, feedback }]);
       alert("Attachment Added Successfully");
-    } catch (error) {
-      console.error("Send Attachment failed:", error);
+    } catch {
       alert("Something went wrong!! Please try again...");
     }
   };
@@ -98,6 +97,16 @@ const TaskSubmit = (props: IProps) => {
     setDisplayPath(e.target.value);
   };
 
+const getAttachment = async () => {
+      const studentAttachment = await getAttachmentPathsByTaskId(
+        Number(props.taskId),
+        Number(props.courseId)
+      );
+      setAttachment(studentAttachment);
+      setLoading(false);
+    };
+    getAttachment();
+  }, [props.courseId, props.taskId]);
   return (
     <>
       {loading ? (

@@ -2,13 +2,7 @@
 
 import { ArrowsClockwise } from "phosphor-react";
 
-export default function Error({
-  error,
-  reset,
-}: {
-  error: Error;
-  reset: () => void;
-}) {
+export default function Error({ reset }: { reset: () => void }) {
   return (
     <div className="flex items-center gap-3 justify-center p-4 rounded-md bg-red-50 text-sm text-red-600">
       <span>

@@ -17,8 +17,9 @@ export function useStudentSubmissions(taskId: number, searchQuery: string) {
       setLoading(true);
       try {
         const submissionData = await fetchSubmissions(taskId, 1, pageSize * 10);
-        setSubmissions(submissionData.submissions || []);
-        setTotalPages(Math.ceil(submissionData.totalCount / pageSize));
+        submissionData && setSubmissions(submissionData.submissions || []);
+        submissionData &&
+          setTotalPages(Math.ceil(submissionData.totalCount / pageSize));
       } catch (error) {
         throw new Error("CODE:10004");
       }

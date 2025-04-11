@@ -5,11 +5,11 @@ import {
   getJoiningRequests,
   updateJoiningRequestStatus,
 } from "@/services/joiningRequest";
-import { addStudentToCourse, getMonitorCoursesNames } from "@/services/courses";
+import { addStudentToCourse } from "@/services/courses";
 import { useAuth } from "@/context/user";
 
 export default function useStudentRequests() {
-  const { userId } = useAuth();
+  const { user } = useAuth();
   const searchParams = useSearchParams();
   const [courseId, setCourseId] = useState<number | undefined>(
     Number(searchParams.get("courseId")) || undefined
@@ -26,7 +26,7 @@ export default function useStudentRequests() {
 
   const fetchRequests = async () => {
     const { JoiningOrders, totalPages } = await getJoiningRequests(
-      userId ?? -1,
+      user.userId ?? -1,
       courseId,
       currentPage,
       pageSize

@@ -5,7 +5,7 @@ import { StudentItem, StudentsListResponse } from "@/types/students";
 import { useAuth } from "@/context/user";
 
 export default function useStudentsList() {
-  const { userId } = useAuth();
+  const { user } = useAuth();
   const searchParams = useSearchParams();
   const [students, setStudents] = useState<StudentItem[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -21,7 +21,7 @@ export default function useStudentsList() {
       const { students, totalPages }: StudentsListResponse =
         await getStudentsWithMonitorCorse(
           currentPage,
-          userId ?? -1,
+          user.userId ?? -1,
           undefined,
           pageSize,
           courseId

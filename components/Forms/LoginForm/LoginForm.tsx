@@ -13,6 +13,7 @@ const initialState: LoginUserStatus = {
   message: "",
   error: "",
   userId: undefined,
+  id: undefined,
   role: undefined,
 };
 
@@ -23,7 +24,7 @@ const LoginForm = () => {
 
   useEffect(() => {
     if (formState.success) {
-      setLoading(true)
+      setLoading(true);
       switch (formState.role) {
         case Role.ADMIN:
           router.push("/admin");
@@ -32,7 +33,7 @@ const LoginForm = () => {
           router.push("/monitor");
           break;
         case Role.CO_MONITOR:
-          router.push("/co-mentor");
+          router.push("/co-monitor");
           break;
         case Role.STUDENT:
           router.push("/student");
@@ -77,7 +78,7 @@ const LoginForm = () => {
           required
         />
       </div>
-      
+
       {formState.error && (
         <p className="text-red-500 text-sm">{formState.error}</p>
       )}

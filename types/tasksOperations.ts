@@ -8,7 +8,7 @@ export interface MonitorsTasks {
   points: number | null;
   createdAt: string;
   updatedAt: string;
-  courseTitle: string | null; // Allow null to match the query result
+  courseTitle: string | null;
   submissionCount: number;
   studentCount: number;
 }

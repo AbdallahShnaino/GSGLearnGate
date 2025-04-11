@@ -50,7 +50,6 @@ const SelectStudentAppointmentTime = (props: IProps) => {
       console.error("Booking failed:", err);
       alert("Failed to book appointment");
     }
-
     setSelectedDate("");
     setTime("");
   };

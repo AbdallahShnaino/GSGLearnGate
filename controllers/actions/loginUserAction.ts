@@ -10,6 +10,7 @@ export type LoginUserStatus =
       message: string;
       error: string;
       userId: undefined;
+      id: undefined;
       role: undefined;
     }
   | {
@@ -17,6 +18,7 @@ export type LoginUserStatus =
       message: string;
       error?: string;
       userId: number | undefined;
+      id?: number | undefined;
       role: Role | undefined;
     };
 
@@ -32,6 +34,7 @@ export async function loginUser(
       message: "Please fill all the fields",
       error: "Please fill all the fields",
       userId: undefined,
+      id: undefined,
       role: undefined,
     };
   }
@@ -42,6 +45,7 @@ export async function loginUser(
       message: "Invalid email format",
       error: "Invalid email format",
       userId: undefined,
+      id: undefined,
       role: undefined,
     };
   }
@@ -52,10 +56,11 @@ export async function loginUser(
       message: "Invalid email or password",
       error: "Invalid email or password",
       userId: undefined,
+      id: undefined,
       role: undefined,
     };
   } else {
-    const token = generateToken({ userId: authenticatedUser.userId, email, role:authenticatedUser.role });
+    const token = generateToken({ userId: authenticatedUser.userId, email, role:authenticatedUser.role, id: authenticatedUser.id });
 
     const cookieStore = await cookies();
     cookieStore.set("token", token, {
@@ -68,6 +73,7 @@ export async function loginUser(
       success: true,
       message: "Login Successfully",
       userId: authenticatedUser.userId,
+      id: authenticatedUser.id,
       role: authenticatedUser.role,
     };
   }
