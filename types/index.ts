@@ -340,6 +340,7 @@ export type StudentCourseTasks = {
   grade: number;
   gradedAt: Date;
   maxGrade: number;
+  coMonitor: string;
 };
 export interface SubmissionView {
   id: number;
@@ -491,4 +492,9 @@ export interface PublicComment {
 export type StudentSubmission = {
   path: string;
   feedback: string;
+};
+
+export type StudentName = {
+  id: number;
+  name: string;
 };

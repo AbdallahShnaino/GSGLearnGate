@@ -1,11 +1,10 @@
 import NotRegisteredCourseCard from "@/components/NotRegisteredCourseCard/NotRegisteredCourseCard";
 import { getNotStartedCoursesNotRegisteredByStudent } from "@/src/db/queries/select";
+import { getStudentIdFromCookie } from "@/app/lib/auth/getStudentIdFromCookie";
 
-interface IProps {
-  params: Promise<{ studentId: string }>;
-}
-const ComingSoonCourses = async (props: IProps) => {
-  const { studentId } = await props.params;
+const ComingSoonCourses = async () => {
+  const studentId = await getStudentIdFromCookie();
+
   const courses = await getNotStartedCoursesNotRegisteredByStudent(
     Number(studentId)
   );
@@ -16,13 +15,19 @@ const ComingSoonCourses = async (props: IProps) => {
         Coming Soon Courses
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {courses?.map((course) => (
-          <NotRegisteredCourseCard
-            key={course.id}
-            course={course}
-            studentId={studentId}
-          />
-        ))}
+        {courses && courses.length >= 1 ? (
+          courses?.map((course) => (
+            <NotRegisteredCourseCard
+              key={course.id}
+              course={course}
+              studentId={studentId!}
+            />
+          ))
+        ) : (
+          <h3 className="text-lg font-semibold">
+            Sorry! Currently there are no soon courses
+          </h3>
+        )}
       </div>
     </div>
   );

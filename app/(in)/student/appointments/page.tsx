@@ -1,14 +1,12 @@
+import { getStudentIdFromCookie } from "@/app/lib/auth/getStudentIdFromCookie";
 import StudentAppointmentsTable from "@/components/StudentAppointmentsTable/StudentAppointmentsTable";
 import {
   getCoursesByStudent,
   getStudentAppointments,
 } from "@/src/db/queries/select";
 
-interface IProps {
-  params: Promise<{ studentId: string }>;
-}
-const InterviewsPage = async (props: IProps) => {
-  const { studentId } = await props.params;
+const InterviewsPage = async () => {
+  const studentId = await getStudentIdFromCookie();
   const appointments = await getStudentAppointments(Number(studentId));
   const registeredCourses = await getCoursesByStudent(Number(studentId));
   return (

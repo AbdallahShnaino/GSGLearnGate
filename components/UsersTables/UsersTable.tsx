@@ -1,28 +1,23 @@
 "use client";
 import {
-  TrashSimple,
   PencilSimple,
   MagnifyingGlass,
 } from "@phosphor-icons/react/dist/ssr";
-import DeleteUserModal from "../DeleteUserModal/DeleteUserModal";
 import { useUsersTable } from "@/hooks/useUsersTable";
 import Loader from "../Shared/Loader";
 import { Role } from "@/types";
 import Link from "next/link";
 import TempPagination from "../Pagination/TempPagination";
+
 interface IProps {
   role: string;
 }
+
 export default function UsersTable(props: IProps) {
   const {
     value,
     handleSearchChange,
     filteredUsers,
-    open,
-    setOpen,
-    selectedMonitor,
-    handleDeleteClick,
-    confirmDelete,
     isLoading,
     handleNextPage,
     handlePreviousPage,
@@ -30,6 +25,7 @@ export default function UsersTable(props: IProps) {
     totalPages,
     setCurrentPage,
   } = useUsersTable(props.role);
+
   if (isLoading) {
     return <Loader />;
   }
@@ -81,12 +77,9 @@ export default function UsersTable(props: IProps) {
                 </td>
                 <td className="px-4 py-4 text-gray-700">{user.city}</td>
                 <td>
-                  <div className="flex justify-evenly">
-                    <button onClick={() => handleDeleteClick(user.userId)}>
-                      <TrashSimple size={18} color="#ee1717" weight="fill" className="cursor-pointer"/>
-                    </button>
+                  <div className="flex justify-center">
                     <Link href={`/admin/users/${user.userId}`}>
-                      <PencilSimple size={18} color="#1cc925" weight="fill" />
+                      <PencilSimple size={18} color="#1cc925" weight="fill" className="cursor-pointer" />
                     </Link>
                   </div>
                 </td>
@@ -95,13 +88,6 @@ export default function UsersTable(props: IProps) {
           </tbody>
         </table>
       </div>
-      {open && selectedMonitor && (
-        <DeleteUserModal
-          setOpen={setOpen}
-          confirmDelete={confirmDelete}
-          selectedUser={selectedMonitor.toString()}
-        />
-      )}
       <TempPagination
         currentPage={currentPage}
         totalPages={totalPages}
