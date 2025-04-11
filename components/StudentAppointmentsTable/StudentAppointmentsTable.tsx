@@ -43,7 +43,7 @@ const StudentAppointmentsTable = (props: IProps) => {
     router.push(`${pathname}?${newParams.toString()}`);
   };
   return (
-    <div className="w-full max-w-4xl mx-auto p-4 space-y-4 flex-grow">
+    <div className="w-11/12 m-auto flex flex-col gap-5">
       <div className="space-y-2">
         <div className="flex flex-col gap-3">
           <label
@@ -66,7 +66,7 @@ const StudentAppointmentsTable = (props: IProps) => {
           </select>
         </div>
       </div>
-      <div className="overflow-x-auto overflow-hidden border border-gray-200 shadow-sm rounded-xl">
+      <div className="overflow-x-auto overflow-hidden border-2 border-gray-200 shadow-sm rounded-xl">
         <table className="w-full max-w-full border-collapse bg-white text-sm">
           <thead className="text-left text-xs text-gray-700 uppercase bg-gray-100">
             <tr className="bg-gray-50">

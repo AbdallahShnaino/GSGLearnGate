@@ -10,7 +10,7 @@ const InterviewsPage = async () => {
   const appointments = await getStudentAppointments(Number(studentId));
   const registeredCourses = await getCoursesByStudent(Number(studentId));
   return (
-    <div className="min-h-screen bg-[#FFF5E8] p-6 flex flex-col w-full">
+    <div className="min-h-screen p-6 flex flex-col w-full">
       <div className="flex-grow">
         <StudentAppointmentsTable
           appointments={appointments}
