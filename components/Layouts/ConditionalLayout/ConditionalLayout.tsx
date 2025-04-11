@@ -38,12 +38,6 @@ export default function ConditionalLayout({
         {lateSubmissionsCard}
       </div>
 
-      <div className="bg-white border border-[#FFA41F]/30 rounded-lg p-3 mb-6 shadow-sm">
-        <div className="flex justify-end flex-col md:flex-row gap-4">
-          <SelectTaskStatus value={1} appendSearchParams={true} />
-        </div>
-      </div>
-
       {tasksList}
     </div>
   );
