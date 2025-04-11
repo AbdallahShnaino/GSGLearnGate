@@ -53,11 +53,6 @@ export default function SelectCourse({
           </option>
         )}
       </select>
-      <input
-        type="hidden"
-        name="courseId"
-        value={selectedCourseId ?? "no courseId value"}
-      />
     </div>
   );
 }

@@ -95,24 +95,30 @@ export async function insertSubmission(
 }
 
 export async function insertTask(data: Omit<Task, "id">): Promise<Task> {
-  const normalizedData = {
-    ...data,
-    startedAt: new Date(data.startedAt).toISOString(),
-    deadline: new Date(data.deadline),
-  };
+  try {
+    const normalizedData = {
+      ...data,
+      startedAt: new Date(data.startedAt).toISOString(),
+      deadline: new Date(data.deadline),
+    };
 
-  const [inserted] = await db
-    .insert(tasksTable)
-    .values(normalizedData)
-    .returning();
+    const [inserted] = await db
+      .insert(tasksTable)
+      .values(normalizedData)
+      .returning();
 
-  if (!inserted) throw new Error("CODE:803");
+    if (!inserted) {
+      throw new Error("CODE:803");
+    }
 
-  return {
-    ...inserted,
-    startedAt: new Date(inserted.startedAt),
-    deadline: inserted.deadline,
-  } as Task;
+    return {
+      ...inserted,
+      startedAt: new Date(inserted.startedAt),
+      deadline: new Date(inserted.deadline),
+    } as Task;
+  } catch (error) {
+    throw new Error("CODE:807");
+  }
 }
 
 export async function insertAttachment(
