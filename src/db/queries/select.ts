@@ -12,6 +12,7 @@ import {
   lt,
   inArray,
   asc,
+  isNull,
 } from "drizzle-orm";
 
 import {
@@ -606,15 +607,14 @@ export async function getCoursesWithStudentCount(
 }
 
 export async function getMonitorTasksDeadlines(
-  monitorId: number
+  userId: number
 ): Promise<Date[]> {
   const results = await db
     .select({
       deadline: tasksTable.deadline,
     })
     .from(tasksTable)
-    .innerJoin(monitorsTable, eq(monitorsTable.userId, tasksTable.creatorId))
-    .where(eq(monitorsTable.userId, monitorId));
+    .where(eq(tasksTable.creatorId, userId));
 
   const deadlines = results.map(
     (result: { deadline: string | number | Date }) => new Date(result.deadline)
@@ -641,16 +641,20 @@ export async function getCoMonitorTasksDeadlines(
   return deadlines;
 }
 export async function getMonitorSubmissionsNotGradedCount(
-  monitorId: number
+  userId: number
 ): Promise<number> {
   const result = await db
     .select({ total: count() })
     .from(submissionsTable)
-    .innerJoin(coursesTable, eq(submissionsTable.courseId, coursesTable.id))
+    .innerJoin(tasksTable, eq(submissionsTable.taskId, tasksTable.id))
     .where(
-      and(eq(coursesTable.monitorId, monitorId), lte(submissionsTable.grade, 0))
+      and(
+        eq(tasksTable.creatorId, userId),
+        or(lte(submissionsTable.grade, 0), isNull(submissionsTable.grade))
+      )
     );
-  return result[0]?.total || 0;
+
+  return result[0]?.total ?? 0;
 }
 export async function getCoMonitorSubmissionsNotGradedCount(
   coMonitorId: number
@@ -669,7 +673,7 @@ export async function getCoMonitorSubmissionsNotGradedCount(
 }
 
 export async function getTasksByMonitor(
-  monitorId: number,
+  userId: number,
   status: TaskStatus,
   page: number = 1,
   pageSize: number = 10
@@ -678,7 +682,7 @@ export async function getTasksByMonitor(
   const now = new Date().toISOString().replace("T", " ").slice(0, 19);
 
   const whereCondition = and(
-    eq(monitorsTable.userId, monitorId),
+    eq(tasksTable.creatorId, userId),
     status === TaskStatus.IN_PROGRESS
       ? and(
           lte(tasksTable.startedAt, now),
@@ -694,7 +698,6 @@ export async function getTasksByMonitor(
       total: sql<number>`count(distinct ${tasksTable.id})`.as("total"),
     })
     .from(tasksTable)
-    .innerJoin(monitorsTable, eq(monitorsTable.userId, tasksTable.creatorId))
     .where(whereCondition)
     .execute();
 
@@ -727,7 +730,6 @@ export async function getTasksByMonitor(
       `.as("student_count"),
     })
     .from(tasksTable)
-    .innerJoin(monitorsTable, eq(monitorsTable.userId, tasksTable.creatorId))
     .leftJoin(coursesTable, eq(tasksTable.courseId, coursesTable.id))
     .where(whereCondition)
     .limit(pageSize)
@@ -1175,7 +1177,7 @@ export async function getSubmissionsAndNonSubmissionsForTask(
   };
 }
 
-export async function getLateSubmissionsCountByMonitor(monitorId: number) {
+export async function getLateSubmissionsCountByMonitor(userId: number) {
   const result = await db
     .select({ count: count() })
     .from(submissionsTable)
@@ -1183,7 +1185,7 @@ export async function getLateSubmissionsCountByMonitor(monitorId: number) {
     .innerJoin(coursesTable, eq(submissionsTable.courseId, coursesTable.id))
     .where(
       and(
-        eq(coursesTable.monitorId, monitorId),
+        eq(tasksTable.creatorId, userId),
         gt(submissionsTable.createdAt, tasksTable.deadline)
       )
     );

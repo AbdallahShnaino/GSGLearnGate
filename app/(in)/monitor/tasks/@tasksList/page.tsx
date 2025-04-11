@@ -23,7 +23,6 @@ export default async function MonitorTasksPage({
     page,
     ITEMS_PER_PAGE
   );
-
   return (
     <div>
       {total > 0 ? (
