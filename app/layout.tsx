@@ -15,7 +15,6 @@ export const metadata: Metadata = {
     "Gaza Sky Geeks offers free online courses to empower learners in Gaza with the skills they need for the tech industry.",
   keywords:
     "Gaza Sky Geeks, free courses, online learning, tech education, skills training, Gaza, technology, coding, software development",
-  viewport: "width=device-width, initial-scale=1",
   robots: "index, follow",
   metadataBase: new URL("https://gsg-learn-gate.vercel.app"),
   alternates: {
