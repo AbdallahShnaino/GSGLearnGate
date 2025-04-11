@@ -624,24 +624,21 @@ export async function getMonitorTasksDeadlines(
   return deadlines;
 }
 export async function getCoMonitorTasksDeadlines(
-  coMonitorId: number
+  userId: number
 ): Promise<Date[]> {
   const results = await db
     .select({
       deadline: tasksTable.deadline,
     })
     .from(tasksTable)
-    .innerJoin(
-      coMonitorsTable,
-      eq(coMonitorsTable.userId, tasksTable.creatorId)
-    )
-    .where(eq(coMonitorsTable.userId, coMonitorId));
+    .where(eq(tasksTable.creatorId, userId));
 
   const deadlines = results.map(
     (result: { deadline: string | number | Date }) => new Date(result.deadline)
   );
   return deadlines;
 }
+
 export async function getMonitorSubmissionsNotGradedCount(
   userId: number
 ): Promise<number> {
@@ -844,7 +841,7 @@ export async function getTaskSubmissionStatsByCoMonitor(
 }
 
 export async function getTasksByCoMonitor(
-  coMonitorId: number,
+  userId: number,
   status: TaskStatus,
   page: number = 1,
   pageSize: number = 10
@@ -853,7 +850,7 @@ export async function getTasksByCoMonitor(
   const now = new Date().toISOString().replace("T", " ").slice(0, 19);
 
   const whereCondition = and(
-    eq(coMonitorsTable.userId, coMonitorId),
+    eq(tasksTable.creatorId, userId),
     status === TaskStatus.IN_PROGRESS
       ? and(
           lte(tasksTable.startedAt, now),
@@ -869,10 +866,6 @@ export async function getTasksByCoMonitor(
       total: sql<number>`count(distinct ${tasksTable.id})`.as("total"),
     })
     .from(tasksTable)
-    .innerJoin(
-      coMonitorsTable,
-      eq(coMonitorsTable.userId, tasksTable.creatorId)
-    )
     .where(whereCondition)
     .execute();
 
@@ -905,10 +898,6 @@ export async function getTasksByCoMonitor(
       `.as("student_count"),
     })
     .from(tasksTable)
-    .innerJoin(
-      coMonitorsTable,
-      eq(coMonitorsTable.userId, tasksTable.creatorId)
-    )
     .leftJoin(coursesTable, eq(tasksTable.courseId, coursesTable.id))
     .where(whereCondition)
     .limit(pageSize)
@@ -1194,7 +1183,7 @@ export async function getLateSubmissionsCountByMonitor(userId: number) {
 
   return result[0]?.count ?? 0;
 }
-export async function getLateSubmissionsCountByCoMonitor(coMonitorId: number) {
+export async function getLateSubmissionsCountByCoMonitor(userId: number) {
   const result = await db
     .select({ count: count() })
     .from(submissionsTable)
@@ -1202,7 +1191,7 @@ export async function getLateSubmissionsCountByCoMonitor(coMonitorId: number) {
     .innerJoin(coursesTable, eq(submissionsTable.courseId, coursesTable.id))
     .where(
       and(
-        eq(coursesTable.coMonitorId, coMonitorId),
+        eq(tasksTable.creatorId, userId),
         gt(submissionsTable.createdAt, tasksTable.deadline)
       )
     );
