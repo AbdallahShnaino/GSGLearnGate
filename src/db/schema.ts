@@ -160,11 +160,7 @@ export const tasksTable = sqliteTable("tasks", {
   startedAt: text("started_at")
     .notNull()
     .default(sql`(current_timestamp)`),
-  creatorId: int("creator_id")
-    .notNull()
-    .references((): AnySQLiteColumn => usersTable.id, {
-      onDelete: "cascade",
-    }),
+  creatorId: int("creator_id").notNull(),
   courseId: int("course_id")
     .notNull()
     .references((): AnySQLiteColumn => coursesTable.id, {
