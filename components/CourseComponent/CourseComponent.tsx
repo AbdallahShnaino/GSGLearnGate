@@ -29,8 +29,8 @@ const CourseComponent = ({ courses }: IProps) => {
     }
   };
   return (
-    <div className="flex flex-col gap-10">
-      <div className="grid grid-cols-[repeat(auto-fill,_minmax(300px,_1fr))] gap-8">
+    <div className="flex gap-10 flex-col">
+      <div className="grid grid-cols-[repeat(auto-fill,_minmax(350px,_1fr))] gap-8 w-full">
         {currentCourses.map((course) => {
           const imageUrl =
             course.image ||
@@ -81,14 +81,14 @@ const CourseComponent = ({ courses }: IProps) => {
             </Link>
           );
         })}
-        <TempPagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          handleNextPage={handleNextPage}
-          handlePreviousPage={handlePreviousPage}
-          onPageChange={setCurrentPage}
-        />
       </div>
+      <TempPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        handleNextPage={handleNextPage}
+        handlePreviousPage={handlePreviousPage}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 };

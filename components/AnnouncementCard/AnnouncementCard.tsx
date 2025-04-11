@@ -6,7 +6,7 @@ interface IProps {
 
 const AnnouncementsCard = ({ description, title, createdAt }: IProps) => {
   return (
-    <div className="relative p-6 rounded-2xl bg-white shadow-lg transition-transform transform hover:scale-105 hover:shadow-xl w-full max-w-3xl mx-auto mb-6">
+    <div className="relative p-6 rounded-2xl bg-white shadow-lg transition-transform transform hover:scale-105 hover:shadow-xl mx-auto mb-6 border-1 border-gray-300 max-h-[220] h-[220] flex flex-col justify-between">
       <div className="absolute left-0 top-0 bottom-0 w-2 bg-[#319DC4] rounded-l-xl"></div>
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-semibold text-gray-900 hover:text-[#FFA41F] transition-all duration-300 ease-in-out">
