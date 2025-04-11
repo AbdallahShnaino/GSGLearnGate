@@ -1,8 +1,28 @@
-import React from "react";
+"use client";
+import {
+  submitUser,
+  SubmitUserStatus,
+} from "@/controllers/actions/createUserAction";
+import { useRouter } from "next/navigation";
+import React, { useActionState, useEffect } from "react";
+
+const initialState: SubmitUserStatus = {
+  success: false,
+  message: "",
+  error: "",
+  userId: undefined,
+};
 
 const SignupForm = () => {
+  const [formState, action, isPending] = useActionState(submitUser, initialState);
+  const router = useRouter();
+  useEffect(()=>{
+    if(formState.success){
+      router.push('/login')
+    }
+  },[formState.success, router])
   return (
-    <form>
+    <form action={action}>
       <div className="flex flex-col mt-4 gap-1.5">
         <label htmlFor="email">Email*</label>
         <input
@@ -35,7 +55,7 @@ const SignupForm = () => {
             <label htmlFor="firstName">First Name*</label>
             <input
               type="text"
-              name="first_name"
+              name="firstName"
               id="firstName"
               placeholder="First Name"
               className="border-1 border-gray-400 rounded-md px-1.5 py-1.5 focus:outline-blue-500"
@@ -47,7 +67,7 @@ const SignupForm = () => {
             <label htmlFor="lastName">Last Name*</label>
             <input
               type="text"
-              name="last_name"
+              name="lastName"
               id="lastName"
               placeholder="Last Name"
               className="border-1 border-gray-400 rounded-md px-1.5 py-1.5 focus:outline-blue-500"
@@ -62,33 +82,34 @@ const SignupForm = () => {
       </div>
       <div className="flex flex-col md:flex-row justify-between mt-4">
         <div className="flex flex-col gap-1.5 w-full md:w-[48%]">
-          <label htmlFor="idNumber">Identification Number*</label>
+          <label htmlFor="city">City*</label>
           <input
-            type="number"
-            name="id"
-            id="idNumber"
-            placeholder="Identification Number"
+            type="text"
+            name="city"
+            id="city"
+            placeholder="City"
             className="border-1 border-gray-400 rounded-md px-1.5 py-1.5 focus:outline-blue-500"
             required
           />
         </div>
 
         <div className="flex flex-col gap-1.5 w-full md:w-[48%] mt-4 md:mt-0">
-          <label htmlFor="DOB">Date Of Birth*</label>
+          <label htmlFor="dateOfBirth">Date Of Birth*</label>
           <input
             type="date"
-            name="date_of_birth"
-            id="DOB"
+            name="dateOfBirth"
+            id="dateOfBirth"
             placeholder="Date Of Birth"
             className="border-1 border-gray-400 rounded-md px-1.5 py-1.5 focus:outline-blue-500"
             required
           />
         </div>
       </div>
+      {!formState.success && <div className="text-red-600 mt-3 text-center">{formState.message}</div>}
       <input
         type="submit"
-        value="Continue"
-        className="border-2 w-full rounded-md mt-4 p-2.5 text-lg cursor-pointer bg-[#1f2328] text-white hover:bg-[#32383f] mb-8 "
+        value={isPending ? "Submitting..." : "submit"}
+        className="border-2 w-full rounded-md mt-4 p-2.5 text-lg cursor-pointer bg-[#1f2328] text-white hover:bg-[#32383f]"
       />
     </form>
   );
