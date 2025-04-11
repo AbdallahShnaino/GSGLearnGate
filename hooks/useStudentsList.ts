@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getStudentsWithMonitorCorse } from "@/services/courses";
 import { StudentItem, StudentsListResponse } from "@/types/students";
+import { useAuth } from "@/context/user";
 
 export default function useStudentsList() {
-  const HELLO = 1;
+  const { user } = useAuth();
   const searchParams = useSearchParams();
   const [students, setStudents] = useState<StudentItem[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -20,7 +21,7 @@ export default function useStudentsList() {
       const { students, totalPages }: StudentsListResponse =
         await getStudentsWithMonitorCorse(
           currentPage,
-          HELLO ?? -1,
+          user.userId ?? -1,
           undefined,
           pageSize,
           courseId
