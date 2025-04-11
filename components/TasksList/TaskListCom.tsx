@@ -69,7 +69,7 @@ export default function TaskListClient({
   const handlePreviousPage = () => page > 1 && updatePage(page - 1);
   const onPageChange = (newPage: number) => updatePage(newPage);
 
-  if (loading) {
+  if (loading && initialTotal > 0) {
     return <Loader message="Loading data..." />;
   }
   return tasks.length > 0 ? (
