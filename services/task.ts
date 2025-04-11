@@ -11,7 +11,10 @@ import {
   getCoMonitorSubmissionsNotGradedCount,
 } from "@/src/db/queries/select";
 import { TaskStatus } from "@/types";
-import { getTaskSubmissionsOverStudentsCount, getTaskSubmissionsOverStudentsCountByCoMonitor } from "./submission";
+import {
+  getTaskSubmissionsOverStudentsCount,
+  getTaskSubmissionsOverStudentsCountByCoMonitor,
+} from "./submission";
 
 export async function createTaskByMonitor(
   creatorId: number,
@@ -153,7 +156,10 @@ export async function getTasksWithSubmissionsByCoMonitors(
     tasks.map(async (task) => {
       try {
         const { studentCount, submissionCount } =
-          await getTaskSubmissionsOverStudentsCountByCoMonitor(coMonitorId , task.id);
+          await getTaskSubmissionsOverStudentsCountByCoMonitor(
+            coMonitorId,
+            task.id
+          );
         return {
           ...task,
           submissionCount,

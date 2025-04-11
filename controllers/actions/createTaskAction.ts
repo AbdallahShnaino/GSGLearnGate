@@ -44,7 +44,6 @@ export async function submitTask(
       description,
       Number(points)
     );
-
     const file = formData.get("file") as File | null;
     if (file && file instanceof File && file.size > 0) {
       const path = await writeFile(file);

@@ -11,7 +11,7 @@ import {
 import Link from "next/link";
 
 export default async function CoMonitorDashboard() {
-  const { userId } = await requireAuth();
+  const user = await requireAuth();
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-6">
       <div className="flex items-center justify-between mb-8">
@@ -47,13 +47,13 @@ export default async function CoMonitorDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <StatusDashBoard coMonitorId={userId} />
+        <StatusDashBoard coMonitorId={user.userId} />
         <div className="bg-[#F8FAFC] p-4 rounded-lg border border-gray-100 shadow-sm h-full flex flex-col items-center">
           <h2 className="text-lg font-semibold text-gray-800 mb-14">
             Co-Monitor Profile
           </h2>
           <div className="w-full">
-            <ProfileCard coMonitorId={userId} />
+            <ProfileCard coMonitorId={user.userId} />
           </div>
         </div>
       </div>

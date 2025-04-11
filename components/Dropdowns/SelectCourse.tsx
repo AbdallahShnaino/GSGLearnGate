@@ -15,7 +15,7 @@ export default function SelectCourse({
 }: IProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [selectedCourseId, setSelectedCourseId] = useState<number>();
+  const [, setSelectedCourseId] = useState<number>();
   const setSearchParam = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set(key, value);
@@ -53,11 +53,6 @@ export default function SelectCourse({
           </option>
         )}
       </select>
-      <input
-        type="hidden"
-        name="courseId"
-        value={selectedCourseId ?? "no courseId value"}
-      />
     </div>
   );
 }
