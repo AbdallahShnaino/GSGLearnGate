@@ -1,11 +1,11 @@
 import CreateTaskForm from "@/components/Task/CreateTaskForm/CreateTaskForm";
 import { requireAuth } from "@/context/auth";
 
-import { getMonitorCoursesNames } from "@/services/courses";
+import { getCoMonitorCoursesNames } from "@/services/courses";
 
 export default async function CreateTaskPage() {
-  const { userId } = await requireAuth();
-  const coursesList = await getMonitorCoursesNames(userId);
+  const user = await requireAuth();
+  const coursesList = await getCoMonitorCoursesNames(user.userId);
 
   return <CreateTaskForm coursesList={coursesList} />;
 }
