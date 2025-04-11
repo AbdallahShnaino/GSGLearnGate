@@ -8,10 +8,10 @@ export default function useStudentsList() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const [students, setStudents] = useState<StudentItem[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState(0);
   const pageSize = 10;
   const [isLoading, setIsLoading] = useState(true);
-  const [totalPages, setTotalPages] = useState<number>(0);
 
   const courseId = Number(searchParams.get("courseId")) || undefined;
 
