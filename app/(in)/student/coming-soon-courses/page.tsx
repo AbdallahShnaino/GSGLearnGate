@@ -8,6 +8,9 @@ const ComingSoonCourses = async () => {
   const courses = await getNotStartedCoursesNotRegisteredByStudent(
     Number(studentId)
   );
+  const filteredCourses = courses?.filter(
+    (course) => new Date(course.applyEndDate).getTime() > new Date().getTime()
+  );
 
   return (
     <div className="px-6 py-3 w-full min-h-screen">
@@ -15,8 +18,8 @@ const ComingSoonCourses = async () => {
         Coming Soon Courses
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {courses && courses.length >= 1 ? (
-          courses?.map((course) => (
+        {filteredCourses && filteredCourses.length >= 1 ? (
+          filteredCourses?.map((course) => (
             <NotRegisteredCourseCard
               key={course.id}
               course={course}

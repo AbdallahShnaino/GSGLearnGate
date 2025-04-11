@@ -11,6 +11,7 @@ export async function POST(req: Request) {
       taskId: Number(body.taskId),
       courseId: Number(body.courseId),
       isPublic: body.isPublic,
+      submissionId: Number(body.submissionId) || null,
     });
 
     return NextResponse.json(newComment, { status: 200 });

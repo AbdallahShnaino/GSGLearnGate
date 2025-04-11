@@ -76,6 +76,8 @@ import {
   Role,
   StudentTaskStatus,
   StudentName,
+  SubmissionId,
+  SubmissionIdNum,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorsTask, MonitorTasksResponse } from "@/types/tasks";
@@ -2301,4 +2303,19 @@ export async function getStudentNameById(
     .innerJoin(usersTable, eq(studentsTable.userId, usersTable.id))
     .where(eq(studentsTable.id, studentId));
   return result;
+}
+
+export async function getSubmissionByCourseAndTask(
+  courseId: number,
+  taskId: number
+): Promise<SubmissionIdNum | null> {
+  const result = await db
+    .select({
+      id: submissionsTable.id,
+    })
+    .from(submissionsTable)
+    .innerJoin(coursesTable, eq(coursesTable.id, submissionsTable.courseId))
+    .innerJoin(tasksTable, eq(tasksTable.courseId, coursesTable.id))
+    .where(and(eq(tasksTable.id, taskId), eq(coursesTable.id, courseId)));
+  return result ? result[0] : null;
 }

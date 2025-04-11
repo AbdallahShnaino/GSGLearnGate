@@ -1,8 +1,10 @@
 "use client";
 
+import { setSubmissionId } from "@/app/lib/submissionStore";
 import { getAttachmentPathsByTaskId } from "@/src/db/queries/select";
 import { StudentSubmission } from "@/types";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 interface IProps {
   taskId: string;
@@ -45,7 +47,7 @@ const TaskSubmit = (props: IProps) => {
       let finalPath = path;
       if (submissionType === "file") {
         if (!file) {
-          alert("Please choose a file to upload.");
+          toast.warning("Please choose a file to upload.", { autoClose: 3000 });
           return;
         }
         const formData = new FormData();
@@ -60,6 +62,12 @@ const TaskSubmit = (props: IProps) => {
 
         const uploadData = await uploadRes.json();
         finalPath = uploadData.url;
+      }
+      if (submissionType === "link") {
+        if (!path) {
+          toast.warning("Please Paste a link", { autoClose: 3000 });
+          return;
+        }
       }
 
       const response = await fetch("/api/student/submitAttachment", {
@@ -78,10 +86,14 @@ const TaskSubmit = (props: IProps) => {
       const insertedData = await response.json();
       const newPath = insertedData.insertedAttachment.path;
       const feedback = insertedData.insertedSubmission.feedback;
+      const submissionId = insertedData.insertedSubmission.id;
+      setSubmissionId(submissionId);
       setAttachment((prev) => [...(prev || []), { path: newPath, feedback }]);
-      alert("Attachment Added Successfully");
+      toast.success("Attachment Added Successfully", { autoClose: 3000 });
     } catch {
-      alert("Something went wrong!! Please try again...");
+      toast.error("Something went wrong!! Please try again...", {
+        autoClose: 3000,
+      });
     }
   };
 

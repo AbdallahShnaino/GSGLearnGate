@@ -2,6 +2,7 @@
 
 import { Comments, StudentName } from "@/types";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 interface IProps {
   comments: Comments[] | null;
@@ -28,6 +29,7 @@ const StudentPublicComments = (props: IProps) => {
             taskId: Number(props.taskId),
             courseId: Number(props.courseId),
             isPublic: true,
+            submissionId: null,
           }),
         });
 
@@ -37,13 +39,15 @@ const StudentPublicComments = (props: IProps) => {
         const newComment = await response.json();
         setComments((prev) => [...(prev || []), newComment]);
         setContent("");
-        alert("Comment Added Successfully");
+        toast.success("Comment Added Successfully", { autoClose: 3000 });
       } catch (error) {
         console.error("Insert Comment failed:", error);
-        alert("Something went wrong!! Please try again...");
+        toast.error("Something went wrong!! Please try again...", {
+          autoClose: 3000,
+        });
       }
     } else {
-      alert("Add Content then post comment");
+      toast.warning("Add Content then post comment", { autoClose: 3000 });
     }
   };
   return (

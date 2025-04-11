@@ -4,6 +4,7 @@ import { Laptop } from "@phosphor-icons/react/dist/ssr";
 import { CalendarCheck } from "@phosphor-icons/react/dist/ssr";
 import { Megaphone } from "@phosphor-icons/react/dist/ssr";
 import { Clock } from "@phosphor-icons/react/dist/ssr";
+import { ToastContainer } from "react-toastify";
 
 export default async function StudentLayout({
   children,
@@ -12,6 +13,7 @@ export default async function StudentLayout({
 }>) {
   return (
     <div className="flex">
+      <ToastContainer position="top-right" />
       <SideBar
         links={[
           {
