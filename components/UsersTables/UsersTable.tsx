@@ -1,10 +1,8 @@
 "use client";
 import {
-  TrashSimple,
   PencilSimple,
   MagnifyingGlass,
 } from "@phosphor-icons/react/dist/ssr";
-import DeleteUserModal from "../DeleteUserModal/DeleteUserModal";
 import { useUsersTable } from "@/hooks/useUsersTable";
 import Loader from "../Shared/Loader";
 import { Role } from "@/types";
@@ -18,11 +16,6 @@ export default function UsersTable(props:IProps) {
     value,
     handleSearchChange,
     filteredUsers,
-    open,
-    setOpen,
-    selectedMonitor,
-    handleDeleteClick,
-    confirmDelete,
     isLoading,
     handleNextPage,
     handlePreviousPage,
@@ -76,9 +69,6 @@ export default function UsersTable(props:IProps) {
                   <td className="px-4 py-4 text-gray-700">{user.city}</td>
                   <td>
                     <div className="flex justify-evenly">
-                      <button onClick={() => handleDeleteClick(user.userId)}>
-                        <TrashSimple size={18} color="#ee1717" weight="fill" />
-                      </button>
                       <Link href={`/admin/users/${user.userId}`}>
                         <PencilSimple size={18} color="#1cc925" weight="fill" />
                       </Link>
@@ -89,13 +79,6 @@ export default function UsersTable(props:IProps) {
             </tbody>
           </table>
         </div>
-      {open && selectedMonitor && (
-        <DeleteUserModal
-          setOpen={setOpen}
-          confirmDelete={confirmDelete}
-          selectedUser={selectedMonitor.toString()}
-        />
-      )}
       <TempPagination
         currentPage={currentPage}
         totalPages={totalPages}
