@@ -9,7 +9,7 @@ import Submit from "./Submit";
 import SelectCourse from "@/components/Dropdowns/SelectCourse";
 import { AttachmentSelector } from "../AttachmentSelector/AttachmentSelector";
 import { useActionState } from "react";
-import { STATIC_COMONITOR_ID } from "@/context/keys";
+import { useAuth } from "@/context/user";
 
 type AttachmentType = "none" | "link" | "file";
 
@@ -18,6 +18,7 @@ interface IProps {
 }
 
 export default function CreateTaskForm({ coursesList }: IProps) {
+  const { user } = useAuth();
   const [attachment, setAttachment] = useState<{
     type: "link" | "file" | null;
     value: string | File | null;
@@ -81,7 +82,7 @@ export default function CreateTaskForm({ coursesList }: IProps) {
           >
             Task Title
           </label>
-          <input type="hidden" name="monitorId" value={STATIC_COMONITOR_ID} />
+          <input type="hidden" name="co-monitorId" value={user.userId!} />
           <input
             type="text"
             name="title"

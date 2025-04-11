@@ -1,4 +1,5 @@
-import { STATIC_COMONITOR_ID } from "@/context/keys";
+
+import { useAuth } from "@/context/user";
 import { getAnnouncements } from "@/services/announcement";
 import { getCoMonitorCoursesNames } from "@/services/courses";
 import { Announcement } from "@/types";
@@ -6,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 export default function useCoMonitorAnnouncements() {
+  const {user}=useAuth()
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -23,7 +25,7 @@ export default function useCoMonitorAnnouncements() {
     async (courseId?: number, page: number = 1) => {
       setIsLoading(true);
       try {
-        const courseData = await getCoMonitorCoursesNames(STATIC_COMONITOR_ID);
+        const courseData = await getCoMonitorCoursesNames(user.userId!);
         const courseIds = courseData
           ? courseData.map((course) => course.courseId)
           : undefined;
@@ -36,7 +38,7 @@ export default function useCoMonitorAnnouncements() {
 
         requests && setTotalPages(Math.ceil(requests.total / pageSize));
         setAnnouncements(requests.announcements);
-      } catch (error) {
+      } catch  {
         setAnnouncements(null);
         throw new Error("CODE:10007");
       } finally {

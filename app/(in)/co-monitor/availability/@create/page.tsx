@@ -8,10 +8,10 @@ import { getCoMonitorCoursesNames } from "@/services/courses";
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Submit from "./Submit";
+import { useAuth } from "@/context/user";
 
 export default function CreateAppointmentPage() {
-  const CO_MONITOR_ID = 5;
-
+  const { user } = useAuth();
   const [coursesList, setCoursesList] = useState<
     | {
         courseId: number;
@@ -32,7 +32,7 @@ export default function CreateAppointmentPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const courses = await getCoMonitorCoursesNames(CO_MONITOR_ID);
+      const courses = await getCoMonitorCoursesNames(user.userId!);
       setCoursesList(courses);
     } catch {
       throw new Error("CODE:602");
@@ -42,7 +42,7 @@ export default function CreateAppointmentPage() {
   };
   useEffect(() => {
     fetchData();
-  }, [CO_MONITOR_ID]);
+  }, [user.userId!]);
 
   useEffect(() => {
     if (formState?.message) {
@@ -73,7 +73,7 @@ export default function CreateAppointmentPage() {
             required
             className="w-full p-2 border rounded-md"
           />
-          <input type="hidden" name="coMonitorId" value={CO_MONITOR_ID} />
+          <input type="hidden" name="coMonitorId" value={user.userId!} />
         </div>
 
         <div className="grid grid-cols-2 gap-4">

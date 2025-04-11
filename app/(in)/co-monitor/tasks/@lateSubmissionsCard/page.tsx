@@ -1,9 +1,10 @@
-import { STATIC_COMONITOR_ID } from "@/context/keys";
+import { requireAuth } from "@/context/auth";
 import { getLateSubmissionsCoMonitorsCount } from "@/services/submission";
 import { Warning } from "@phosphor-icons/react/dist/ssr";
 
 export default async function LateSubmissionsCard() {
-  const count = await getLateSubmissionsCoMonitorsCount(STATIC_COMONITOR_ID);
+  const { userId } = await requireAuth();
+  const count = await getLateSubmissionsCoMonitorsCount(userId);
   return (
     <div className="bg-white border border-[#FFA41F]/30 rounded-lg p-4 shadow-sm">
       <div className="flex items-center justify-between">

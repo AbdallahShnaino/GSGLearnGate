@@ -1,11 +1,10 @@
-import { STATIC_COMONITOR_ID } from "@/context/keys";
+import { requireAuth } from "@/context/auth";
 import { getActiveTasksCoMonitorCount } from "@/services/task";
 import { CheckCircle } from "@phosphor-icons/react/dist/ssr";
 
 export default async function ActiveTasksCard() {
-  const activeTasksCount = await getActiveTasksCoMonitorCount(
-    STATIC_COMONITOR_ID
-  );
+  const { userId } = await requireAuth();
+  const activeTasksCount = await getActiveTasksCoMonitorCount(userId);
   return (
     <div className="bg-white border border-[#FFA41F]/30 rounded-lg p-4 shadow-sm">
       <div className="flex items-center justify-between">

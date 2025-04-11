@@ -1,5 +1,6 @@
 "use client";
 import Loader from "@/components/Shared/Loader";
+import { useAuth } from "@/context/user";
 import { getCoMonitorAppointmentsList } from "@/services/availability";
 import { CoMonitorAppointment } from "@/types/appointments";
 import { useEffect, useState } from "react";
@@ -7,12 +8,11 @@ import { useEffect, useState } from "react";
 export default function ListAppointmentPage() {
   const [availability, setAvailability] = useState<CoMonitorAppointment[]>();
   const [loading, setLoading] = useState(true);
-  const CO_MONITOR_ID = 5;
-
+  const { user } = useAuth();
   const fetchData = async () => {
     try {
       setLoading(true);
-      const appointments = await getCoMonitorAppointmentsList(CO_MONITOR_ID);
+      const appointments = await getCoMonitorAppointmentsList(user.userId!);
       setAvailability(appointments);
     } catch {
       throw new Error("CODE:604");
