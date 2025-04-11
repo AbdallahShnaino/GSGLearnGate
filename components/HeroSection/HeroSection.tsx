@@ -26,7 +26,7 @@ export default function HeroSection() {
       </div>
 
       {/* الفاصل الموجي */}
-      <div className="absolute bottom-0 left-0 w-full overflow-hidden rotate-180">
+      <div className="absolute bottom-0 left-0 w-full overflow-hidden rotate-180 max-lg:hidden">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 1200 120"

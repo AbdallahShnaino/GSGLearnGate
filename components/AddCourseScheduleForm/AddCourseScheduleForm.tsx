@@ -64,9 +64,9 @@ export default function AddCourseScheduleForm() {
   ];
 
   return (
-    <div className="w-full max-w-2xl mx-auto py-2 px-4">
+    <div className="w-full mx-auto mt-4 mb-10">
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="bg-white rounded-lg shadow-2xl overflow-hidden px-6 py-4">
+      <div className="bg-white rounded shadow-md overflow-hidden p-5 border-1 border-gray-300">
         <h1 className="text-xl font-semibold text-[#FFA41F] py-3">
           Schedule Course
         </h1>
@@ -210,10 +210,10 @@ export default function AddCourseScheduleForm() {
             <button
               type="submit"
               disabled={isPending || selectedDays.length === 0}
-              className={`w-1/3 px-4 py-2 border border-none rounded-md shadow-sm text-sm font-medium text-white ${
+              className={`w-full py-2 border-none rounded-md shadow-sm text-lg text-white ${
                 selectedDays.length === 0
                   ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-[#FFA41F] hover:bg-[#FF8A00]"
+                  : "bg-[#FFA41F] hover:bg-[#ffb11f] cursor-pointer"
               }`}
             >
               {isPending ? "Creating Schedules..." : "Create Schedules"}

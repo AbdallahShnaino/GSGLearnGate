@@ -32,11 +32,11 @@ const HeaderNav = ({ position }: positionProps) => {
         />
       ) : (
         <div className="flex items-center gap-3">
-          <Link className="py-2 px-4 hover:bg-[#f9fafb]" href={"/login"}>
+          <Link className="py-2 px-4 lg:text-white hover:text-black hover:bg-[#f9fafb] max-sm:py-1 max-sm:px-1" href={"/login"}>
             Log in
           </Link>
           <Link
-            className="py-2 px-4 bg-[var(--primary-color)] rounded text-white"
+            className="py-2 px-4 bg-[#ffa41f] hover:bg-[#ffaf1f] rounded text-white font-bold max-sm:py-1 max-sm:px-1"
             href={"/signup"}
           >
             Get started

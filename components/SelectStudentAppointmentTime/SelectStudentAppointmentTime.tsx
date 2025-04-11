@@ -1,6 +1,4 @@
 "use client";
-import { getCoMonitorAppointmentsList } from "@/services/availability";
-import { bookAppointment } from "@/src/db/queries/update";
 import { CoMonitorAppointment } from "@/types/appointments";
 import { useEffect, useState } from "react";
 
@@ -15,25 +13,42 @@ const SelectStudentAppointmentTime = (props: IProps) => {
   const [time, setTime] = useState("");
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchAppointments = async () => {
       try {
-        const appointments = await getCoMonitorAppointmentsList(
-          props.coMonitorId
+        const res = await fetch(
+          `/api/student/coMonitorAvailability?id=${props.coMonitorId}`
         );
-        setAvailability(appointments);
-      } catch {
-        throw new Error("CODE:3001");
+        const data = await res.json();
+        setAvailability(data);
+      } catch (err) {
+        console.error("Failed to fetch:", err);
       }
     };
-    fetchData();
+    fetchAppointments();
   }, [props.coMonitorId]);
 
   const handleBooking = async () => {
     try {
-      await bookAppointment(selectedRecord!.id, Number(props.studentId));
-      alert(`Appointment booked on ${selectedDate} at ${time}`);
-    } catch {
-      alert("Something went wrong!! Please try again...");
+      const response = await fetch("/api/student/bookingAppointment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          appointmentId: selectedRecord!.id,
+          studentId: Number(props.studentId),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to book appointment");
+      }
+
+      const result = await response.json();
+      alert("Appointment booked successfully!");
+    } catch (err) {
+      console.error("Booking failed:", err);
+      alert("Failed to book appointment");
     }
     setSelectedDate("");
     setTime("");
@@ -41,7 +56,9 @@ const SelectStudentAppointmentTime = (props: IProps) => {
   const handleDateSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = e.target.value;
     const newSelectedRecord = availability?.find((appointment) => {
-      return appointment.date.toLocaleDateString("en-GB") === selectedValue;
+      return (
+        new Date(appointment.date).toLocaleDateString("en-GB") === selectedValue
+      );
     });
     setSelectedDate(selectedValue);
     setSelectedRecord(newSelectedRecord);
@@ -67,9 +84,9 @@ const SelectStudentAppointmentTime = (props: IProps) => {
               .map((appointment) => (
                 <option
                   key={appointment.id}
-                  value={appointment.date.toLocaleDateString("en-GB")}
+                  value={new Date(appointment.date).toLocaleDateString("en-GB")}
                 >
-                  {appointment.date.toLocaleDateString("en-GB")}
+                  {new Date(appointment.date).toLocaleDateString("en-GB")}
                 </option>
               ))}
         </select>

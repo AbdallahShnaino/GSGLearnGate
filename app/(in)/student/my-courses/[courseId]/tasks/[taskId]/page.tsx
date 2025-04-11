@@ -1,23 +1,27 @@
+import { getStudentIdFromCookie } from "@/app/lib/auth/getStudentIdFromCookie";
 import StudentPublicComments from "@/components/StudentComments/StudentPublicComments/StudentPublicComments";
 import StudentPrivateComments from "@/components/StudentComments/SudentPrivateComments/StudentPrivateComments";
 import TaskSubmit from "@/components/TaskSubmit/TaskSubmit";
 import {
   getCommentsByTaskId,
+  getStudentNameById,
   getSubmissionIdByTaskId,
   getTaskByTaskId,
 } from "@/src/db/queries/select";
 
 interface IProps {
-  params: Promise<{ studentId: string; courseId: string; taskId: string }>;
+  params: Promise<{ courseId: string; taskId: string }>;
 }
 const Task = async (props: IProps) => {
-  const { studentId, courseId, taskId } = await props.params;
+  const studentId = await getStudentIdFromCookie();
+  const { courseId, taskId } = await props.params;
   const taskDetails = await getTaskByTaskId(Number(taskId));
   const comments = await getCommentsByTaskId(Number(courseId), Number(taskId));
-  const submissionId = await getSubmissionIdByTaskId(
-    Number(courseId),
-    Number(taskId)
-  );
+  const studentName = await getStudentNameById(Number(studentId));
+  // const submissionId = await getSubmissionIdByTaskId(
+  //   Number(courseId),
+  //   Number(taskId)
+  // );
 
   return (
     <div className="min-h-screen bg-[#FFF5E8] p-6 w-full">
@@ -78,10 +82,11 @@ const Task = async (props: IProps) => {
 
           <StudentPublicComments
             comments={comments}
-            studentId={studentId}
+            studentId={studentId!}
             courseId={courseId}
             taskId={taskId}
-            submissionId={submissionId![0].submissionId}
+            studentName={studentName}
+            // submissionId={submissionId![0].submissionId}
           />
         </div>
 
@@ -90,15 +95,16 @@ const Task = async (props: IProps) => {
             deadline={taskDetails![0].deadline}
             taskId={taskId}
             courseId={courseId}
-            studentId={studentId}
+            studentId={studentId!}
           />
 
           <StudentPrivateComments
             comments={comments}
-            studentId={studentId}
+            studentId={studentId!}
             courseId={courseId}
             taskId={taskId}
-            submissionId={submissionId![0].submissionId}
+            studentName={studentName}
+            // submissionId={submissionId![0].submissionId}
           />
         </div>
       </div>
