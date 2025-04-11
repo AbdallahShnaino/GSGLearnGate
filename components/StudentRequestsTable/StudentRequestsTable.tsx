@@ -17,7 +17,6 @@ export default function StudentRequestsTable({ monitorCoursesList }: IProps) {
     courseId,
     joiningOrders,
     currentPage,
-    pageSize,
     isApproveModalOpen,
     isRejectModalOpen,
     selectedOrder,

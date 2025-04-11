@@ -14,12 +14,13 @@ export default function Layout({
 }) {
   return (
     <ConditionalLayout
-      children={children}
       activeTasksCard={activeTasksCard}
       lateSubmissionsCard={lateSubmissionsCard}
       submissionsAwaitingReview={submissionsAwaitingReview}
       tasksList={tasksList}
       role="co-monitor"
-    />
+    >
+      {children}
+    </ConditionalLayout>
   );
 }

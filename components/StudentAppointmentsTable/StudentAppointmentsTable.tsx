@@ -15,7 +15,7 @@ const StudentAppointmentsTable = (props: IProps) => {
   const [filteredAppointments, setFilteredAppointments] = useState(
     props.appointments
   );
-  const [selectedCourse, setSelectedCourse] = useState("");
+  const [, setSelectedCourse] = useState("");
 
   useEffect(() => {
     const courseParam = searchParams.get("course") || "";

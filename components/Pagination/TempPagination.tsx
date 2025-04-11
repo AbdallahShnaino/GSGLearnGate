@@ -16,7 +16,6 @@ const TempPagination = ({
   handlePreviousPage,
   onPageChange,
 }: IProps) => {
-  console.log(totalPages);
   return (
     <div className="flex items-center justify-between">
       <p className="text-sm text-gray-500">

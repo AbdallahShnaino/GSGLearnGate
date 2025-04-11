@@ -5,15 +5,14 @@ import { getCoMonitorCoursesNames } from "@/services/courses";
 import { CourseScheduleList } from "@/types/attendanceOperations";
 import Link from "next/link";
 
-const SchedulePage = async ({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) => {
+interface SchedulePageProps {
+  searchParams: Promise<{ [courseId: string]: string }>;
+}
+const SchedulePage = async ({ searchParams }: SchedulePageProps) => {
   const coursesList = await getCoMonitorCoursesNames(STATIC_COMONITOR_ID);
-
-  const selectedCourseId = searchParams.courseId
-    ? Number(searchParams.courseId)
+  const params = await searchParams;
+  const selectedCourseId = params.courseId
+    ? Number(params.courseId)
     : coursesList?.[0]?.courseId;
 
   const schedules: CourseScheduleList[] = selectedCourseId

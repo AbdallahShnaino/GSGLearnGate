@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { GraduationCap, Books, CheckCircle, Spinner } from "phosphor-react"; // إضافة Spinner
+import { GraduationCap, Books, CheckCircle, Spinner } from "phosphor-react";
 import {
   fetchTotalStudentsByCoMonitor,
   fetchTotalCoursesByCoMonitor,
@@ -41,14 +41,11 @@ const StatusDashBoard = ({ coMonitorId }: { coMonitorId: number }) => {
         const tasks = await fetchTotalTasksByCoMonitor(coMonitorId);
         setTotalTasks(tasks);
         setLoadingTasks(false);
-
-        //
         setLoadingChart(true);
         const teachingStats = await getCoMonitorTeachingStats(coMonitorId);
         setCourses(teachingStats);
         setLoadingChart(false);
-      } catch (err) {
-        console.error("Error fetching dashboard data:", err);
+      } catch {
         setError("Failed to load dashboard data.");
       }
     };

@@ -37,7 +37,6 @@ export default function StudentSubmissionsTable({
     onPageChange,
     loading,
   } = useStudentSubmissions(taskId, searchQuery);
-  console.log("Submissions:", submissions);
   if (loading) {
     return <Loader message="Loading data..." />;
   }

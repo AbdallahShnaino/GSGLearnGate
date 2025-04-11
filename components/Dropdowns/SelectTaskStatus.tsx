@@ -8,17 +8,16 @@ interface IProps {
   value?: number;
   appendSearchParams: boolean;
 }
+const options = [
+  { key: 1, value: TaskStatus.ALL },
+  { key: 2, value: TaskStatus.COMPLETED },
+  { key: 3, value: TaskStatus.IN_PROGRESS },
+];
 
 export default function SelectTaskStatus({
   appendSearchParams,
   value,
 }: IProps) {
-  const options = [
-    { key: 1, value: TaskStatus.ALL },
-    { key: 2, value: TaskStatus.COMPLETED },
-    { key: 3, value: TaskStatus.IN_PROGRESS },
-  ];
-
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -64,7 +63,7 @@ export default function SelectTaskStatus({
       <select
         id="taskStatusList"
         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#FFA41F] focus:border-[#FFA41F]"
-        value={selectedTaskStatus} // Controlled value
+        value={selectedTaskStatus}
         onChange={(e) => {
           const newValue = e.target.value as TaskStatus;
           setSelectedTaskStatus(newValue);

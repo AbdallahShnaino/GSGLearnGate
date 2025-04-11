@@ -14,8 +14,8 @@ export default function ListAppointmentPage() {
       setLoading(true);
       const appointments = await getCoMonitorAppointmentsList(CO_MONITOR_ID);
       setAvailability(appointments);
-    } catch (error) {
-      console.error("Error loading data:", error);
+    } catch {
+      throw new Error("CODE:604");
     } finally {
       setLoading(false);
     }

@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getCoMonitorTasks } from "@/services/task";
 import { TaskStatus } from "@/types";
-import { MonitorsTasks } from "@/types/tasksOperations";
 import { getStudentsCountPerCourse } from "@/services/courses";
 import { STATIC_COMONITOR_ID } from "@/context/keys";
+import { MonitorsTask } from "@/types/tasks";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -16,7 +16,7 @@ export function useCoMonitorTasks() {
     (searchParams.get("taskStatus") as TaskStatus) || TaskStatus.ALL;
   const page = Number(searchParams.get("page")) || 1;
 
-  const [tasks, setTasks] = useState<MonitorsTasks[]>([]);
+  const [tasks, setTasks] = useState<MonitorsTask[]>([]);
   const [total, setTotal] = useState(0);
   const [_, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -29,7 +29,7 @@ export function useCoMonitorTasks() {
       setLoading(true);
       try {
         const { tasks, total } = await getCoMonitorTasks(
-         STATIC_COMONITOR_ID,
+          STATIC_COMONITOR_ID,
           taskStatus,
           page,
           ITEMS_PER_PAGE

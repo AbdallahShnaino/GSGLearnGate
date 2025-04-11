@@ -11,7 +11,7 @@ import {
 
 import { Metadata } from "next";
 
-export const links: SidebarLink[] = [
+const links: SidebarLink[] = [
   {
     href: "/co-monitor",
     label: "Dashboard",

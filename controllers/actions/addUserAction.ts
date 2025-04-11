@@ -12,18 +12,24 @@ export async function submitUser(
   state: UserState,
   formData: FormData
 ): Promise<UserState> {
-  console.log("formData:", Object.fromEntries(formData));
-
   try {
     const firstName = formData.get("firstName") as string;
-    const lastName= formData.get("lastName") as string;
+    const lastName = formData.get("lastName") as string;
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const city = formData.get("city") as string;
     const role = formData.get("role") as Role;
     const dateOfBirth = new Date(formData.get("dateOfBirth") as string);
 
-    if (!firstName || !lastName || !email || !password || !city || !role || !dateOfBirth) {
+    if (
+      !firstName ||
+      !lastName ||
+      !email ||
+      !password ||
+      !city ||
+      !role ||
+      !dateOfBirth
+    ) {
       return {
         success: false,
         error: "Missing required fields",
@@ -36,12 +42,11 @@ export async function submitUser(
     let publicFilePath: string = "";
 
     if (image) {
-
       publicFilePath = await writeFile(image);
     }
 
-    const newUser= await addUser({
-
+    const newUser = await addUser(
+      {
         firstName,
         lastName,
         email,
@@ -50,15 +55,16 @@ export async function submitUser(
         image: publicFilePath,
         role,
         city,
-    },role);
+      },
+      role
+    );
 
     return {
       success: true,
       message: "Course creation successful.",
       id: newUser.id,
     };
-  } catch (error) {
-    console.error("Error in submitCourse:", error);
+  } catch {
     return {
       success: false,
       error: "Something went wrong",
