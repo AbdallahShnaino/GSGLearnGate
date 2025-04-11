@@ -12,8 +12,6 @@ import {
   lt,
   inArray,
   asc,
-  isNull,
-  not,
 } from "drizzle-orm";
 
 import {
@@ -112,7 +110,6 @@ export async function getCourseSchedule(
 
   return query;
 }
-
 
 export async function getUserByEmail(
   email: string

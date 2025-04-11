@@ -5,7 +5,7 @@ import Loader from "@/components/Shared/Loader";
 import { TimePicker } from "@/components/TimePicker/TimePicker";
 import { saveAvailability } from "@/controllers/actions/availability";
 import { getCoMonitorCoursesNames } from "@/services/courses";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Submit from "./Submit";
 import { useAuth } from "@/context/user";
@@ -29,20 +29,23 @@ export default function CreateAppointmentPage() {
     errors: null,
   });
 
-  const fetchData = async () => {
+  const userId = user.userId!;
+
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const courses = await getCoMonitorCoursesNames(user.userId!);
+      const courses = await getCoMonitorCoursesNames(userId);
       setCoursesList(courses);
     } catch {
       throw new Error("CODE:602");
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
   useEffect(() => {
     fetchData();
-  }, [user.userId!]);
+  }, [fetchData]);
 
   useEffect(() => {
     if (formState?.message) {
@@ -53,7 +56,7 @@ export default function CreateAppointmentPage() {
       }
     }
     fetchData();
-  }, [formState]);
+  }, [formState, fetchData]);
 
   if (loading) return <Loader message="Loading availability..." />;
 
