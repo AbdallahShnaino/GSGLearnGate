@@ -4,8 +4,8 @@ import AnnouncementsTableByCoMonitor from "@/components/AnnouncementsTable/Annou
 import { requireAuth } from "@/context/auth";
 
 export default async function Page() {
-  const { userId } = await requireAuth();
-  const coursesList = await getCoMonitorCoursesNames(userId);
+  const user = await requireAuth();
+  const coursesList = await getCoMonitorCoursesNames(user.userId);
 
   return (
     <div className="container mx-auto px-6 py-8">
