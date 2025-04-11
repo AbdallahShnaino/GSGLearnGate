@@ -3,26 +3,28 @@ import Loader from "@/components/Shared/Loader";
 import { useAuth } from "@/context/user";
 import { getCoMonitorAppointmentsList } from "@/services/availability";
 import { CoMonitorAppointment } from "@/types/appointments";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export default function ListAppointmentPage() {
   const [availability, setAvailability] = useState<CoMonitorAppointment[]>();
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
-  const fetchData = async () => {
+  const userId = user.userId!;
+
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const appointments = await getCoMonitorAppointmentsList(user.userId!);
+      const appointments = await getCoMonitorAppointmentsList(userId);
       setAvailability(appointments);
     } catch {
       throw new Error("CODE:604");
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
   if (loading) return <Loader message="Loading availability..." />;
 
   return (

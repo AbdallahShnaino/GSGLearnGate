@@ -97,16 +97,6 @@ const TaskSubmit = (props: IProps) => {
     setDisplayPath(e.target.value);
   };
 
-const getAttachment = async () => {
-      const studentAttachment = await getAttachmentPathsByTaskId(
-        Number(props.taskId),
-        Number(props.courseId)
-      );
-      setAttachment(studentAttachment);
-      setLoading(false);
-    };
-    getAttachment();
-  }, [props.courseId, props.taskId]);
   return (
     <>
       {loading ? (

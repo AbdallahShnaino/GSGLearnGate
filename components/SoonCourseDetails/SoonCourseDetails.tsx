@@ -28,7 +28,6 @@ const SoonCourseDetails = (props: IProps) => {
         throw new Error("Request failed");
       }
 
-      const result = await response.json();
       alert("Joining Request Sent Successfully");
     } catch {
       alert("Something went wrong!! Please try again...");
