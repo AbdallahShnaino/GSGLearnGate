@@ -1,6 +1,7 @@
 "use client";
 import { CoMonitorAppointment } from "@/types/appointments";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 interface IProps {
   coMonitorId: number;
@@ -44,10 +45,15 @@ const SelectStudentAppointmentTime = (props: IProps) => {
         throw new Error("Failed to book appointment");
       }
 
+<<<<<<< Updated upstream
       alert("Appointment booked successfully!");
+=======
+      const result = await response.json();
+      toast.success("Appointment booked successfully!", { autoClose: 3000 });
+>>>>>>> Stashed changes
     } catch (err) {
       console.error("Booking failed:", err);
-      alert("Failed to book appointment");
+      toast.error("Failed to book appointment", { autoClose: 3000 });
     }
     setSelectedDate("");
     setTime("");

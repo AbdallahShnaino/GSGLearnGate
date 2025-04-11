@@ -498,3 +498,7 @@ export type StudentName = {
   id: number;
   name: string;
 };
+
+export type SubmissionIdNum = {
+  id: string | null;
+};

@@ -1,7 +1,8 @@
 "use client";
 
 import { Comments, StudentName } from "@/types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 interface IProps {
   comments: Comments[] | null;
@@ -9,13 +10,44 @@ interface IProps {
   courseId: string;
   taskId: string;
   studentName: StudentName[];
-  // submissionId: number;
 }
 const StudentPrivateComments = (props: IProps) => {
   const [content, setContent] = useState("");
   const [comments, setComments] = useState<Comments[] | null>(props.comments);
+  const [submissionId, setSubmissionId] = useState<number | null>(null);
+  const fetchSubmission = async () => {
+    try {
+      const res = await fetch("/api/student/getSubmission", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          courseId: props.courseId,
+          taskId: props.taskId,
+        }),
+      });
+
+      if (!res.ok) {
+        console.error("No submission found");
+        return;
+      }
+
+      const data = await res.json();
+
+      if (data === null || data.id === null) {
+        console.log("No submission found");
+        setSubmissionId(null);
+      } else {
+        setSubmissionId(Number(data.id));
+      }
+    } catch (error) {
+      console.error("Error fetching submission:", error);
+    }
+  };
+  useEffect(() => {
+    fetchSubmission();
+  }, [props.courseId, props.taskId]);
   const handleClick = async () => {
-    if (content !== "") {
+    if (content !== "" && submissionId !== null) {
       try {
         const response = await fetch("/api/student/insertComment", {
           method: "POST",
@@ -28,6 +60,7 @@ const StudentPrivateComments = (props: IProps) => {
             taskId: Number(props.taskId),
             courseId: Number(props.courseId),
             isPublic: false,
+            submissionId: submissionId,
           }),
         });
 
@@ -37,16 +70,17 @@ const StudentPrivateComments = (props: IProps) => {
         const newComment = await response.json();
         setComments((prev) => [...(prev || []), newComment]);
         setContent("");
-        alert("Comment Added Successfully");
+        fetchSubmission();
+        toast.success("Comment Added Successfully", { autoClose: 3000 });
       } catch (error) {
         console.error("Insert Comment failed:", error);
-        alert("Something went wrong!! Please try again...");
+        toast.error("Comment Added Successfully", { autoClose: 3000 });
       }
     } else {
-      alert("Add Content then post comment");
+      toast.warning("Add Content then post comment", { autoClose: 3000 });
     }
   };
-  return (
+  return submissionId ? (
     <section className="bg-white p-6 rounded-xl shadow-md">
       <h2 className="text-xl font-semibold text-[#FFA41F] mb-4">
         Private Comments
@@ -96,6 +130,12 @@ const StudentPrivateComments = (props: IProps) => {
           Post Comment
         </button>
       </div>
+    </section>
+  ) : (
+    <section className="bg-white p-6 rounded-xl shadow-md">
+      <h2 className="text-xl font-semibold text-[#FFA41F] mb-4">
+        Private Comments only after submit
+      </h2>
     </section>
   );
 };
