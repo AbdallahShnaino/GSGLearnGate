@@ -1,11 +1,12 @@
 import AnnouncementsTable from "@/components/AnnouncementsTable/AnnouncementsTable";
 import { getMonitorCoursesNames } from "@/services/courses";
 import CreateTaskButton from "@/components/CreateTaskButtom/CreateTaskButtom";
+import { requireAuth } from "@/context/auth";
 
 export default async function Page() {
-  const HELLO = 1;
+  const { userId } = await requireAuth();
 
-  const coursesList = await getMonitorCoursesNames(HELLO ?? -1);
+  const coursesList = await getMonitorCoursesNames(userId);
 
   return (
     <div className="container mx-auto px-6 py-8">

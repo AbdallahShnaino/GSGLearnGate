@@ -3,13 +3,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { getTasksWithSubmissions } from "@/services/task";
 import { TaskStatus } from "@/types";
 import { MonitorsTask } from "@/types/tasks";
+import { useAuth } from "@/context/user";
 
 const ITEMS_PER_PAGE = 10;
 
 export function useMonitorTasks() {
+  const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const HELLO = 1;
   const taskStatus =
     (searchParams.get("taskStatus") as TaskStatus) || TaskStatus.ALL;
   const page = Number(searchParams.get("page")) || 1;
@@ -24,7 +25,7 @@ export function useMonitorTasks() {
       setLoading(true);
       try {
         const { tasks, total } = await getTasksWithSubmissions(
-          HELLO ?? -1,
+          user.userId ?? -1,
           taskStatus,
           page,
           ITEMS_PER_PAGE

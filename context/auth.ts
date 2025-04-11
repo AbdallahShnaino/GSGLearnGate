@@ -1,3 +1,4 @@
+"use server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 
@@ -15,7 +16,9 @@ export interface AuthUser {
   id: number;
 }
 
-export function getUserFromToken(token: string | null): AuthUser | null {
+export async function getUserFromToken(
+  token: string | null
+): Promise<AuthUser | null> {
   if (!token) return null;
 
   try {
@@ -39,7 +42,7 @@ export async function requireAuth(): Promise<AuthUser> {
   const token = cookieStore.get("token")?.value;
   let user;
   if (token) {
-    user = getUserFromToken(token);
+    user = await getUserFromToken(token);
   }
   if (!user) {
     throw new Error("User not authenticated");
