@@ -116,7 +116,7 @@ export async function insertTask(data: Omit<Task, "id">): Promise<Task> {
       startedAt: new Date(inserted.startedAt),
       deadline: new Date(inserted.deadline),
     } as Task;
-  } catch (error) {
+  } catch {
     throw new Error("CODE:807");
   }
 }
@@ -140,10 +140,6 @@ export async function insertComment(
   if (!data.content) {
     throw new Error("CODE:801");
   }
-  // if (!data.submissionId || !data.content || !data.privateRecipientId) {
-  //   throw new Error("CODE:801");
-  // }
-
   try {
     const [inserted] = await db.insert(commentsTable).values(data).returning();
 
