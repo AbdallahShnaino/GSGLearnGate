@@ -90,7 +90,7 @@ const FullCourseCard = (props: IProps) => {
       </div>
       {props.course.status !== "Finished" && (
         <Link
-          href={`/student/${props.studentId}/my-courses/${props.course.id}`}
+          href={`/student/my-courses/${props.course.id}`}
           className="mt-3 px-4 py-2 bg-[#FFA41F] text-white rounded-lg hover:bg-[#FFA41F] transition cursor-pointer flex justify-center"
         >
           More Details

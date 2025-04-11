@@ -1,6 +1,5 @@
 "use client";
 
-import { insertJoiningRequest } from "@/src/db/queries/insert";
 import { Status, StudentCourseDetails } from "@/types";
 
 interface IProps {
@@ -10,22 +9,33 @@ interface IProps {
   requestStatus: Status | null;
 }
 const SoonCourseDetails = (props: IProps) => {
-  console.log(props.requestStatus);
-
   const handleRegister = async () => {
     try {
-      await insertJoiningRequest({
-        studentId: Number(props.studentId),
-        courseId: Number(props.soonCourseId),
-        interviewStatus: Status.PENDING,
-        joiningStatus: Status.PENDING,
+      const response = await fetch("/api/student/joinRequests", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          studentId: Number(props.studentId),
+          courseId: Number(props.soonCourseId),
+          interviewStatus: Status.PENDING,
+          joiningStatus: Status.PENDING,
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error("Request failed");
+      }
+
+      const result = await response.json();
       alert("Joining Request Sent Successfully");
     } catch (error) {
       console.error("Register failed:", error);
       alert("Something went wrong!! Please try again...");
     }
   };
+
   return (
     <div className="w-full max-w-screen-xl mx-auto bg-gray-50 p-8">
       <div className="bg-gradient-to-r from-[#FFA41F] to-[#FF8C1A] p-6 rounded-2xl text-white shadow-lg mb-8">

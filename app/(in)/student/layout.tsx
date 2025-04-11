@@ -6,39 +6,36 @@ import { Megaphone } from "@phosphor-icons/react/dist/ssr";
 import { Clock } from "@phosphor-icons/react/dist/ssr";
 
 export default async function StudentLayout({
-  params,
   children,
 }: Readonly<{
-  params: Promise<{ studentId: string }>;
   children: React.ReactNode;
 }>) {
-  const { studentId } = await params;
   return (
     <div className="flex">
       <SideBar
         links={[
           {
-            href: `/student/${studentId}`,
+            href: `/student`,
             label: "Dashboard",
             icon: <Gauge />,
           },
           {
-            href: `/student/${studentId}/my-courses`,
+            href: `/student/my-courses`,
             label: "My Courses",
             icon: <Laptop />,
           },
           {
-            href: `/student/${studentId}/appointments`,
+            href: `/student/appointments`,
             label: "Appointments",
             icon: <CalendarCheck />,
           },
           {
-            href: `/student/${studentId}/announcements`,
+            href: `/student/announcements`,
             label: "Announcements ",
             icon: <Megaphone />,
           },
           {
-            href: `/student/${studentId}/coming-soon-courses`,
+            href: `/student/coming-soon-courses`,
             label: "Soon Courses",
             icon: <Clock />,
           },

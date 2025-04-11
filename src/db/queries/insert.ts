@@ -131,9 +131,12 @@ export async function insertAttachment(
 export async function insertComment(
   data: Omit<InsertCommentsTable, "id">
 ): Promise<SelectCommentsTable> {
-  if (!data.submissionId || !data.content || !data.privateRecipientId) {
+  if (!data.content) {
     throw new Error("CODE:801");
   }
+  // if (!data.submissionId || !data.content || !data.privateRecipientId) {
+  //   throw new Error("CODE:801");
+  // }
 
   try {
     const [inserted] = await db.insert(commentsTable).values(data).returning();

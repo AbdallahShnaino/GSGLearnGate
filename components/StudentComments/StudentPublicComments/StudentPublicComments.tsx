@@ -1,33 +1,49 @@
 "use client";
 
-import { insertComment } from "@/src/db/queries/insert";
-import { Comments } from "@/types";
+import { Comments, StudentName } from "@/types";
 import { useState } from "react";
 
 interface IProps {
-  comments: Comments[];
+  comments: Comments[] | null;
   studentId: string;
   courseId: string;
   taskId: string;
-  submissionId: number;
+  studentName: StudentName[];
+  // submissionId: number;
 }
 const StudentPublicComments = (props: IProps) => {
   const [content, setContent] = useState("");
+  const [comments, setComments] = useState<Comments[] | null>(props.comments);
   const handleClick = async () => {
-    try {
-      await insertComment({
-        content: content,
-        studentId: Number(props.studentId),
-        submissionId: props.submissionId,
-        taskId: Number(props.taskId),
-        courseId: Number(props.courseId),
-        isPublic: true,
-        privateRecipientId: 5,
-      });
-      setContent("");
-    } catch (error) {
-      console.error("Insert Comment failed:", error);
-      alert("Something went wrong!! Please try again...");
+    if (content !== "") {
+      try {
+        const response = await fetch("/api/student/insertComment", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            content: content,
+            studentId: Number(props.studentId),
+            taskId: Number(props.taskId),
+            courseId: Number(props.courseId),
+            isPublic: true,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to submit comment");
+        }
+        const newComment = await response.json();
+        setComments((prev) => [...(prev || []), newComment]);
+        setContent("");
+        alert("Comment Added Successfully");
+      } catch (error) {
+        console.error("Insert Comment failed:", error);
+        alert("Something went wrong!! Please try again...");
+      }
+    } else {
+      alert("Add Content then post comment");
     }
   };
   return (
@@ -36,32 +52,33 @@ const StudentPublicComments = (props: IProps) => {
         Public Comments
       </h2>
       <div className="space-y-4">
-        {props.comments
-          .filter((comment) => comment.isPublic)
-          .map((comment) => {
-            return (
-              <div
-                key={comment.id}
-                className="bg-[#FFF5E8] p-4 rounded-lg shadow flex justify-between items-center"
-              >
-                <p className="text-sm text-neutral-700">
-                  <span className="font-medium text-[#E99375]">
-                    {comment.userName}:
-                  </span>{" "}
-                  {comment.content}
-                </p>
-                <p className="text-xs text-neutral-700">
-                  {new Date(comment.createdAt).toLocaleDateString("en-GB", {
-                    year: "numeric",
-                    month: "2-digit",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </p>
-              </div>
-            );
-          })}
+        {comments &&
+          comments
+            .filter((comment) => comment.isPublic)
+            .map((comment) => {
+              return (
+                <div
+                  key={comment.id}
+                  className="bg-[#FFF5E8] p-4 rounded-lg shadow flex justify-between items-center"
+                >
+                  <p className="text-sm text-neutral-700">
+                    <span className="font-medium text-[#E99375]">
+                      {comment.userName || props.studentName[0].name}:
+                    </span>{" "}
+                    {comment.content}
+                  </p>
+                  <p className="text-xs text-neutral-700">
+                    {new Date(comment.createdAt).toLocaleDateString("en-GB", {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </div>
+              );
+            })}
       </div>
       <form className="space-y-4 mt-5">
         <textarea

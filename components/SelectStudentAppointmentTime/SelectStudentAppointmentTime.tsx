@@ -1,6 +1,4 @@
 "use client";
-import { getCoMonitorAppointmentsList } from "@/services/availability";
-import { bookAppointment } from "@/src/db/queries/update";
 import { CoMonitorAppointment } from "@/types/appointments";
 import { useEffect, useState } from "react";
 
@@ -14,36 +12,54 @@ const SelectStudentAppointmentTime = (props: IProps) => {
   const [availability, setAvailability] = useState<CoMonitorAppointment[]>();
   const [time, setTime] = useState("");
 
-  const fetchData = async () => {
-    try {
-      const appointments = await getCoMonitorAppointmentsList(
-        props.coMonitorId
-      );
-      setAvailability(appointments);
-    } catch (error) {
-      console.error("Error loading data:", error);
-    }
-  };
-
   useEffect(() => {
-    fetchData();
-  }, []);
+    const fetchAppointments = async () => {
+      try {
+        const res = await fetch(
+          `/api/student/coMonitorAvailability?id=${props.coMonitorId}`
+        );
+        const data = await res.json();
+        setAvailability(data);
+      } catch (err) {
+        console.error("Failed to fetch:", err);
+      }
+    };
+    fetchAppointments();
+  }, [props.coMonitorId]);
 
   const handleBooking = async () => {
     try {
-      await bookAppointment(selectedRecord!.id, Number(props.studentId));
-      alert(`Appointment booked on ${selectedDate} at ${time}`);
-    } catch (error) {
-      console.error("Booking failed:", error);
-      alert("Something went wrong!! Please try again...");
+      const response = await fetch("/api/student/bookingAppointment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          appointmentId: selectedRecord!.id,
+          studentId: Number(props.studentId),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to book appointment");
+      }
+
+      const result = await response.json();
+      alert("Appointment booked successfully!");
+    } catch (err) {
+      console.error("Booking failed:", err);
+      alert("Failed to book appointment");
     }
+
     setSelectedDate("");
     setTime("");
   };
   const handleDateSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = e.target.value;
     const newSelectedRecord = availability?.find((appointment) => {
-      return appointment.date.toLocaleDateString("en-GB") === selectedValue;
+      return (
+        new Date(appointment.date).toLocaleDateString("en-GB") === selectedValue
+      );
     });
     setSelectedDate(selectedValue);
     setSelectedRecord(newSelectedRecord);
@@ -69,9 +85,9 @@ const SelectStudentAppointmentTime = (props: IProps) => {
               .map((appointment) => (
                 <option
                   key={appointment.id}
-                  value={appointment.date.toLocaleDateString("en-GB")}
+                  value={new Date(appointment.date).toLocaleDateString("en-GB")}
                 >
-                  {appointment.date.toLocaleDateString("en-GB")}
+                  {new Date(appointment.date).toLocaleDateString("en-GB")}
                 </option>
               ))}
         </select>

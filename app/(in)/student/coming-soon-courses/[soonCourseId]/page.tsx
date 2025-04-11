@@ -3,12 +3,14 @@ import {
   getCoursesByStudentId,
   getJoiningRequestStatus,
 } from "@/src/db/queries/select";
+import { getStudentIdFromCookie } from "@/app/lib/auth/getStudentIdFromCookie";
 
 interface IProps {
-  params: Promise<{ studentId: string; soonCourseId: string }>;
+  params: Promise<{ soonCourseId: string }>;
 }
 const page = async (props: IProps) => {
-  const { studentId, soonCourseId } = await props.params;
+  const studentId = await getStudentIdFromCookie();
+  const { soonCourseId } = await props.params;
   const courseData = await getCoursesByStudentId(Number(soonCourseId));
   const requestStatus = await getJoiningRequestStatus(
     Number(studentId),
@@ -18,7 +20,7 @@ const page = async (props: IProps) => {
   return (
     <SoonCourseDetails
       courseData={courseData}
-      studentId={studentId}
+      studentId={studentId!}
       soonCourseId={soonCourseId}
       requestStatus={requestStatus}
     />

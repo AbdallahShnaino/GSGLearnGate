@@ -14,6 +14,7 @@ import {
   inArray,
   asc,
   isNull,
+  not,
 } from "drizzle-orm";
 
 import {
@@ -75,6 +76,8 @@ import {
   Status,
   StudentSubmission,
   Role,
+  StudentTaskStatus,
+  StudentName,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorsTask, MonitorTasksResponse } from "@/types/tasks";
@@ -1376,15 +1379,18 @@ export async function getTasksByCourseId(
       taskId: tasksTable.id,
       taskTitle: tasksTable.title,
       deadline: tasksTable.deadline,
-      status: submissionsTable.status,
+      status: submissionsTable.status || StudentTaskStatus.PENDING,
       grade: submissionsTable.grade,
       gradedAt: submissionsTable.gradedAt,
       maxGrade: tasksTable.points,
+      coMonitor: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
     })
     .from(tasksTable)
     .innerJoin(coursesTable, eq(coursesTable.id, tasksTable.courseId))
-    .innerJoin(submissionsTable, eq(tasksTable.id, submissionsTable.taskId))
-    .innerJoin(studentsTable, eq(studentsTable.id, submissionsTable.studentId))
+    .leftJoin(coMonitorsTable, eq(coursesTable.coMonitorId, coMonitorsTable.id))
+    .leftJoin(usersTable, eq(coMonitorsTable.userId, usersTable.id))
+    .leftJoin(submissionsTable, eq(tasksTable.id, submissionsTable.taskId))
+    .leftJoin(studentsTable, eq(studentsTable.id, submissionsTable.studentId))
     .where(eq(coursesTable.id, courseId));
 
   return results.length > 0 ? results : null;
@@ -1816,8 +1822,8 @@ export async function getStudentAttendanceById(
 export async function getCommentsByTaskId(
   courseId: number,
   TaskId: number
-): Promise<Comments[]> {
-  const students = await db
+): Promise<Comments[] | null> {
+  const comments = await db
     .select({
       id: commentsTable.id,
       content: commentsTable.content,
@@ -1826,19 +1832,20 @@ export async function getCommentsByTaskId(
       createdAt: commentsTable.createdAt,
     })
     .from(commentsTable)
-    .innerJoin(usersTable, eq(usersTable.id, commentsTable.privateRecipientId))
+    .innerJoin(studentsTable, eq(studentsTable.id, commentsTable.studentId))
+    .innerJoin(usersTable, eq(usersTable.id, studentsTable.userId))
     .innerJoin(coursesTable, eq(coursesTable.id, commentsTable.courseId))
     .innerJoin(tasksTable, eq(tasksTable.id, commentsTable.taskId))
     .where(and(eq(coursesTable.id, courseId), eq(tasksTable.id, TaskId)))
     .all();
 
-  return students;
+  return comments ? comments : null;
 }
 
 export async function getSubmissionIdByTaskId(
   courseId: number,
   TaskId: number
-): Promise<{ submissionId: number }[]> {
+): Promise<{ submissionId: number }[] | null> {
   const SubmissionId = await db
     .select({
       submissionId: submissionsTable.id,
@@ -1848,7 +1855,7 @@ export async function getSubmissionIdByTaskId(
     .innerJoin(coursesTable, eq(coursesTable.id, tasksTable.courseId))
     .where(and(eq(coursesTable.id, courseId), eq(tasksTable.id, TaskId)));
 
-  return SubmissionId;
+  return SubmissionId ? SubmissionId : null;
 }
 
 export async function getStudentAnnouncementsById(
@@ -1929,7 +1936,7 @@ export async function getPublicCommentsByTaskId(
 export async function getAttachmentPathsByTaskId(
   taskId: number,
   courseId: number
-): Promise<StudentSubmission> {
+): Promise<StudentSubmission[]> {
   const attachments = await db
     .select({
       path: attachmentsTable.path,
@@ -1941,9 +1948,12 @@ export async function getAttachmentPathsByTaskId(
       eq(attachmentsTable.id, submissionsTable.attachmentId)
     )
     .innerJoin(coursesTable, eq(coursesTable.id, submissionsTable.courseId))
-    .where(eq(attachmentsTable.taskId, taskId))
-    .execute();
-
+    .where(
+      and(
+        eq(attachmentsTable.taskId, taskId),
+        eq(attachmentsTable.courseId, courseId)
+      )
+    );
   return attachments;
 }
 
@@ -2095,11 +2105,13 @@ export async function getCoursesWithStudentCountsByCoMonitor(
 export async function getNotStartedCoursesNotRegisteredByStudent(
   studentId: number
 ): Promise<StudentCourseBigCard[] | null> {
+  const monitorUsersTable = alias(usersTable, "monitor_users");
+
   const results = await db
     .select({
       id: coursesTable.id,
       title: coursesTable.title,
-      monitorName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+      monitorName: sql<string>`${monitorUsersTable.firstName} || ' ' || ${monitorUsersTable.lastName}`,
       startDate: coursesTable.courseStartDate,
       endDate: coursesTable.courseEndDate,
       duration: coursesTable.duration,
@@ -2114,20 +2126,26 @@ export async function getNotStartedCoursesNotRegisteredByStudent(
     .from(coursesTable)
     .leftJoin(
       studentsCoursesTable,
-      and(
-        eq(studentsCoursesTable.courseId, coursesTable.id),
-        eq(studentsCoursesTable.studentId, studentId)
-      )
+      eq(studentsCoursesTable.courseId, coursesTable.id)
     )
-    .innerJoin(monitorsTable, eq(coursesTable.monitorId, monitorsTable.id))
-    .innerJoin(usersTable, eq(monitorsTable.userId, usersTable.id))
+    .leftJoin(
+      studentsTable,
+      eq(studentsTable.id, studentsCoursesTable.studentId)
+    )
+    .leftJoin(usersTable, eq(studentsTable.userId, usersTable.id)) // الطالب
+    .leftJoin(monitorsTable, eq(monitorsTable.id, coursesTable.monitorId))
+    .leftJoin(monitorUsersTable, eq(monitorUsersTable.id, monitorsTable.userId)) // المونيتور
     .where(
       and(
         gt(
           coursesTable.courseStartDate,
           sql<number>`CAST(strftime('%s','now') AS INTEGER)`
         ),
-        isNull(studentsCoursesTable.studentId)
+        sql<boolean>`${coursesTable.id} NOT IN (
+          SELECT ${studentsCoursesTable.courseId}
+          FROM ${studentsCoursesTable}
+          WHERE ${studentsCoursesTable.studentId} = ${studentId}
+        )`
       )
     );
 
@@ -2214,4 +2232,17 @@ export async function getCoMonitorUserDetails(
     .get();
 
   return result || null;
+}
+export async function getStudentNameById(
+  studentId: number
+): Promise<StudentName[]> {
+  const result = await db
+    .select({
+      id: studentsTable.id,
+      name: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
+    })
+    .from(studentsTable)
+    .innerJoin(usersTable, eq(studentsTable.userId, usersTable.id))
+    .where(eq(studentsTable.id, studentId));
+  return result;
 }

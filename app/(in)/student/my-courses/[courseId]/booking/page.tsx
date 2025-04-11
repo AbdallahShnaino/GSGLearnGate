@@ -1,12 +1,14 @@
+import { getStudentIdFromCookie } from "@/app/lib/auth/getStudentIdFromCookie";
 import SelectStudentAppointmentTime from "@/components/SelectStudentAppointmentTime/SelectStudentAppointmentTime";
 import { getCoMonitorByCourseId } from "@/src/db/queries/select";
 import Link from "next/link";
 
 interface IProps {
-  params: Promise<{ studentId: string; courseId: string }>;
+  params: Promise<{ courseId: string }>;
 }
 const BookingPage = async (props: IProps) => {
-  const { studentId, courseId } = await props.params;
+  const { courseId } = await props.params;
+  const studentId = await getStudentIdFromCookie();
   const coMonitor = await getCoMonitorByCourseId(Number(courseId));
   return (
     <div className="w-full max-w-lg mx-auto bg-white shadow-lg rounded-2xl border border-gray-200 p-6 flex flex-col gap-4 mt-10">
@@ -27,11 +29,11 @@ const BookingPage = async (props: IProps) => {
 
       <SelectStudentAppointmentTime
         coMonitorId={coMonitor![0].coMonitorId}
-        studentId={studentId}
+        studentId={studentId!}
       />
 
       <Link
-        href={`/student/${studentId}/appointments`}
+        href={`/student/appointments`}
         className="text-center text-[#FFA41F] hover:underline mt-4"
       >
         View My Appointments
