@@ -59,7 +59,7 @@ export default function MonitorDashboard({
   return (
     <div className="flex min-h-screen">
       <Sidebar links={links} />
-      <main className="flex-grow px-4 py-6">
+      <main className="flex-grow">
         <div className="max-w-[1200px] mx-auto w-full">{children}</div>
       </main>
     </div>
