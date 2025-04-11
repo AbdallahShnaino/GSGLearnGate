@@ -44,13 +44,8 @@ const SelectStudentAppointmentTime = (props: IProps) => {
       if (!response.ok) {
         throw new Error("Failed to book appointment");
       }
-
-<<<<<<< Updated upstream
-      alert("Appointment booked successfully!");
-=======
       const result = await response.json();
       toast.success("Appointment booked successfully!", { autoClose: 3000 });
->>>>>>> Stashed changes
     } catch (err) {
       console.error("Booking failed:", err);
       toast.error("Failed to book appointment", { autoClose: 3000 });

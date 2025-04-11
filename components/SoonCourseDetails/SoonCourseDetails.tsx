@@ -33,14 +33,9 @@ const SoonCourseDetails = (props: IProps) => {
       if (!response.ok) {
         throw new Error("Request failed");
       }
-
-<<<<<<< Updated upstream
-      alert("Joining Request Sent Successfully");
-=======
       const result = await response.json();
       setRequestStatus(result.joiningStatus);
       toast.success("Joining Request Sent Successfully", { autoClose: 3000 });
->>>>>>> Stashed changes
     } catch {
       toast.error("Something went wrong!! Please try again...", {
         autoClose: 3000,
