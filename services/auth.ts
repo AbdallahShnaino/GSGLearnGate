@@ -1,4 +1,3 @@
-
 import { getUserByEmail } from "@/src/db/queries/select";
 import { Role } from "@/types";
 import { comparePassword } from "@/utils/crypt";
@@ -28,6 +27,7 @@ export async function createNewUser(
     },
     role: Role.STUDENT,
   });
+}
 
 export async function authenticateUser(email: string, password: string) {
   try {
@@ -40,7 +40,7 @@ export async function authenticateUser(email: string, password: string) {
         error: "User not found",
         userId: undefined,
         id: undefined,
-        role: undefined
+        role: undefined,
       };
     }
     const isPasswordValid = await comparePassword(password, user.password);
@@ -52,7 +52,7 @@ export async function authenticateUser(email: string, password: string) {
         error: "Incorrect password",
         userId: undefined,
         id: undefined,
-        role: undefined
+        role: undefined,
       };
     } else {
       return {
@@ -61,7 +61,7 @@ export async function authenticateUser(email: string, password: string) {
         error: undefined,
         userId: user.roleId,
         id: user.id,
-        role: user.role as Role
+        role: user.role as Role,
       };
     }
   } catch {
@@ -71,7 +71,7 @@ export async function authenticateUser(email: string, password: string) {
       error: "Internal server error",
       userId: undefined,
       id: undefined,
-      role: undefined
+      role: undefined,
     };
   }
 }

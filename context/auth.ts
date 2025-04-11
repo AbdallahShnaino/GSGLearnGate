@@ -22,28 +22,28 @@ export function getUserFromToken(token: string | null): AuthUser | null {
     const decodedToken = jwt.decode(token) as DecodedToken | null;
     if (decodedToken) {
       return {
-        email: decodedToken.email || '',
-        role: decodedToken.role || '',
+        email: decodedToken.email || "",
+        role: decodedToken.role || "",
         userId: Number(decodedToken.userId) || -1,
         id: Number(decodedToken.id) || -1,
       };
     }
-  } catch (error) {
-    console.error("Error decoding token:", error);
+  } catch {
+    throw new Error("CODE:1009");
   }
   return null;
 }
 
 export async function requireAuth(): Promise<AuthUser> {
   const cookieStore = await cookies();
-  const token = cookieStore.get('token')?.value;
+  const token = cookieStore.get("token")?.value;
   let user;
-  if(token){
+  if (token) {
     user = getUserFromToken(token);
   }
   if (!user) {
     throw new Error("User not authenticated");
   }
-  
+
   return user;
 }

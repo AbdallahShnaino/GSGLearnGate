@@ -16,7 +16,7 @@ interface IProps {
   coMonitors: UsersNames[];
 }
 const AddCourseForm = ({ monitors, coMonitors }: IProps) => {
-  const {user} = useAuth();
+  const { user } = useAuth();
   const initialState: CourseState = {
     success: false,
     error: "",

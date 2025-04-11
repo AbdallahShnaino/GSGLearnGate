@@ -4,14 +4,12 @@ import { createNewUser } from "@/services/auth";
 
 export type SubmitUserStatus =
   | {
-      // Failed status
       success: false;
       message: string;
       error: string;
       userId: undefined;
     }
   | {
-      // Success status
       success: true;
       message: string;
       error?: string;
@@ -37,7 +35,6 @@ export async function submitUser(
       userId: undefined,
     };
   }
-  // Make authentication (check if email is used)
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return {
@@ -51,8 +48,10 @@ export async function submitUser(
   if (!passwordRegex.test(password)) {
     return {
       success: false,
-      message: "Password must be at least 8 characters with at least one letter and one number",
-      error: "Password must be at least 8 characters with at least one letter and one number",
+      message:
+        "Password must be at least 8 characters with at least one letter and one number",
+      error:
+        "Password must be at least 8 characters with at least one letter and one number",
       userId: undefined,
     };
   }
@@ -71,7 +70,10 @@ export async function submitUser(
   const today = new Date();
   const age = today.getFullYear() - birthDate.getFullYear();
 
-  if (age < 16 || (age === 16 && today < new Date(birthDate.setFullYear(today.getFullYear())))) {
+  if (
+    age < 16 ||
+    (age === 16 && today < new Date(birthDate.setFullYear(today.getFullYear())))
+  ) {
     return {
       success: false,
       message: "You must be at least 16 years old to register",
@@ -79,7 +81,7 @@ export async function submitUser(
       userId: undefined,
     };
   }
-  
+
   const newUser = await createNewUser(
     city,
     dateOfBirth,
