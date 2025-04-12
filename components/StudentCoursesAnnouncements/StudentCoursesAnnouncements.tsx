@@ -43,7 +43,7 @@ const StudentCoursesAnnouncements = (props: IProps) => {
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 mb-10">
       <div className="space-y-2">
         <div className="flex flex-col justify-between gap-3">
           <label
@@ -72,7 +72,7 @@ const StudentCoursesAnnouncements = (props: IProps) => {
             className="bg-white shadow-lg rounded-xl border border-gray-200 p-6 w-full"
             key={announcement.id}
           >
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between items-center max-md:flex-col max-md:gap-3 max-md:items-start">
               <h3 className="text-2xl font-semibold text-[#FFA41F]">
                 {announcement.courseTitle}
               </h3>
@@ -89,9 +89,9 @@ const StudentCoursesAnnouncements = (props: IProps) => {
                 })}
               </p>
             </div>
-            <div className="flex justify-between items-end">
-              <p className="text-gray-700">{announcement.description}</p>
-              <p className="text-gray-700">
+            <div className="flex max-md:flex-col max-md:gap-8 justify-between ">
+              <p className="text-gray-700 flex-3">{announcement.description}</p>
+              <p className="text-gray-700 flex-1 text-end self-end">
                 Posted By: {announcement.postedBy}
               </p>
             </div>

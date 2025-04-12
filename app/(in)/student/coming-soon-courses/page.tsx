@@ -14,7 +14,7 @@ const ComingSoonCourses = async () => {
   );
 
   return (
-    <div className="px-6 py-3 w-full min-h-screen">
+    <div className="px-6 py-3 w-full min-h-screen mb-10">
       <h1 className="text-4xl font-bold text-gray-800 my-4">
         Coming Soon Courses
       </h1>
