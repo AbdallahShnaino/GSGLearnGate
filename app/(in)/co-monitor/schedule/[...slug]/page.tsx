@@ -129,7 +129,7 @@ export default function AttendanceEvaluationPage() {
                             <input
                               type="hidden"
                               name="monitorId"
-                              value={user.userId!}
+                              value={user.id!}
                             />
                             <input
                               type="hidden"
