@@ -1,8 +1,8 @@
 import AnnouncementsTable from "@/components/AnnouncementsTable/AnnouncementsTable";
-import { UserCircle } from "@phosphor-icons/react/dist/ssr";
+import { Newspaper, UserCircle } from "@phosphor-icons/react/dist/ssr";
 import { getMonitorCoursesNames } from "@/services/courses";
-import CreateTaskButton from "@/components/CreateTaskButtom/CreateTaskButtom";
 import { requireAuth } from "@/context/auth";
+import Link from "next/link";
 
 export default async function Page() {
   const { userId } = await requireAuth();
@@ -14,7 +14,12 @@ export default async function Page() {
       <div className="flex items-center justify-between p-2">
         <h1 className="text-xl font-semibold max-sm:text-sm">Announcements</h1>
         <div className="flex items-center gap-2">
-          <CreateTaskButton link="/monitor/announcements/create" />
+          <Link href="/monitor/announcements/create">
+            <button className="flex items-center gap-2 px-4 py-2 bg-[#FFA41F] text-white rounded-md hover:bg-[#F59000]">
+              <Newspaper size={18} />
+              <span>Post Announcement</span>
+            </button>
+          </Link>
           <span className="text-gray-600">Hi, monitor</span>
           <UserCircle size={32} weight="duotone" className="text-[#FFA41F]" />
         </div>

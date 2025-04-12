@@ -2,7 +2,7 @@ import React from "react";
 import CardFooter from "@/components/CardFooter/CardFooter";
 import TaskCardDetails from "@/components/TaskCardDetails/TaskCardDetails";
 import { getTask } from "@/services/task";
-import { Task } from "@/types";
+import { Role, Task } from "@/types";
 import { getAttachmentForTask } from "@/services/attachment";
 import PublicComments from "@/components/Comments/PublicComments";
 interface IProps {
@@ -28,7 +28,7 @@ const page = async ({ params }: IProps) => {
           title={task.title}
           paths={[submission[0] && submission[0].path]}
         />
-        <PublicComments taskId={Number(taskId)} roles={"monitor"} />
+        <PublicComments taskId={Number(taskId)} roles={Role.MONITOR} />
       </div>
 
       <CardFooter taskId={Number(taskId)} Link={"/monitor/tasks/submissions"} />
