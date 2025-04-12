@@ -464,6 +464,7 @@ export type Comments = {
   userName: string;
   isPublic: boolean;
   createdAt: string;
+  submissionId: number | null;
 };
 
 export type SubmissionId = {

@@ -1877,6 +1877,7 @@ export async function getCommentsByTaskId(
       userName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
       isPublic: commentsTable.isPublic,
       createdAt: commentsTable.createdAt,
+      submissionId: commentsTable.submissionId,
     })
     .from(commentsTable)
     .innerJoin(studentsTable, eq(studentsTable.id, commentsTable.studentId))
