@@ -1,7 +1,7 @@
 import { getLimitCoursesByStudent } from "@/src/db/queries/select";
 
 interface IProps {
-  studentId: string;
+  studentId: number;
 }
 const Table = async (props: IProps) => {
   const courses = await getLimitCoursesByStudent(Number(props.studentId));

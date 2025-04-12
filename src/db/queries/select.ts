@@ -76,6 +76,8 @@ import {
   Role,
   StudentTaskStatus,
   StudentName,
+  SubmissionId,
+  SubmissionIdNum,
 } from "@/types/index";
 import { alias } from "drizzle-orm/sqlite-core";
 import { MonitorsTask, MonitorTasksResponse } from "@/types/tasks";
@@ -622,24 +624,21 @@ export async function getMonitorTasksDeadlines(
   return deadlines;
 }
 export async function getCoMonitorTasksDeadlines(
-  coMonitorId: number
+  userId: number
 ): Promise<Date[]> {
   const results = await db
     .select({
       deadline: tasksTable.deadline,
     })
     .from(tasksTable)
-    .innerJoin(
-      coMonitorsTable,
-      eq(coMonitorsTable.userId, tasksTable.creatorId)
-    )
-    .where(eq(coMonitorsTable.userId, coMonitorId));
+    .where(eq(tasksTable.creatorId, userId));
 
   const deadlines = results.map(
     (result: { deadline: string | number | Date }) => new Date(result.deadline)
   );
   return deadlines;
 }
+
 export async function getMonitorSubmissionsNotGradedCount(
   userId: number
 ): Promise<number> {
@@ -842,7 +841,7 @@ export async function getTaskSubmissionStatsByCoMonitor(
 }
 
 export async function getTasksByCoMonitor(
-  coMonitorId: number,
+  userId: number,
   status: TaskStatus,
   page: number = 1,
   pageSize: number = 10
@@ -851,7 +850,7 @@ export async function getTasksByCoMonitor(
   const now = new Date().toISOString().replace("T", " ").slice(0, 19);
 
   const whereCondition = and(
-    eq(coMonitorsTable.userId, coMonitorId),
+    eq(tasksTable.creatorId, userId),
     status === TaskStatus.IN_PROGRESS
       ? and(
           lte(tasksTable.startedAt, now),
@@ -867,10 +866,6 @@ export async function getTasksByCoMonitor(
       total: sql<number>`count(distinct ${tasksTable.id})`.as("total"),
     })
     .from(tasksTable)
-    .innerJoin(
-      coMonitorsTable,
-      eq(coMonitorsTable.userId, tasksTable.creatorId)
-    )
     .where(whereCondition)
     .execute();
 
@@ -903,10 +898,6 @@ export async function getTasksByCoMonitor(
       `.as("student_count"),
     })
     .from(tasksTable)
-    .innerJoin(
-      coMonitorsTable,
-      eq(coMonitorsTable.userId, tasksTable.creatorId)
-    )
     .leftJoin(coursesTable, eq(tasksTable.courseId, coursesTable.id))
     .where(whereCondition)
     .limit(pageSize)
@@ -1192,7 +1183,7 @@ export async function getLateSubmissionsCountByMonitor(userId: number) {
 
   return result[0]?.count ?? 0;
 }
-export async function getLateSubmissionsCountByCoMonitor(coMonitorId: number) {
+export async function getLateSubmissionsCountByCoMonitor(userId: number) {
   const result = await db
     .select({ count: count() })
     .from(submissionsTable)
@@ -1200,7 +1191,7 @@ export async function getLateSubmissionsCountByCoMonitor(coMonitorId: number) {
     .innerJoin(coursesTable, eq(submissionsTable.courseId, coursesTable.id))
     .where(
       and(
-        eq(coursesTable.coMonitorId, coMonitorId),
+        eq(tasksTable.creatorId, userId),
         gt(submissionsTable.createdAt, tasksTable.deadline)
       )
     );
@@ -1886,6 +1877,7 @@ export async function getCommentsByTaskId(
       userName: sql<string>`${usersTable.firstName} || ' ' || ${usersTable.lastName}`,
       isPublic: commentsTable.isPublic,
       createdAt: commentsTable.createdAt,
+      submissionId: commentsTable.submissionId,
     })
     .from(commentsTable)
     .innerJoin(studentsTable, eq(studentsTable.id, commentsTable.studentId))
@@ -1992,7 +1984,7 @@ export async function getPublicCommentsByTaskId(
 export async function getAttachmentPathsByTaskId(
   taskId: number,
   courseId: number
-): Promise<StudentSubmission[]> {
+): Promise<StudentSubmission[] | null> {
   const attachments = await db
     .select({
       path: attachmentsTable.path,
@@ -2010,7 +2002,7 @@ export async function getAttachmentPathsByTaskId(
         eq(attachmentsTable.courseId, courseId)
       )
     );
-  return attachments;
+  return attachments ? attachments : null;
 }
 
 export async function getStudentsListByCourseId(
@@ -2164,7 +2156,7 @@ export async function getNotStartedCoursesNotRegisteredByStudent(
   const monitorUsersTable = alias(usersTable, "monitor_users");
 
   const results = await db
-    .select({
+    .selectDistinct({
       id: coursesTable.id,
       title: coursesTable.title,
       monitorName: sql<string>`${monitorUsersTable.firstName} || ' ' || ${monitorUsersTable.lastName}`,
@@ -2301,4 +2293,19 @@ export async function getStudentNameById(
     .innerJoin(usersTable, eq(studentsTable.userId, usersTable.id))
     .where(eq(studentsTable.id, studentId));
   return result;
+}
+
+export async function getSubmissionByCourseAndTask(
+  courseId: number,
+  taskId: number
+): Promise<SubmissionIdNum | null> {
+  const result = await db
+    .select({
+      id: submissionsTable.id,
+    })
+    .from(submissionsTable)
+    .innerJoin(coursesTable, eq(coursesTable.id, submissionsTable.courseId))
+    .innerJoin(tasksTable, eq(tasksTable.courseId, coursesTable.id))
+    .where(and(eq(tasksTable.id, taskId), eq(coursesTable.id, courseId)));
+  return result ? result[0] : null;
 }

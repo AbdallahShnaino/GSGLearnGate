@@ -1,14 +1,20 @@
 "use client";
 
 import { Status, StudentCourseDetails } from "@/types";
+import { useState } from "react";
+import { toast } from "react-toastify";
 
 interface IProps {
   courseData: StudentCourseDetails[];
-  studentId: string;
+  studentId: number;
   soonCourseId: string;
   requestStatus: Status | null;
 }
 const SoonCourseDetails = (props: IProps) => {
+  const [requestStatus, setRequestStatus] = useState<Status | null>(
+    props.requestStatus
+  );
+
   const handleRegister = async () => {
     try {
       const response = await fetch("/api/student/joinRequests", {
@@ -27,10 +33,13 @@ const SoonCourseDetails = (props: IProps) => {
       if (!response.ok) {
         throw new Error("Request failed");
       }
-
-      alert("Joining Request Sent Successfully");
+      const result = await response.json();
+      setRequestStatus(result.joiningStatus);
+      toast.success("Joining Request Sent Successfully", { autoClose: 3000 });
     } catch {
-      alert("Something went wrong!! Please try again...");
+      toast.error("Something went wrong!! Please try again...", {
+        autoClose: 3000,
+      });
     }
   };
 
@@ -88,7 +97,7 @@ const SoonCourseDetails = (props: IProps) => {
         </div>
       </div>
 
-      {!props.requestStatus ? (
+      {!requestStatus ? (
         <div className="mt-8 flex justify-center">
           <button
             onClick={handleRegister}

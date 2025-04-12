@@ -1,5 +1,5 @@
-import { getStudentIdFromCookie } from "@/app/lib/auth/getStudentIdFromCookie";
 import SelectStudentAppointmentTime from "@/components/SelectStudentAppointmentTime/SelectStudentAppointmentTime";
+import { requireAuth } from "@/context/auth";
 import { getCoMonitorByCourseId } from "@/src/db/queries/select";
 import Link from "next/link";
 
@@ -8,7 +8,8 @@ interface IProps {
 }
 const BookingPage = async (props: IProps) => {
   const { courseId } = await props.params;
-  const studentId = await getStudentIdFromCookie();
+  const data = await requireAuth();
+  const studentId = data.userId;
   const coMonitor = await getCoMonitorByCourseId(Number(courseId));
   return (
     <div className="w-full max-w-lg mx-auto bg-white shadow-lg rounded-2xl border border-gray-200 p-6 flex flex-col gap-4 mt-10">
@@ -29,7 +30,7 @@ const BookingPage = async (props: IProps) => {
 
       <SelectStudentAppointmentTime
         coMonitorId={coMonitor![0].coMonitorId}
-        studentId={studentId!}
+        studentId={studentId}
       />
 
       <Link

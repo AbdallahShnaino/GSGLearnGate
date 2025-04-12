@@ -4,7 +4,7 @@ import Link from "next/link";
 interface IProps {
   task: StudentCourseTasks;
   courseId: string;
-  studentId: string;
+  studentId: number;
 }
 const TaskCard = (props: IProps) => {
   const statusBg = {

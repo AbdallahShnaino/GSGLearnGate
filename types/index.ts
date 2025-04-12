@@ -464,6 +464,7 @@ export type Comments = {
   userName: string;
   isPublic: boolean;
   createdAt: string;
+  submissionId: number | null;
 };
 
 export type SubmissionId = {
@@ -497,4 +498,8 @@ export type StudentSubmission = {
 export type StudentName = {
   id: number;
   name: string;
+};
+
+export type SubmissionIdNum = {
+  id: string | null;
 };

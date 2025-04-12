@@ -26,12 +26,9 @@ export default function AnnouncementsTable({ monitorCoursesList }: IProps) {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="bg-white rounded-xl shadow-lg p-6">
+    <div className="w-full mx-auto mt-4 mb-10 border-1 border-gray-300 rounded-md overflow-hidden shadow-md">
+      <div className="bg-white rounded-xl shadow-lg p-5">
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            Announcements
-          </h2>
           <div className="max-w-xs">
             <SelectCourse
               options={monitorCoursesList}
@@ -43,7 +40,7 @@ export default function AnnouncementsTable({ monitorCoursesList }: IProps) {
 
         {announcements && announcements.length > 0 ? (
           <div>
-            <ul className="space-y-4">
+            <ul className="grid grid-cols-[repeat(auto-fill,_minmax(300px,_1fr))] gap-8">
               {announcements.map((announcement) => (
                 <li
                   key={announcement.id}
