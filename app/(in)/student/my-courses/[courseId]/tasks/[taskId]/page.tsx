@@ -5,6 +5,7 @@ import { requireAuth } from "@/context/auth";
 import {
   getCommentsByTaskId,
   getStudentNameById,
+  getSubmissionIdByTaskId,
   getTaskByTaskId,
 } from "@/src/db/queries/select";
 
@@ -18,6 +19,10 @@ const Task = async (props: IProps) => {
   const taskDetails = await getTaskByTaskId(Number(taskId));
   const comments = await getCommentsByTaskId(Number(courseId), Number(taskId));
   const studentName = await getStudentNameById(Number(studentId));
+  const submissionId = await getSubmissionIdByTaskId(
+    Number(courseId),
+    Number(taskId)
+  );
 
   return (
     <div className="min-h-screen bg-[#FFF5E8] p-6 w-full">
@@ -104,6 +109,7 @@ const Task = async (props: IProps) => {
             courseId={courseId}
             taskId={taskId}
             studentName={studentName}
+            submissionId={submissionId![0]?.submissionId || null}
           />
         </div>
       </div>

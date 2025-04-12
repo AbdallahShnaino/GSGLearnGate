@@ -10,6 +10,7 @@ interface IProps {
   courseId: string;
   taskId: string;
   studentName: StudentName[];
+  submissionId: number | null;
 }
 const StudentPrivateComments = (props: IProps) => {
   const [content, setContent] = useState("");
@@ -62,7 +63,7 @@ const StudentPrivateComments = (props: IProps) => {
             taskId: Number(props.taskId),
             courseId: Number(props.courseId),
             isPublic: false,
-            submissionId: submissionId,
+            submissionId: props.submissionId,
           }),
         });
 
@@ -92,7 +93,12 @@ const StudentPrivateComments = (props: IProps) => {
       <div className="space-y-4">
         {comments &&
           comments
-            .filter((comment) => !comment.isPublic)
+            .filter(
+              (comment) =>
+                !comment.isPublic &&
+                (props.submissionId == null ||
+                  comment.submissionId === props.submissionId)
+            )
             .map((comment) => {
               return (
                 <div
