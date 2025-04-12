@@ -3,7 +3,7 @@ import Link from "next/link";
 
 interface IProps {
   course: StudentCourseBigCard;
-  studentId: string;
+  studentId: number;
 }
 const NotRegisteredCourseCard = (props: IProps) => {
   return (

@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 
 interface IProps {
   courseData: StudentCourseDetails[];
-  studentId: string;
+  studentId: number;
   soonCourseId: string;
   requestStatus: Status | null;
 }

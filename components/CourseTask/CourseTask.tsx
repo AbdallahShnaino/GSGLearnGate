@@ -6,7 +6,7 @@ interface IProps {
   task: StudentCourseTasks;
   number: number;
   courseId: string;
-  studentId: string;
+  studentId: number;
 }
 const CourseTask = (props: IProps) => {
   return (

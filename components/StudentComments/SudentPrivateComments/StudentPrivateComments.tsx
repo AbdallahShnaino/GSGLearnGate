@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 
 interface IProps {
   comments: Comments[] | null;
-  studentId: string;
+  studentId: number;
   courseId: string;
   taskId: string;
   studentName: StudentName[];
@@ -15,6 +15,7 @@ const StudentPrivateComments = (props: IProps) => {
   const [content, setContent] = useState("");
   const [comments, setComments] = useState<Comments[] | null>(props.comments);
   const [submissionId, setSubmissionId] = useState<number | null>(null);
+
   const fetchSubmission = async () => {
     try {
       const res = await fetch("/api/student/getSubmission", {
@@ -32,20 +33,21 @@ const StudentPrivateComments = (props: IProps) => {
       }
 
       const data = await res.json();
-
       if (data === null || data.id === null) {
-        console.log("No submission found");
         setSubmissionId(null);
       } else {
-        setSubmissionId(Number(data.id));
+        const number = Number(data.id);
+        setSubmissionId(number);
       }
     } catch (error) {
       console.error("Error fetching submission:", error);
     }
   };
+
   useEffect(() => {
     fetchSubmission();
   }, [props.courseId, props.taskId]);
+
   const handleClick = async () => {
     if (content !== "" && submissionId !== null) {
       try {
@@ -77,7 +79,9 @@ const StudentPrivateComments = (props: IProps) => {
         toast.error("Comment Added Successfully", { autoClose: 3000 });
       }
     } else {
-      toast.warning("Add Content then post comment", { autoClose: 3000 });
+      toast.warning("Add Submission and Content then post comment", {
+        autoClose: 3000,
+      });
     }
   };
   return submissionId ? (

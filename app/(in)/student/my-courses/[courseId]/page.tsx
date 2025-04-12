@@ -1,5 +1,5 @@
-import { getStudentIdFromCookie } from "@/app/lib/auth/getStudentIdFromCookie";
 import CourseTask from "@/components/CourseTask/CourseTask";
+import { requireAuth } from "@/context/auth";
 import {
   getCoursesById,
   getStudentAttendanceById,
@@ -13,7 +13,8 @@ interface IProps {
 }
 const CourseDetails = async (props: IProps) => {
   const { courseId } = await props.params;
-  const studentId = await getStudentIdFromCookie();
+  const data = await requireAuth();
+  const studentId = data.userId;
   const courseData = await getCoursesById(Number(courseId));
   const courseTasks = await getTasksByCourseId(Number(courseId));
   const attendancesNumber = await getStudentAttendanceById(
@@ -108,7 +109,7 @@ const CourseDetails = async (props: IProps) => {
                       task={task}
                       number={index + 1}
                       courseId={courseId}
-                      studentId={studentId!}
+                      studentId={studentId}
                     />
                   );
                 })

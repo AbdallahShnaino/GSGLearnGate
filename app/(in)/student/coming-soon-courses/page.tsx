@@ -1,9 +1,10 @@
 import NotRegisteredCourseCard from "@/components/NotRegisteredCourseCard/NotRegisteredCourseCard";
 import { getNotStartedCoursesNotRegisteredByStudent } from "@/src/db/queries/select";
-import { getStudentIdFromCookie } from "@/app/lib/auth/getStudentIdFromCookie";
+import { requireAuth } from "@/context/auth";
 
 const ComingSoonCourses = async () => {
-  const studentId = await getStudentIdFromCookie();
+  const data = await requireAuth();
+  const studentId = data.userId;
 
   const courses = await getNotStartedCoursesNotRegisteredByStudent(
     Number(studentId)
@@ -23,7 +24,7 @@ const ComingSoonCourses = async () => {
             <NotRegisteredCourseCard
               key={course.id}
               course={course}
-              studentId={studentId!}
+              studentId={studentId}
             />
           ))
         ) : (

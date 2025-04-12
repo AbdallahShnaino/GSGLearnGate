@@ -1,7 +1,7 @@
-import { getStudentIdFromCookie } from "@/app/lib/auth/getStudentIdFromCookie";
 import StudentPublicComments from "@/components/StudentComments/StudentPublicComments/StudentPublicComments";
 import StudentPrivateComments from "@/components/StudentComments/SudentPrivateComments/StudentPrivateComments";
 import TaskSubmit from "@/components/TaskSubmit/TaskSubmit";
+import { requireAuth } from "@/context/auth";
 import {
   getCommentsByTaskId,
   getStudentNameById,
@@ -12,15 +12,12 @@ interface IProps {
   params: Promise<{ courseId: string; taskId: string }>;
 }
 const Task = async (props: IProps) => {
-  const studentId = await getStudentIdFromCookie();
+  const data = await requireAuth();
+  const studentId = data.userId;
   const { courseId, taskId } = await props.params;
   const taskDetails = await getTaskByTaskId(Number(taskId));
   const comments = await getCommentsByTaskId(Number(courseId), Number(taskId));
   const studentName = await getStudentNameById(Number(studentId));
-  // const submissionId = await getSubmissionIdByTaskId(
-  //   Number(courseId),
-  //   Number(taskId)
-  // );
 
   return (
     <div className="min-h-screen bg-[#FFF5E8] p-6 w-full">
@@ -39,8 +36,13 @@ const Task = async (props: IProps) => {
             Created By: {taskDetails![0].creator}
           </p>
           <p className="text-sm text-neutral-700">
-            Created At: {taskDetails![0].createdAt.slice(0, 16)} (last update:{" "}
-            {taskDetails![0].updatedAt.slice(0, 16)})
+            Created At: {taskDetails![0].createdAt.slice(0, 16)}
+            {taskDetails![0].createdAt.slice(0, 16) !==
+              taskDetails![0].updatedAt.slice(0, 16) && (
+              <span className="text-sm text-neutral-700">
+                last update: {taskDetails![0].updatedAt.slice(0, 16)}
+              </span>
+            )}
           </p>
           <p className="text-sm text-neutral-700">
             Deadline: {taskDetails![0].deadline.toLocaleDateString("en-GB")}{" "}
@@ -81,11 +83,10 @@ const Task = async (props: IProps) => {
 
           <StudentPublicComments
             comments={comments}
-            studentId={studentId!}
+            studentId={studentId}
             courseId={courseId}
             taskId={taskId}
             studentName={studentName}
-            // submissionId={submissionId![0].submissionId}
           />
         </div>
 
@@ -94,16 +95,15 @@ const Task = async (props: IProps) => {
             deadline={taskDetails![0].deadline}
             taskId={taskId}
             courseId={courseId}
-            studentId={studentId!}
+            studentId={studentId}
           />
 
           <StudentPrivateComments
             comments={comments}
-            studentId={studentId!}
+            studentId={studentId}
             courseId={courseId}
             taskId={taskId}
             studentName={studentName}
-            // submissionId={submissionId![0].submissionId}
           />
         </div>
       </div>

@@ -1994,7 +1994,7 @@ export async function getPublicCommentsByTaskId(
 export async function getAttachmentPathsByTaskId(
   taskId: number,
   courseId: number
-): Promise<StudentSubmission[]> {
+): Promise<StudentSubmission[] | null> {
   const attachments = await db
     .select({
       path: attachmentsTable.path,
@@ -2012,7 +2012,7 @@ export async function getAttachmentPathsByTaskId(
         eq(attachmentsTable.courseId, courseId)
       )
     );
-  return attachments;
+  return attachments ? attachments : null;
 }
 
 export async function getStudentsListByCourseId(
@@ -2166,7 +2166,7 @@ export async function getNotStartedCoursesNotRegisteredByStudent(
   const monitorUsersTable = alias(usersTable, "monitor_users");
 
   const results = await db
-    .select({
+    .selectDistinct({
       id: coursesTable.id,
       title: coursesTable.title,
       monitorName: sql<string>`${monitorUsersTable.firstName} || ' ' || ${monitorUsersTable.lastName}`,
