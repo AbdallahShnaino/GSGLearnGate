@@ -73,5 +73,21 @@ GSGLearnGate supports multiple user roles with defined permissions, streamlining
 ```git clone https://github.com/AbdallahShnaino/GSGLearnGate.git ```
 
 ``` npm install ``` 
+
+## Team Members 
+[Abdallah Shnaino](https://github.com/AbdallahShnaino)
+
+[Alaa Mousa](https://github.com/AlaaMousa05)
+
+[Mohammad Khudary](https://github.com/Mohammad200326)
+
+[Mohammad Qashqesh](https://github.com/M7mdQashqesh)
+
+[Tasneem Ghazal](https://github.com/Tasneemghazal)
+
+## Team Ranking
+![image](https://github.com/user-attachments/assets/70dc8ea5-7b77-4abd-89d7-d95cbe616aae)
+ 
+
 ## 🤝 Acknowledgments
 GSGLearnGate is developed for Gaza Sky Geeks to support a future of seamless, collaborative, and empowering education.
